@@ -1,23 +1,39 @@
 [gd_resource type="Resource" script_class="QuestData" format=3]
 
-[ext_resource type="Script" path="res://game/items/item_stack.gd" id="1_fbcap"]
-[ext_resource type="Resource" path="res://game/items/data/healing_herb.tres" id="2_p6vjn"]
-[ext_resource type="Script" path="res://game/quests/quest_data.gd" id="3_bjvnn"]
+[ext_resource type="Script" path="res://game/items/item_stack.gd" id="1_bjvnn"]
+[ext_resource type="Resource" path="res://game/items/data/mana_potion.tres" id="2_n2tmu"]
+[ext_resource type="Script" path="res://game/quests/quest_data.gd" id="3_qgett"]
+[ext_resource type="Script" path="res://game/quests/quest_step.gd" id="4_e68ti"]
+[ext_resource type="Resource" path="res://game/items/data/healing_herb.tres" id="5_ryqr6"]
 
-[sub_resource type="Resource" id="Resource_n2tmu"]
-script = ExtResource("1_fbcap")
-item = ExtResource("2_p6vjn")
+[sub_resource type="Resource" id="Resource_75p18"]
+script = ExtResource("1_bjvnn")
+item = ExtResource("2_n2tmu")
 count = 2
 
-[resource]
-script = ExtResource("3_bjvnn")
-id = &"clear_the_hall"
-title = "Ameaça no salão"
-description = "Derrote 3 inimigos."
+[sub_resource type="Resource" id="Resource_l11yr"]
+script = ExtResource("4_e68ti")
+description = "Derrote 3 inimigos"
 target_kind = &"basic_enemy"
 required_count = 3
-reward_xp = 40
-reward_items = Array[ExtResource("1_fbcap")]([SubResource("Resource_n2tmu")])
-offer_lines = Array[String](["Você aí! Criaturas tomaram o salão adiante.", "Derrote três delas e eu te recompenso."])
-in_progress_lines = Array[String](["Ainda há criaturas no salão. Volte quando tiver derrotado três."])
-complete_lines = Array[String](["Muito bem! Tome, você mereceu."])
+in_progress_lines = Array[String](["Ainda há criaturas no salão. Derrote três."])
+advance_lines = Array[String](["Muito bem. Mas há feridos aqui.", "Traga duas ervas medicinais."])
+
+[sub_resource type="Resource" id="Resource_cskit"]
+script = ExtResource("4_e68ti")
+description = "Traga 2 ervas medicinais"
+objective = 1
+target_item = ExtResource("5_ryqr6")
+required_count = 2
+in_progress_lines = Array[String](["Preciso de duas ervas medicinais."])
+
+[resource]
+script = ExtResource("3_qgett")
+id = &"clear_the_hall"
+title = "Ameaça no salão"
+description = "Derrote as criaturas e ajude os feridos."
+steps = Array[ExtResource("4_e68ti")]([SubResource("Resource_l11yr"), SubResource("Resource_cskit")])
+reward_xp = 60
+reward_items = Array[ExtResource("1_bjvnn")]([SubResource("Resource_75p18")])
+offer_lines = Array[String](["Você aí! Criaturas tomaram o salão adiante.", "Derrote três delas e volte aqui."])
+complete_lines = Array[String](["Obrigado. Tome, você mereceu."])

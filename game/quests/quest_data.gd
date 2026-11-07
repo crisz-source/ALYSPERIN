@@ -1,27 +1,22 @@
 class_name QuestData
 extends Resource
-## Missão: objetivo, recompensa e as falas de quem a oferece.
+## Missão: uma ou mais etapas, a recompensa (só ao entregar tudo) e as falas.
 ## PROVISÓRIO quanto ao conteúdo (textos e números); a estrutura é a base.
-
-enum Objective { KILL, COLLECT }
+##
+## Marcadores no NPC: "!" missão nova; nada enquanto a etapa está em andamento;
+## "?" etapa cumprida e há continuação; "*" última etapa cumprida, pronta para entregar.
 
 @export var id: StringName
 @export var title: String = ""
 @export_multiline var description: String = ""
-
-@export_group("Objetivo")
-@export var objective: Objective = Objective.KILL
-## KILL: tipo de inimigo (BasicEnemy.kind). Vazio = qualquer inimigo.
-@export var target_kind: StringName = &""
-## COLLECT: item a entregar (sai da bolsa ao concluir).
-@export var target_item: ItemData
-@export var required_count: int = 1
+@export var steps: Array[QuestStep] = []
 
 @export_group("Recompensa")
 @export var reward_xp: int = 0
 @export var reward_items: Array[ItemStack] = []
 
 @export_group("Falas")
+## Ao oferecer a missão (aceita ao fim da conversa).
 @export var offer_lines: Array[String] = []
-@export var in_progress_lines: Array[String] = []
+## Ao entregar a missão completa.
 @export var complete_lines: Array[String] = []

@@ -52,6 +52,7 @@ func bind_player(player: Player) -> void:
 	player.quest_log.quest_started.connect(func(_q: QuestData) -> void: _update_quest_tracker())
 	player.quest_log.quest_progressed.connect(func(_q: QuestData, _p: int) -> void: _update_quest_tracker())
 	player.quest_log.quest_completed.connect(func(_q: QuestData) -> void: _update_quest_tracker())
+	player.quest_log.quest_step_advanced.connect(func(_q: QuestData, _s: int) -> void: _update_quest_tracker())
 	_update_quest_tracker()
 	_on_mana_changed(player.mana.current(), player.mana.max_mana)
 
@@ -179,10 +180,14 @@ func _update_quest_tracker() -> void:
 		_quest_tracker.text = ""
 		return
 	var quest: QuestData = active[0]
-	if _player.quest_log.is_ready(quest):
+	var log_ref: QuestLog = _player.quest_log
+	var step: QuestStep = log_ref.current_step(quest)
+	if log_ref.is_ready(quest):
 		_quest_tracker.text = "Missão: %s\nConcluída! Volte para entregar." % quest.title
+	elif log_ref.is_step_done(quest):
+		_quest_tracker.text = "Missão: %s\nVolte e fale com quem pediu." % quest.title
 	else:
-		_quest_tracker.text = "Missão: %s (%d/%d)" % [quest.title, _player.quest_log.progress_of(quest), quest.required_count]
+		_quest_tracker.text = "Missão: %s\n%s (%d/%d)" % [quest.title, step.description, log_ref.progress_of(quest), step.required_count]
 
 
 func _on_mana_changed(current: int, maximum: int) -> void:

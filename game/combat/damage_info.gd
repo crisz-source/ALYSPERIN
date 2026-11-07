@@ -14,6 +14,8 @@ var knockback: Vector2 = Vector2.ZERO
 var source: Node = null
 ## Marcado pelo HealthComponent quando quem apanha bloqueou o golpe (sem dano).
 var blocked: bool = false
+## Marcado quando o golpe acertou pelas costas (dano maior).
+var backstab: bool = false
 
 
 func _init(p_amount: int = 0, p_knockback: Vector2 = Vector2.ZERO, p_source: Node = null) -> void:

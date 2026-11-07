@@ -29,7 +29,8 @@ conhecidos. Detalhes técnicos de cada etapa ficam em `documentation/worklog/`.
 | 2026-11-07 | Interagir na tecla F (antes E); barra de habilidades no centro embaixo com 21 espaços: 1-9 e F1-F12 |
 | 2026-11-07 | Inventário na tecla I (antes Tab); consumíveis podem ser arrastados para a barra de habilidades |
 | 2026-11-07 | Barra de vida dos monstros sempre visível; números de dano na tela |
-| 2026-11-07 | Marcadores de missão: ! nova, ? em andamento, * pronta para entregar |
+| 2026-11-07 | Missões em etapas. Marcadores: ! nova; nada em andamento; ? etapa cumprida com continuação; * pronta para entregar (recompensa só no fim) |
+| 2026-11-07 | Golpe pelas costas de monstros/chefes causa x1,5 (número laranja); inimigo mostra a frente com uma seta |
 | 2026-11-07 | Chefes aprovados; Fúria aos 70%, 50% e 20% de vida; óleos de arma aprovados |
 | 2026-11-07 | ~~Morrer recomeça a área do zero~~ → substituído: morrer mostra "Você morreu!" / "Deseja continuar?"; Sim volta ao último ponto de descanso mantendo itens e experiência |
 

@@ -27,6 +27,9 @@ var _invulnerable_flag: bool = false
 ## bloqueado. Quem sabe se está defendendo é o dono (ex.: Player), mas a
 ## decisão final continua passando por apply_damage().
 var block_filter: Callable
+## Opcional: func(info: DamageInfo) -> void que pode alterar info.amount antes
+## do dano (ex.: golpe pelas costas). Quem sabe para onde está virado é o dono.
+var damage_modifier: Callable
 
 
 func _ready() -> void:
@@ -62,6 +65,8 @@ func apply_damage(info: DamageInfo) -> bool:
 		info.blocked = true
 		blocked.emit(info)
 		return false
+	if damage_modifier.is_valid():
+		damage_modifier.call(info)
 	current_health = maxi(current_health - info.amount, 0)
 	damaged.emit(info)
 	health_changed.emit(current_health, max_health)

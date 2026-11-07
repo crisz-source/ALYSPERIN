@@ -2,37 +2,37 @@
 
 [ext_resource type="Script" path="res://game/ui/hud/hud.gd" id="1_d4vpa"]
 
-[node name="Hud" type="CanvasLayer" unique_id=948028180]
+[node name="Hud" type="CanvasLayer" unique_id=1524649923]
 script = ExtResource("1_d4vpa")
 
-[node name="HelpPlaceholder" type="Label" parent="." unique_id=661677451]
+[node name="HelpPlaceholder" type="Label" parent="." unique_id=650844418]
 offset_left = 8.0
 offset_top = 298.0
 offset_right = 8.0
 offset_bottom = 298.0
 theme_override_font_sizes/font_size = 8
 
-[node name="PlayerHealth" type="ColorRect" parent="." unique_id=1727161250]
+[node name="PlayerHealth" type="ColorRect" parent="." unique_id=2009947942]
 offset_left = 8.0
 offset_top = 8.0
 offset_right = 88.0
 offset_bottom = 14.0
 color = Color(0.1, 0.1, 0.1, 1)
 
-[node name="Fill" type="ColorRect" parent="PlayerHealth" unique_id=547552670]
+[node name="Fill" type="ColorRect" parent="PlayerHealth" unique_id=257941466]
 layout_mode = 0
 offset_right = 80.0
 offset_bottom = 6.0
 color = Color(0.3, 0.8, 0.35, 1)
 
-[node name="MessageBox" type="ColorRect" parent="." unique_id=429260404]
+[node name="MessageBox" type="ColorRect" parent="." unique_id=362714626]
 offset_left = 120.0
 offset_top = 250.0
 offset_right = 520.0
 offset_bottom = 290.0
 color = Color(0.05, 0.05, 0.08, 0.85)
 
-[node name="Text" type="Label" parent="MessageBox" unique_id=754197586]
+[node name="Text" type="Label" parent="MessageBox" unique_id=850797631]
 layout_mode = 0
 offset_left = 8.0
 offset_top = 4.0
@@ -43,25 +43,25 @@ horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
 
-[node name="AbilityBar" type="Control" parent="." unique_id=1888924916]
+[node name="AbilityBar" type="Control" parent="." unique_id=647667260]
 layout_mode = 3
 anchors_preset = 0
 mouse_filter = 2
 
-[node name="PlayerMana" type="ColorRect" parent="." unique_id=82808810]
+[node name="PlayerMana" type="ColorRect" parent="." unique_id=736369380]
 offset_left = 8.0
 offset_top = 15.0
 offset_right = 88.0
 offset_bottom = 18.0
 color = Color(0.1, 0.1, 0.1, 1)
 
-[node name="Fill" type="ColorRect" parent="PlayerMana" unique_id=165611409]
+[node name="Fill" type="ColorRect" parent="PlayerMana" unique_id=1332919025]
 layout_mode = 0
 offset_right = 80.0
 offset_bottom = 3.0
 color = Color(0.35, 0.55, 1, 1)
 
-[node name="QuestTracker" type="Label" parent="." unique_id=152871596]
+[node name="QuestTracker" type="Label" parent="." unique_id=850408724]
 offset_left = 400.0
 offset_top = 4.0
 offset_right = 632.0
@@ -71,7 +71,7 @@ theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 3
 horizontal_alignment = 2
 
-[node name="LevelLabel" type="Label" parent="." unique_id=1462369513]
+[node name="LevelLabel" type="Label" parent="." unique_id=1764073841]
 offset_left = 92.0
 offset_top = 3.0
 offset_right = 92.0
@@ -79,14 +79,14 @@ offset_bottom = 3.0
 theme_override_font_sizes/font_size = 10
 text = "Nv 1"
 
-[node name="XpBar" type="ColorRect" parent="." unique_id=2132773580]
+[node name="XpBar" type="ColorRect" parent="." unique_id=1622387452]
 offset_left = 8.0
 offset_top = 20.0
 offset_right = 88.0
 offset_bottom = 22.0
 color = Color(0.1, 0.1, 0.1, 1)
 
-[node name="Fill" type="ColorRect" parent="XpBar" unique_id=1727459735]
+[node name="Fill" type="ColorRect" parent="XpBar" unique_id=1649366260]
 layout_mode = 0
 offset_right = 80.0
 offset_bottom = 2.0

@@ -1,24 +1,26 @@
 class_name QuestLog
 extends Node
-## Diário de missões do jogador: quais estão ativas, o progresso e quais já
-## foram entregues. Só guarda e avisa; quem dá a recompensa é o NPC/Player.
+## Diário de missões do jogador: missões ativas, em que etapa estão, o
+## progresso da etapa e quais já foram entregues. Só guarda e avisa; quem dá
+## recompensa e retira itens é o Player.
 
 signal quest_started(quest: QuestData)
 signal quest_progressed(quest: QuestData, progress: int)
+signal quest_step_advanced(quest: QuestData, step_index: int)
 signal quest_completed(quest: QuestData)
 
-## id -> progresso (KILL). Para COLLECT o progresso é lido da bolsa na hora.
+## id -> {"step": int, "kills": int}. Coleta é contada na bolsa na hora.
 var _active: Dictionary = {}
 var _quests: Dictionary = {}   # id -> QuestData
 var _completed: Array[StringName] = []
-## Bolsa usada para contar itens de missões de coleta (definida pelo dono).
+## Bolsa usada para contar itens de etapas de coleta (definida pelo dono).
 var inventory: Inventory
 
 
 func start(quest: QuestData) -> void:
-	if is_active(quest) or is_completed(quest):
+	if quest.steps.is_empty() or is_active(quest) or is_completed(quest):
 		return
-	_active[quest.id] = 0
+	_active[quest.id] = {"step": 0, "kills": 0}
 	_quests[quest.id] = quest
 	quest_started.emit(quest)
 
@@ -38,41 +40,74 @@ func active_quests() -> Array[QuestData]:
 	return list
 
 
+func step_index(quest: QuestData) -> int:
+	return int(_active[quest.id]["step"]) if is_active(quest) else -1
+
+
+func current_step(quest: QuestData) -> QuestStep:
+	return quest.steps[step_index(quest)] if is_active(quest) else null
+
+
+func is_last_step(quest: QuestData) -> bool:
+	return is_active(quest) and step_index(quest) == quest.steps.size() - 1
+
+
 func progress_of(quest: QuestData) -> int:
-	if not is_active(quest):
+	var step: QuestStep = current_step(quest)
+	if step == null:
 		return 0
-	if quest.objective == QuestData.Objective.COLLECT:
-		return mini(inventory.count_of(quest.target_item) if inventory else 0, quest.required_count)
-	return int(_active[quest.id])
+	if step.objective == QuestStep.Objective.COLLECT:
+		return mini(inventory.count_of(step.target_item) if inventory else 0, step.required_count)
+	return int(_active[quest.id]["kills"])
 
 
+## A etapa atual foi cumprida?
+func is_step_done(quest: QuestData) -> bool:
+	var step: QuestStep = current_step(quest)
+	return step != null and progress_of(quest) >= step.required_count
+
+
+## Última etapa cumprida: pronta para entregar.
 func is_ready(quest: QuestData) -> bool:
-	return is_active(quest) and progress_of(quest) >= quest.required_count
+	return is_last_step(quest) and is_step_done(quest)
 
 
 ## Um inimigo foi derrotado por este jogador.
 func notify_kill(kind: StringName) -> void:
 	for id: StringName in _active:
 		var quest: QuestData = _quests[id]
-		if quest.objective != QuestData.Objective.KILL:
+		var step: QuestStep = current_step(quest)
+		if step.objective != QuestStep.Objective.KILL:
 			continue
-		if quest.target_kind != &"" and quest.target_kind != kind:
+		if step.target_kind != &"" and step.target_kind != kind:
 			continue
-		if int(_active[id]) >= quest.required_count:
+		var entry: Dictionary = _active[id]
+		if int(entry["kills"]) >= step.required_count:
 			continue
-		_active[id] = int(_active[id]) + 1
-		quest_progressed.emit(quest, int(_active[id]))
+		entry["kills"] = int(entry["kills"]) + 1
+		quest_progressed.emit(quest, int(entry["kills"]))
 
 
-## Avisa a interface quando a bolsa muda (missões de coleta).
+## Avisa a interface quando a bolsa muda (etapas de coleta).
 func refresh_collect() -> void:
 	for id: StringName in _active:
 		var quest: QuestData = _quests[id]
-		if quest.objective == QuestData.Objective.COLLECT:
+		if current_step(quest).objective == QuestStep.Objective.COLLECT:
 			quest_progressed.emit(quest, progress_of(quest))
 
 
-## Marca como entregue. Devolve false se o objetivo ainda não foi cumprido.
+## Passa para a próxima etapa. Só se a atual foi cumprida e não é a última.
+func advance(quest: QuestData) -> bool:
+	if not is_step_done(quest) or is_last_step(quest):
+		return false
+	var entry: Dictionary = _active[quest.id]
+	entry["step"] = int(entry["step"]) + 1
+	entry["kills"] = 0
+	quest_step_advanced.emit(quest, int(entry["step"]))
+	return true
+
+
+## Marca como entregue. Devolve false se a última etapa ainda não foi cumprida.
 func complete(quest: QuestData) -> bool:
 	if not is_ready(quest):
 		return false

@@ -59,6 +59,12 @@ const EYE_OFFSET := Vector2(0, -8)
 ## Velocidade do recuo ao bater no escudo (px/s).
 @export var blocked_recoil_speed: float = 150.0
 
+@export_group("Ponto fraco")
+## Golpes vindos de trás causam mais dano (vale para monstros e chefes).
+@export var backstab_multiplier: float = 1.5
+## Ângulo (graus, a partir da frente) a partir do qual o golpe conta como "pelas costas".
+@export var backstab_angle: float = 120.0
+
 @export_group("Recompensa")
 ## Experiência dada a quem derrotou este inimigo.
 @export var xp_reward: int = 10
@@ -68,6 +74,8 @@ const EYE_OFFSET := Vector2(0, -8)
 
 var state: State = State.IDLE
 var target: Player = null
+## Para onde o inimigo está virado (a seta mostra). Define o que é "costas".
+var facing: Vector2 = Vector2.DOWN
 
 var _state_time: float = 0.0
 var _lunge_direction: Vector2 = Vector2.ZERO
@@ -85,6 +93,7 @@ var _spawn_position: Vector2 = Vector2.ZERO
 @onready var _health_bar: Node2D = $HealthBar
 @onready var _health_bar_fill: ColorRect = $HealthBar/Fill
 @onready var _telegraph: Polygon2D = $LungeTelegraph
+@onready var _facing_indicator: Polygon2D = $FacingIndicator
 
 
 func _ready() -> void:
@@ -94,6 +103,7 @@ func _ready() -> void:
 	_hitbox.hit_blocked.connect(_on_lunge_blocked)
 	_health_bar.visible = true
 	_spawn_position = global_position
+	health.damage_modifier = _apply_backstab
 	_build_telegraph()
 
 
@@ -134,8 +144,36 @@ func _physics_process(delta: float) -> void:
 			modulate.a = 1.0 - clampf(_state_time / death_fade_time, 0.0, 1.0)
 			if _state_time >= death_fade_time:
 				queue_free()
+	_update_facing()
 	move_and_slide()
 	_update_visuals(delta)
+
+
+## Vira para o alvo enquanto persegue/prepara; na investida, para a direção dela.
+## Atordoado ou ferido, mantém a direção (as costas ficam expostas).
+func _update_facing() -> void:
+	var wanted := Vector2.ZERO
+	match state:
+		State.CHASE, State.WINDUP:
+			if _is_valid_target(target):
+				wanted = global_position.direction_to(target.global_position)
+		State.LUNGE:
+			wanted = _lunge_direction
+	if wanted != Vector2.ZERO:
+		facing = wanted
+	_facing_indicator.rotation = facing.angle()
+
+
+## Golpe de trás causa mais dano. "Trás" = mais de backstab_angle graus da frente.
+func _apply_backstab(info: DamageInfo) -> void:
+	if not is_instance_valid(info.source) or not (info.source is Node2D):
+		return
+	var to_attacker: Vector2 = global_position.direction_to((info.source as Node2D).global_position)
+	if to_attacker == Vector2.ZERO:
+		return
+	if absf(rad_to_deg(facing.angle_to(to_attacker))) >= backstab_angle:
+		info.amount = roundi(info.amount * backstab_multiplier)
+		info.backstab = true
 
 
 func _process_chase(delta: float) -> void:
@@ -271,8 +309,10 @@ func _on_died() -> void:
 ## que morreu nesse golpe.
 func _show_damage_number(info: DamageInfo) -> void:
 	var owner_node: Node = info.source if is_instance_valid(info.source) else self
-	var size: int = clampi(8 + info.amount / 4, 8, 18)
+	var size: int = clampi(8 + info.amount / 4, 8, 18) + (2 if info.backstab else 0)
 	var color: Color = Color.WHITE.lerp(Color(1.0, 0.85, 0.3), clampf(info.amount / 40.0, 0.0, 1.0))
+	if info.backstab:
+		color = Color(1.0, 0.55, 0.2)  # laranja: acerto pelas costas
 	var jitter := Vector2(randf_range(-6.0, 6.0), 0.0)
 	FloatingText.spawn(owner_node, str(info.amount), global_position + Vector2(0, -24) + jitter, color, size)
 

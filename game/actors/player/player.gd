@@ -286,10 +286,11 @@ func request_dialogue(speaker: String, lines: Array[String], on_finished: Callab
 func turn_in_quest(quest: QuestData) -> void:
 	# Concluir ANTES de tirar os itens: a conclusão confere o objetivo, e na
 	# coleta ele é contado na própria bolsa.
+	var last_step: QuestStep = quest_log.current_step(quest)
 	if not quest_log.complete(quest):
 		return
-	if quest.objective == QuestData.Objective.COLLECT:
-		_remove_items(quest.target_item, quest.required_count)
+	if last_step.objective == QuestStep.Objective.COLLECT:
+		_remove_items(last_step.target_item, last_step.required_count)
 	gain_xp(quest.reward_xp)
 	for reward: ItemStack in quest.reward_items:
 		var piece: ItemStack = reward.copy()
@@ -298,6 +299,16 @@ func turn_in_quest(quest: QuestData) -> void:
 			piece.count = left
 			item_dropped.emit(piece, global_position + facing * 14.0)
 	_say("Missão concluída: %s" % quest.title)
+
+
+## Etapa cumprida com continuação: entrega os itens da etapa (se for coleta) e
+## passa para a próxima. Sem recompensa ainda — ela vem ao entregar a missão.
+func advance_quest(quest: QuestData) -> void:
+	var step: QuestStep = quest_log.current_step(quest)
+	if not quest_log.advance(quest):
+		return
+	if step.objective == QuestStep.Objective.COLLECT:
+		_remove_items(step.target_item, step.required_count)
 
 
 func _remove_items(item: ItemData, amount: int) -> void:

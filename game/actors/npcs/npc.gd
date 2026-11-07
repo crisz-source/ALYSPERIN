@@ -3,9 +3,9 @@ extends StaticBody2D
 ## Personagem não jogável (PROVISÓRIO: retângulo sem arte, sem nome definitivo).
 ## Conversa com o jogador (E) e pode oferecer uma missão.
 ##
-## Fluxo com missão: oferece -> (jogador aceita ao terminar a conversa) ->
-## fala "em andamento" até o objetivo ser cumprido -> entrega e recompensa ->
-## depois só as falas comuns.
+## Fluxo com missão: oferece ("!") -> sem marcador enquanto a etapa está em
+## andamento -> "?" etapa cumprida e há continuação (falar dá a próxima etapa)
+## -> "*" última etapa cumprida (falar entrega e dá a recompensa) -> falas comuns.
 
 @export var npc_name: String = "Viajante"
 @export var idle_lines: Array[String] = []
@@ -25,7 +25,7 @@ func _ready() -> void:
 
 
 func _process(_delta: float) -> void:
-	# "!" = missão nova; "?" = em andamento; "*" = pronta para entregar.
+	# "!" nova; "" em andamento; "?" etapa cumprida com continuação; "*" pronta para entregar.
 	_marker.text = _marker_text(_last_player if is_instance_valid(_last_player) else null)
 
 
@@ -36,8 +36,10 @@ func _on_interact(by: Player) -> String:
 		by.request_dialogue(npc_name, quest.offer_lines, func() -> void: quests.start(quest))
 	elif quest and quests.is_ready(quest):
 		by.request_dialogue(npc_name, quest.complete_lines, func() -> void: by.turn_in_quest(quest))
+	elif quest and quests.is_step_done(quest):
+		by.request_dialogue(npc_name, quests.current_step(quest).advance_lines, func() -> void: by.advance_quest(quest))
 	elif quest and quests.is_active(quest):
-		by.request_dialogue(npc_name, quest.in_progress_lines)
+		by.request_dialogue(npc_name, quests.current_step(quest).in_progress_lines)
 	else:
 		by.request_dialogue(npc_name, idle_lines)
 	return ""
@@ -52,4 +54,6 @@ func _marker_text(player: Player) -> String:
 		return ""
 	if player.quest_log.is_ready(quest):
 		return "*"
-	return "?" if player.quest_log.is_active(quest) else "!"
+	if player.quest_log.is_step_done(quest):
+		return "?"
+	return "" if player.quest_log.is_active(quest) else "!"
