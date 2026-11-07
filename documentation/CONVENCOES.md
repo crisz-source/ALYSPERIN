@@ -68,6 +68,21 @@ ficam na mesma pasta.
 → `HealthComponent.apply_damage(DamageInfo)` → sinais `damaged` / `died`.
 Todo dano passa por `apply_damage`: nunca alterar `current_health` direto.
 Timers que podem sobreviver ao nó: usar `create_timer().timeout.connect(...)`, não `await`.
+Defesa/escudo: o dono registra `HealthComponent.block_filter`; golpe bloqueado não
+causa dano, marca `DamageInfo.blocked` e emite `blocked` / `Hitbox.hit_blocked`.
+
+## Autoloads (game/systems)
+| Nome | Para quê |
+|---|---|
+| `Hitstop` | congela o jogo por centésimos de segundo no impacto (`Hitstop.request(s)`) |
+
+Não misturar relógios: com `Engine.time_scale = 0`, timers "que ignoram a escala"
+contam por um relógio diferente do real. Para medir tempo real, usar `Time.get_ticks_usec()`.
+
+## Mapas
+- Tiles em `TileMapLayer` com TileSet em `game/world/tilesets/`; textura em `assets/`.
+- Camadas: `Ground` (sem colisão) e `Walls` (colisão na camada `world`).
+- A área chama `player.set_camera_bounds(...)` com o retângulo do mapa.
 
 ## Camadas de física (2D)
 | # | Nome | Uso |

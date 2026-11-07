@@ -16,58 +16,62 @@ size = Vector2(10, 20)
 [sub_resource type="ConvexPolygonShape2D" id="ConvexPolygonShape2D_b0bri"]
 points = PackedVector2Array(0, 0, 10.142838, -21.751389, 15.824299, -18.044155, 20.241394, -12.895191, 23.041197, -6.7158966, 24, 0, 23.041197, 6.7158966, 20.241394, 12.895191, 15.824299, 18.044155, 10.142838, 21.751389)
 
-[node name="Player" type="CharacterBody2D" unique_id=1489162219]
+[node name="Player" type="CharacterBody2D" unique_id=1466524765]
 collision_layer = 2
 motion_mode = 1
 script = ExtResource("1_pqla1")
 
-[node name="CollisionShape" type="CollisionShape2D" parent="." unique_id=1609944677]
+[node name="CollisionShape" type="CollisionShape2D" parent="." unique_id=872024218]
 position = Vector2(0, -3)
 shape = SubResource("RectangleShape2D_qdo3w")
 
-[node name="BodyPlaceholder" type="Polygon2D" parent="." unique_id=262045809]
+[node name="BodyPlaceholder" type="Polygon2D" parent="." unique_id=1967846623]
 color = Color(0.36, 0.62, 0.92, 1)
 polygon = PackedVector2Array(-6, -24, 6, -24, 6, 0, -6, 0)
 
-[node name="FacingIndicator" type="Polygon2D" parent="." unique_id=620177720]
+[node name="FacingIndicator" type="Polygon2D" parent="." unique_id=2093559585]
 position = Vector2(0, -12)
 color = Color(1, 0.85, 0.3, 1)
 polygon = PackedVector2Array(13, 0, 8, -4, 8, 4)
 
-[node name="HealthComponent" type="Node" parent="." unique_id=229017804]
+[node name="HealthComponent" type="Node" parent="." unique_id=1926259223]
 script = ExtResource("2_j5vpa")
 
-[node name="Hurtbox" type="Area2D" parent="." unique_id=1052103215 node_paths=PackedStringArray("health")]
+[node name="Hurtbox" type="Area2D" parent="." unique_id=563932526 node_paths=PackedStringArray("health")]
 collision_layer = 2
 collision_mask = 0
 script = ExtResource("3_hlqpx")
 health = NodePath("../HealthComponent")
 
-[node name="CollisionShape" type="CollisionShape2D" parent="Hurtbox" unique_id=268449122]
+[node name="CollisionShape" type="CollisionShape2D" parent="Hurtbox" unique_id=155297210]
 position = Vector2(0, -10)
 shape = SubResource("RectangleShape2D_br5st")
 
-[node name="AttackPivot" type="Node2D" parent="." unique_id=560547274]
+[node name="AttackPivot" type="Node2D" parent="." unique_id=872544660]
 position = Vector2(0, -10)
 
-[node name="SwordHitbox" type="Area2D" parent="AttackPivot" unique_id=2085447024 node_paths=PackedStringArray("attacker")]
+[node name="SwordHitbox" type="Area2D" parent="AttackPivot" unique_id=1680228213 node_paths=PackedStringArray("attacker")]
 collision_layer = 8
 collision_mask = 4
 script = ExtResource("4_oawdx")
 knockback_force = 170.0
 attacker = NodePath("../..")
 
-[node name="CollisionShape" type="CollisionShape2D" parent="AttackPivot/SwordHitbox" unique_id=1813165741]
+[node name="CollisionShape" type="CollisionShape2D" parent="AttackPivot/SwordHitbox" unique_id=77119900]
 shape = SubResource("ConvexPolygonShape2D_b0bri")
 
-[node name="SwingPlaceholder" type="Polygon2D" parent="AttackPivot" unique_id=1219132341]
+[node name="SwingPlaceholder" type="Polygon2D" parent="AttackPivot" unique_id=1031515327]
 color = Color(1, 1, 0.85, 0.75)
 polygon = PackedVector2Array(0, 0, 10.142838, -21.751389, 15.824299, -18.044155, 20.241394, -12.895191, 23.041197, -6.7158966, 24, 0, 23.041197, 6.7158966, 20.241394, 12.895191, 15.824299, 18.044155, 10.142838, 21.751389)
 
-[node name="PlayerInput" type="Node" parent="." unique_id=107935481]
+[node name="ShieldPlaceholder" type="Polygon2D" parent="AttackPivot" unique_id=1638770486]
+color = Color(0.75, 0.85, 1, 0.85)
+polygon = PackedVector2Array(7.4999995, -12.990381, 10.606602, -10.606602, 12.990381, -7.5, 14.488887, -3.8822856, 15, 0, 14.488887, 3.8822856, 12.990381, 7.5, 10.606602, 10.606602, 7.4999995, 12.990381, 5.4999995, 9.526279, 7.7781744, 7.7781744, 9.526279, 5.5, 10.625184, 2.8470094, 11, 0, 10.625184, -2.8470094, 9.526279, -5.5, 7.7781744, -7.7781744, 5.4999995, -9.526279)
+
+[node name="PlayerInput" type="Node" parent="." unique_id=1941218208]
 script = ExtResource("5_tiye0")
 
-[node name="Camera" type="Camera2D" parent="." unique_id=258331374]
+[node name="Camera" type="Camera2D" parent="." unique_id=857089216]
 position = Vector2(0, -12)
 position_smoothing_enabled = true
 position_smoothing_speed = 8.0

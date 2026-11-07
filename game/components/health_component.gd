@@ -9,6 +9,8 @@ extends Node
 signal health_changed(current: int, maximum: int)
 signal damaged(info: DamageInfo)
 signal died
+## O golpe chegou, mas foi bloqueado (escudo, defesa). Nenhum dano aplicado.
+signal blocked(info: DamageInfo)
 
 @export var max_health: int = 100
 
@@ -18,6 +20,10 @@ var is_dead: bool = false
 var _invulnerable_time: float = 0.0
 ## Invulnerabilidade controlada por outro sistema (ex.: janela da esquiva).
 var _invulnerable_flag: bool = false
+## Opcional: função que recebe o DamageInfo e devolve true se o golpe foi
+## bloqueado. Quem sabe se está defendendo é o dono (ex.: Player), mas a
+## decisão final continua passando por apply_damage().
+var block_filter: Callable
 
 
 func _ready() -> void:
@@ -45,6 +51,10 @@ func set_invulnerable(value: bool) -> void:
 ## Retorna true se o dano foi aplicado.
 func apply_damage(info: DamageInfo) -> bool:
 	if is_dead or is_invulnerable() or info.amount <= 0:
+		return false
+	if block_filter.is_valid() and block_filter.call(info):
+		info.blocked = true
+		blocked.emit(info)
 		return false
 	current_health = maxi(current_health - info.amount, 0)
 	damaged.emit(info)

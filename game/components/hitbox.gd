@@ -8,6 +8,8 @@ extends Area2D
 ## enxerga a camada "enemy").
 
 signal hit_landed(target: Hurtbox)
+## O alvo defendeu o golpe (ex.: jogador com escudo levantado).
+signal hit_blocked(target: Hurtbox)
 
 @export var damage: int = 10
 ## Força do empurrão aplicado no alvo, em pixels por segundo.
@@ -48,8 +50,11 @@ func _physics_process(delta: float) -> void:
 		if hurtbox == null or not _can_hit(hurtbox):
 			continue
 		_hit_times[hurtbox] = _clock
-		if hurtbox.receive_hit(_build_damage(hurtbox)):
+		var info: DamageInfo = _build_damage(hurtbox)
+		if hurtbox.receive_hit(info):
 			hit_landed.emit(hurtbox)
+		elif info.blocked:
+			hit_blocked.emit(hurtbox)
 
 
 func _can_hit(hurtbox: Hurtbox) -> bool:

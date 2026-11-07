@@ -18,6 +18,8 @@ const BUFFER_TIME: float = 0.2
 var move_direction: Vector2 = Vector2.ZERO
 ## Ponto do mundo para onde o jogador está mirando (cursor do mouse).
 var aim_position: Vector2 = Vector2.ZERO
+## Defesa: vale enquanto o botão estiver segurado (sem buffer).
+var defend_held: bool = false
 
 var _attack_buffer: float = 0.0
 var _dodge_buffer: float = 0.0
@@ -29,6 +31,7 @@ func poll(delta: float) -> void:
 	move_direction = Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	var viewport: Viewport = get_viewport()
 	aim_position = viewport.get_canvas_transform().affine_inverse() * viewport.get_mouse_position()
+	defend_held = Input.is_action_pressed("defend")
 	_attack_buffer = BUFFER_TIME if Input.is_action_just_pressed("attack") else maxf(_attack_buffer - delta, 0.0)
 	_dodge_buffer = BUFFER_TIME if Input.is_action_just_pressed("dodge") else maxf(_dodge_buffer - delta, 0.0)
 

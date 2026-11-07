@@ -11,8 +11,12 @@ config_version=5
 [application]
 
 config/name="ALYSPERIN"
-run/main_scene="res://game/world/arenas/test_arena/test_arena.tscn"
+run/main_scene="res://game/world/areas/prototype_area/prototype_area.tscn"
 config/features=PackedStringArray("4.7")
+
+[autoload]
+
+Hitstop="*res://game/systems/hitstop.gd"
 
 [debug]
 
@@ -129,3 +133,4 @@ pause={
 textures/canvas_textures/default_texture_filter=0
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
+environment/defaults/default_clear_color=Color(0.07, 0.06, 0.08, 1)

@@ -12,6 +12,8 @@ var amount: int = 0
 var knockback: Vector2 = Vector2.ZERO
 ## Nó que causou o dano (pode ser liberado antes do pacote ser lido: checar com is_instance_valid).
 var source: Node = null
+## Marcado pelo HealthComponent quando quem apanha bloqueou o golpe (sem dano).
+var blocked: bool = false
 
 
 func _init(p_amount: int = 0, p_knockback: Vector2 = Vector2.ZERO, p_source: Node = null) -> void:

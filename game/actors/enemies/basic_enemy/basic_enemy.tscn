@@ -14,35 +14,35 @@ size = Vector2(14, 14)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_mle0g"]
 size = Vector2(14, 14)
 
-[node name="BasicEnemy" type="CharacterBody2D" unique_id=1502425973]
+[node name="BasicEnemy" type="CharacterBody2D" unique_id=326606237]
 collision_layer = 4
 collision_mask = 5
 motion_mode = 1
 script = ExtResource("1_6huk2")
 
-[node name="CollisionShape" type="CollisionShape2D" parent="." unique_id=1196703443]
+[node name="CollisionShape" type="CollisionShape2D" parent="." unique_id=400789737]
 position = Vector2(0, -3)
 shape = SubResource("RectangleShape2D_ukgti")
 
-[node name="BodyPlaceholder" type="Polygon2D" parent="." unique_id=1197934838]
+[node name="BodyPlaceholder" type="Polygon2D" parent="." unique_id=1278737543]
 color = Color(0.78, 0.25, 0.25, 1)
 polygon = PackedVector2Array(-7, -14, 7, -14, 7, 0, -7, 0)
 
-[node name="HealthComponent" type="Node" parent="." unique_id=1231936725]
+[node name="HealthComponent" type="Node" parent="." unique_id=1511754533]
 script = ExtResource("2_dkhml")
 max_health = 30
 
-[node name="Hurtbox" type="Area2D" parent="." unique_id=621763848 node_paths=PackedStringArray("health")]
+[node name="Hurtbox" type="Area2D" parent="." unique_id=287759500 node_paths=PackedStringArray("health")]
 collision_layer = 4
 collision_mask = 0
 script = ExtResource("3_65ebo")
 health = NodePath("../HealthComponent")
 
-[node name="CollisionShape" type="CollisionShape2D" parent="Hurtbox" unique_id=30866326]
+[node name="CollisionShape" type="CollisionShape2D" parent="Hurtbox" unique_id=1841520593]
 position = Vector2(0, -7)
 shape = SubResource("RectangleShape2D_jfe3p")
 
-[node name="LungeHitbox" type="Area2D" parent="." unique_id=798248336 node_paths=PackedStringArray("attacker")]
+[node name="LungeHitbox" type="Area2D" parent="." unique_id=1154006283 node_paths=PackedStringArray("attacker")]
 collision_layer = 16
 collision_mask = 2
 script = ExtResource("4_vb8ev")
@@ -50,19 +50,19 @@ damage = 15
 knockback_force = 200.0
 attacker = NodePath("..")
 
-[node name="CollisionShape" type="CollisionShape2D" parent="LungeHitbox" unique_id=513161578]
+[node name="CollisionShape" type="CollisionShape2D" parent="LungeHitbox" unique_id=1370214190]
 position = Vector2(0, -7)
 shape = SubResource("RectangleShape2D_mle0g")
 
-[node name="HealthBar" type="Node2D" parent="." unique_id=2112509012]
+[node name="HealthBar" type="Node2D" parent="." unique_id=968898351]
 position = Vector2(-8, -20)
 
-[node name="Background" type="ColorRect" parent="HealthBar" unique_id=437821213]
+[node name="Background" type="ColorRect" parent="HealthBar" unique_id=1411818554]
 offset_right = 16.0
 offset_bottom = 2.0
 color = Color(0.1, 0.1, 0.1, 1)
 
-[node name="Fill" type="ColorRect" parent="HealthBar" unique_id=163302417]
+[node name="Fill" type="ColorRect" parent="HealthBar" unique_id=1752246498]
 offset_right = 16.0
 offset_bottom = 2.0
 color = Color(0.85, 0.2, 0.2, 1)

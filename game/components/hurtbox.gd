@@ -16,7 +16,8 @@ func _ready() -> void:
 	assert(health != null, "Hurtbox '%s' sem HealthComponent configurado" % get_path())
 
 
-## Retorna true se o golpe causou dano de fato (false se invulnerável ou morto).
+## Retorna true se o golpe causou dano de fato (false se invulnerável, morto
+## ou bloqueado; no bloqueio, info.blocked fica true).
 func receive_hit(info: DamageInfo) -> bool:
 	if not health.apply_damage(info):
 		return false

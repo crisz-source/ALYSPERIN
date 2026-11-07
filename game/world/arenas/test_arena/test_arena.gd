@@ -8,17 +8,18 @@ extends Node2D
 @export var enemy_respawn_delay: float = 4.0
 ## Segundos entre a morte do jogador e o reinício da arena.
 @export var restart_delay: float = 2.0
+## Tamanho da arena em pixels (a câmera não mostra nada fora disto).
+@export var bounds: Rect2 = Rect2(0, 0, 1024, 576)
 
 @onready var _player: Player = $Entities/Player
 @onready var _entities: Node2D = $Entities
-@onready var _health_fill: ColorRect = $Hud/PlayerHealth/Fill
-@onready var _status_label: Label = $Hud/StatusLabel
+@onready var _hud: Hud = $Hud
 
 
 func _ready() -> void:
-	_player.health.health_changed.connect(_on_player_health_changed)
+	_hud.bind_player(_player)
+	_player.set_camera_bounds(bounds)
 	_player.died.connect(_on_player_died)
-	_status_label.visible = false
 	for node: Node in get_tree().get_nodes_in_group(&"arena_enemies"):
 		_watch_enemy(node as BasicEnemy)
 
@@ -44,12 +45,7 @@ func _respawn_enemy(spawn_position: Vector2) -> void:
 	_watch_enemy(enemy)
 
 
-func _on_player_health_changed(current: int, maximum: int) -> void:
-	_health_fill.scale.x = float(current) / float(maximum)
-
-
 func _on_player_died() -> void:
-	_status_label.visible = true
 	get_tree().create_timer(restart_delay).timeout.connect(_restart)
 
 
