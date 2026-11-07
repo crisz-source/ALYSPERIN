@@ -17,6 +17,8 @@ signal message_requested(text: String)
 signal item_dropped(stack: ItemStack, at_position: Vector2)
 ## Disciplina escolhida/trocada: habilidades e bônus mudaram (HUD refaz a barra).
 signal discipline_changed(discipline: DisciplineData)
+## Itens colocados na barra de habilidades mudaram.
+signal hotbar_changed
 ## Um NPC quer conversar: a área abre a caixa de diálogo e chama on_finished no fim.
 signal dialogue_requested(speaker: String, lines: Array[String], on_finished: Callable)
 
@@ -124,6 +126,9 @@ var _attack_recovery_now: float = 0.0
 ## Vida máxima sem bônus de Vigor (o valor configurado no HealthComponent).
 var _base_max_health: int = 0
 var _block_direction: Vector2 = Vector2.DOWN
+## Consumíveis arrastados para a barra (mesma posição das habilidades; null = vazio).
+## Guarda o TIPO de item: a tecla usa a primeira pilha dele na bolsa.
+var hotbar_items: Array[ItemData] = []
 ## Uma mensagem por esquiva, mesmo que dois inimigos acertem a mesma esquiva.
 var _dodge_success_this_dodge: bool = false
 ## Objeto usável mais próximo (o que recebe o "[E]"), ou null.
@@ -189,6 +194,7 @@ func _ready() -> void:
 	stats.leveled_up.connect(_on_leveled_up)
 	_ability_cooldowns.resize(abilities.size())
 	_ability_cooldowns.fill(0.0)
+	hotbar_items.resize(PlayerInput.ABILITY_SLOTS)
 	_spin_hitbox.hit_landed.connect(_on_ability_hit)
 	_spin_visual.visible = false
 
@@ -547,6 +553,9 @@ func _try_start_ability() -> bool:
 	if slot == -1:
 		return false
 	_input.consume_ability(slot)
+	if hotbar_items[slot] != null:
+		use_hotbar_item(slot)
+		return false
 	if slot >= abilities.size() or abilities[slot] == null:
 		return false
 	var ability: AbilityData = abilities[slot]
@@ -567,6 +576,34 @@ func _try_start_ability() -> bool:
 		_spin_hitbox.damage = maxi(roundi(current_attack_damage(0) * spin.damage_multiplier), 1)
 		_spin_hitbox.knockback_force = spin.knockback
 	return true
+
+
+## Coloca um consumível num espaço vazio da barra (sem habilidade). Devolve false se não pode.
+func assign_hotbar_item(slot: int, item: ItemData) -> bool:
+	if slot < 0 or slot >= hotbar_items.size() or not (item is ConsumableData):
+		return false
+	if slot < abilities.size() and abilities[slot] != null:
+		return false
+	hotbar_items[slot] = item
+	hotbar_changed.emit()
+	return true
+
+
+func clear_hotbar_slot(slot: int) -> void:
+	if slot >= 0 and slot < hotbar_items.size() and hotbar_items[slot] != null:
+		hotbar_items[slot] = null
+		hotbar_changed.emit()
+
+
+## Usa a primeira pilha do item na bolsa. O espaço continua na barra mesmo com 0
+## (mostra x0) para o jogador não precisar arrastar de novo quando achar mais.
+func use_hotbar_item(slot: int) -> String:
+	var item: ItemData = hotbar_items[slot]
+	for i in inventory.slots.size():
+		var stack: ItemStack = inventory.get_slot(i)
+		if stack and stack.item == item:
+			return use_inventory_slot(i)
+	return _say("Você não tem %s." % item.display_name)
 
 
 func is_ability_unlocked(slot: int) -> bool:
@@ -670,6 +707,7 @@ func _on_damaged(info: DamageInfo) -> void:
 	health.grant_invulnerability(post_hit_invulnerability)
 	velocity = info.knockback
 	_flash_time = 0.08
+	FloatingText.spawn(self, str(info.amount), global_position + Vector2(0, -34), Color(1.0, 0.35, 0.3), 10)
 	_camera.shake(3.0, 0.15)
 	Hitstop.request(hitstop_hurt)
 	_change_state(State.HURT)

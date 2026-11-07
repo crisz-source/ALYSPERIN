@@ -67,6 +67,8 @@ ficam na mesma pasta.
 `Hitbox` (quem bate, só machuca enquanto ativa) → detecta `Hurtbox` (quem apanha)
 → `HealthComponent.apply_damage(DamageInfo)` → sinais `damaged` / `died`.
 Todo dano passa por `apply_damage`: nunca alterar `current_health` direto.
+Controle de tela cheia numa camada de interface (raiz de tela) deve ter `mouse_filter = IGNORE`,
+senão engole cliques e arrastes destinados a outras camadas (ex.: barra do HUD).
 Área que precisa detectar paredes/portas (corpos estáticos) deve ter `monitorable = true`:
 com `monitorable = false` a física da Godot não compara a área com corpos estáticos.
 Timers que podem sobreviver ao nó: usar `create_timer().timeout.connect(...)`, não `await`.
@@ -119,7 +121,7 @@ contam por um relógio diferente do real. Para medir tempo real, usar `Time.get_
 ## Controles (ações já mapeadas)
 `move_up/down/left/right` (WASD), `attack` (botão esq.), `defend` (botão dir.),
 `dodge` (Espaço), `special` (Q), `interact` (F), `ability_1..9` (1–9), `ability_f1..f12` (F1–F12),
-`inventory` (Tab), `pause` (Esc). Teclas físicas: valem para teclado ABNT ou US.
+`inventory` (I), `pause` (Esc). Teclas físicas: valem para teclado ABNT ou US.
 
 ## Git
 - Branch principal `main`. Commit ao fim de cada etapa testada.

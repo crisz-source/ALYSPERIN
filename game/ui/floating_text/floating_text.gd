@@ -9,6 +9,7 @@ extends Label
 @export var rise_speed: float = 18.0
 ## Segundos até sumir.
 @export var lifetime: float = 0.9
+@export var font_size: int = 10
 
 var _age: float = 0.0
 var _anchor: Vector2 = Vector2.ZERO
@@ -16,9 +17,10 @@ var _anchor: Vector2 = Vector2.ZERO
 
 ## Cria o texto centralizado em world_position, como filho de `owner_node`
 ## (some junto com ele se a cena for trocada).
-static func spawn(owner_node: Node, message: String, world_position: Vector2, color: Color = Color.WHITE) -> FloatingText:
+static func spawn(owner_node: Node, message: String, world_position: Vector2, color: Color = Color.WHITE, size: int = 10) -> FloatingText:
 	var label := FloatingText.new()
 	label.text = message
+	label.font_size = size
 	label.modulate = color
 	label._anchor = world_position
 	owner_node.add_child(label)
@@ -29,7 +31,7 @@ func _ready() -> void:
 	top_level = true
 	z_index = 10
 	horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	add_theme_font_size_override("font_size", 10)
+	add_theme_font_size_override("font_size", font_size)
 	add_theme_constant_override("outline_size", 3)
 	add_theme_color_override("font_outline_color", Color(0.05, 0.05, 0.08))
 	_place()

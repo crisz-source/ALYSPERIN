@@ -92,7 +92,7 @@ func _ready() -> void:
 	health.died.connect(_on_died)
 	health.health_changed.connect(_on_health_changed)
 	_hitbox.hit_blocked.connect(_on_lunge_blocked)
-	_health_bar.visible = false
+	_health_bar.visible = true
 	_spawn_position = global_position
 	_build_telegraph()
 
@@ -239,6 +239,7 @@ func _on_damaged(info: DamageInfo) -> void:
 		return
 	velocity = info.knockback
 	_flash_time = 0.08
+	_show_damage_number(info)
 	if info.source is Player:
 		_last_attacker = info.source
 	if target == null and info.source is Player:
@@ -265,8 +266,20 @@ func _on_died() -> void:
 	died.emit()
 
 
+## Número do dano: maior e mais amarelado quanto maior o dano. Criado como
+## filho de quem bateu (se ainda existir), para não sumir junto com o inimigo
+## que morreu nesse golpe.
+func _show_damage_number(info: DamageInfo) -> void:
+	var owner_node: Node = info.source if is_instance_valid(info.source) else self
+	var size: int = clampi(8 + info.amount / 4, 8, 18)
+	var color: Color = Color.WHITE.lerp(Color(1.0, 0.85, 0.3), clampf(info.amount / 40.0, 0.0, 1.0))
+	var jitter := Vector2(randf_range(-6.0, 6.0), 0.0)
+	FloatingText.spawn(owner_node, str(info.amount), global_position + Vector2(0, -24) + jitter, color, size)
+
+
+## A barra de vida fica sempre visível enquanto o inimigo está vivo.
 func _on_health_changed(current: int, maximum: int) -> void:
-	_health_bar.visible = current < maximum and current > 0
+	_health_bar.visible = current > 0
 	_health_bar_fill.scale.x = float(current) / float(maximum)
 
 

@@ -25,7 +25,7 @@ func _ready() -> void:
 
 
 func _process(_delta: float) -> void:
-	# "!" = tem missão para oferecer; "?" = pronta para entregar.
+	# "!" = missão nova; "?" = em andamento; "*" = pronta para entregar.
 	_marker.text = _marker_text(_last_player if is_instance_valid(_last_player) else null)
 
 
@@ -51,5 +51,5 @@ func _marker_text(player: Player) -> String:
 	if player.quest_log.is_completed(quest):
 		return ""
 	if player.quest_log.is_ready(quest):
-		return "?"
-	return "" if player.quest_log.is_active(quest) else "!"
+		return "*"
+	return "?" if player.quest_log.is_active(quest) else "!"

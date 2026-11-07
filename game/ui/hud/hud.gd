@@ -46,6 +46,8 @@ func bind_player(player: Player) -> void:
 	_on_xp_changed(player.stats.xp, player.stats.xp_to_next())
 	_build_ability_bar()
 	player.discipline_changed.connect(func(_d: DisciplineData) -> void: _build_ability_bar())
+	player.hotbar_changed.connect(_build_ability_bar)
+	player.inventory.changed.connect(_build_ability_bar)
 	player.mana.mana_changed.connect(_on_mana_changed)
 	player.quest_log.quest_started.connect(func(_q: QuestData) -> void: _update_quest_tracker())
 	player.quest_log.quest_progressed.connect(func(_q: QuestData, _p: int) -> void: _update_quest_tracker())
@@ -95,8 +97,20 @@ func _build_ability_bar() -> void:
 		key.add_theme_font_size_override("font_size", 8)
 		key.add_theme_constant_override("outline_size", 2)
 		key.add_theme_color_override("font_outline_color", Color.BLACK)
+		var item: ItemData = _player.hotbar_items[i] if i < _player.hotbar_items.size() else null
+		_setup_item_drop(box, i)
 		if ability == null:
 			box.add_child(key)
+			if item:
+				box.color = item.icon_color
+				var count := Label.new()
+				count.name = "Count"
+				count.text = "x%d" % _player.inventory.count_of(item)
+				count.position = Vector2(6, 9)
+				count.add_theme_font_size_override("font_size", 8)
+				count.add_theme_constant_override("outline_size", 2)
+				count.add_theme_color_override("font_outline_color", Color.BLACK)
+				box.add_child(count)
 			_ability_bar.add_child(box)
 			continue
 		var shade := ColorRect.new()
@@ -114,6 +128,22 @@ func _build_ability_bar() -> void:
 		lock.add_theme_color_override("font_outline_color", Color.BLACK)
 		box.add_child(lock)
 		_ability_bar.add_child(box)
+
+
+## Espaço da barra aceita consumível arrastado do inventário (se não tiver
+## habilidade); clique direito tira o item.
+func _setup_item_drop(box: Control, slot: int) -> void:
+	box.mouse_filter = Control.MOUSE_FILTER_STOP
+	box.set_drag_forwarding(Callable(),
+		func(_at: Vector2, data: Variant) -> bool:
+			return data is Dictionary and data.get("item") is ConsumableData \
+				and not (slot < _player.abilities.size() and _player.abilities[slot] != null),
+		func(_at: Vector2, data: Variant) -> void:
+			_player.assign_hotbar_item(slot, data["item"]))
+	box.gui_input.connect(func(event: InputEvent) -> void:
+		var mb := event as InputEventMouseButton
+		if mb and mb.pressed and mb.button_index == MOUSE_BUTTON_RIGHT:
+			_player.clear_hotbar_slot(slot))
 
 
 ## Posição do espaço na tela: 0-8 = fileira de baixo (1-9), 9-20 = de cima (F1-F12).

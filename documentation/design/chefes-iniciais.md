@@ -1,6 +1,7 @@
 # ALYSPERIN — Os 3 primeiros Chefes
 
-- **Status:** PROPOSTA v1 (2026-11-07) para aprovação do proprietário.
+- **Status:** APROVADO v2 (2026-11-07). Proprietário aprovou os 3 chefes, os números de dano
+  na tela e os óleos de arma, e acrescentou a regra de Fúria (§0).
 - **Origem:** especificação do proprietário "Criação dos 3 primeiros Bosses"
   (inspiração Monster Hunter: fraquezas elementais, partes destrutíveis, descoberta em combate).
 - **Escopo:** exatamente 3 chefes, um para cada uma das 3 primeiras masmorras.
@@ -31,10 +32,8 @@ Elementos: **Fogo, Gelo, Raio, Terra, Luz, Trevas**. Ataques físicos sem elemen
   (Caçador) e **óleos/encantamentos de arma** (itens consumíveis que dão um elemento à
   arma por um tempo, para qualquer classe). Os óleos também garantem que **nenhuma
   disciplina fique sem resposta** a uma fraqueza.
-- **Números de dano na tela** ⚑: recomendo mostrar números flutuantes com **tamanho e cor**
-  proporcionais ao dano. Isso é "diferença perceptível na quantidade de dano", que a
-  especificação permite, e não revela o nome da fraqueza. *(Decisão do proprietário: mostrar
-  números ou só reações visuais?)*
+- **Números de dano na tela** (aprovado): números flutuantes com **tamanho e cor**
+  proporcionais ao dano, sem nome de elemento. **Já implementado** para todos os inimigos.
 
 ### Partes destrutíveis
 Cada parte tem **vida própria** (Hurtbox separada). O dano na parte também conta para a
@@ -46,6 +45,22 @@ Mudam por **vida do chefe** (≈ 70% e 35%) e por **eventos** (partes quebradas,
 Toda transição tem uma animação de 1–2 s em que o chefe fica **invulnerável e parado**
 (respiro para o grupo) ⚑. Mudanças de resistência são sempre acompanhadas de mudança de
 aparência — nunca de texto.
+
+### Fúria (regra do proprietário, vale para TODOS os chefes)
+Aos **70%, 50% e 20%** de vida o chefe entra em **Fúria**. Em Fúria os ataques ficam
+**mais rápidos e mais fortes**. Cada limiar ativa a Fúria de novo e mais intensa ⚑:
+
+| Limiar | Velocidade dos ataques ⚑ | Dano ⚑ | Sinal visual (sem texto) |
+|---|---|---|---|
+| 70% | +15% | +15% | rugido + aura vermelha fraca |
+| 50% | +25% | +25% | aura mais forte, olhos/brilho mudam de cor |
+| 20% | +40% | +40% | aura intensa, respiração ofegante visível |
+
+- Os avisos dos ataques (chão/postura) **encurtam junto**, mas nunca abaixo de 0,35 s ⚑
+  — continua justo.
+- A Fúria **se soma** às fases (70%/35%): no limiar de 70% o chefe muda de fase e entra em
+  Fúria ao mesmo tempo.
+- A entrada em Fúria tem uma animação curta (rugido) em que o chefe não ataca ⚑.
 
 ### Ataques justos
 Todo ataque forte tem **aviso no chão** (como a faixa vermelha do protótipo) ou uma
@@ -375,7 +390,8 @@ ferida, e volta mais furiosa. Odeia ser cercada: se três jogadores ficam perto,
 documento de classes), efeitos de status (Etapa B), masmorras com entrada/saída (Etapa E).
 Proposta: chefe 1 junto com a masmorra 1 (Etapa I).
 
-## 5. Decisões pendentes do proprietário
-1. Aprovar nomes, histórias e mecânicas dos 3 chefes (ou ajustar).
-2. **Números de dano na tela:** mostrar (tamanho/cor pelo dano, sem nome do elemento) ou não?
-3. **Óleos/encantamentos de arma** como fonte de elemento para qualquer classe (e de Terra): aprovar?
+## 5. Decisões do proprietário (2026-11-07)
+1. Os 3 chefes: **aprovados**.
+2. Números de dano na tela: **sim** (implementado).
+3. Óleos/encantamentos de arma: **sim** (entram com os elementos, Etapa C).
+4. **Fúria aos 70%, 50% e 20%** de vida, para todos os chefes (§0).

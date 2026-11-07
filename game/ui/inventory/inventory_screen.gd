@@ -8,7 +8,9 @@ extends CanvasLayer
 ## Não pausa o jogo (no co-op não dá para pausar para os outros).
 ##
 ## Controles: clique esquerdo = usar/equipar (ou desequipar, no equipamento);
-## clique direito na bolsa = descartar; Tab/Esc = fechar.
+## clique direito na bolsa = descartar; arrastar consumível para a barra de
+## habilidades = atalho; I/Esc = fechar. Cliques valem ao SOLTAR o botão (apertar
+## e arrastar não usa o item).
 
 const SLOT_SIZE := Vector2(32, 32)
 const PANEL_RECT := Rect2(70, 40, 500, 270)
@@ -92,6 +94,9 @@ func _build() -> void:
 	_root = Control.new()
 	_root.name = "Root"
 	_root.set_anchors_preset(Control.PRESET_FULL_RECT)
+	# A raiz cobre a tela toda: precisa deixar o mouse passar, senão engole o
+	# "soltar" na barra de habilidades do HUD (que fica abaixo do painel).
+	_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_root)
 	var bg := ColorRect.new()
 	bg.position = PANEL_RECT.position
@@ -101,7 +106,7 @@ func _build() -> void:
 
 	var x0: float = PANEL_RECT.position.x + 12
 	var y0: float = PANEL_RECT.position.y + 10
-	_label("INVENTÁRIO  (Tab fecha)", Vector2(x0, y0), Color.WHITE)
+	_label("INVENTÁRIO  (I fecha)", Vector2(x0, y0), Color.WHITE)
 	_label("Bolsa", Vector2(x0, y0 + 18), TEXT_DIM)
 	_bag_grid = GridContainer.new()
 	_bag_grid.columns = 4
@@ -123,7 +128,7 @@ func _build() -> void:
 	_shield_slot.gui_input.connect(_on_equip_slot_input.bind(false))
 	_shield_slot.mouse_entered.connect(func() -> void: _hover(_player.equipment.shield))
 	_root.add_child(_shield_slot)
-	var hint := _label("Clique: usar / equipar / tirar   |   Botão direito: descartar", Vector2(x0, y0 + 176), TEXT_DIM)
+	var hint := _label("Clique: usar / equipar / tirar  |  Botão dir.: descartar  |  Arraste consumível para a barra", Vector2(x0, y0 + 176), TEXT_DIM)
 	hint.add_theme_font_size_override("font_size", 8)
 
 	# Coluna da direita: detalhes e progressão.
@@ -206,6 +211,7 @@ func _refresh() -> void:
 		var index: int = _bag_grid.get_child_count()
 		var slot := _make_slot()
 		slot.gui_input.connect(_on_bag_slot_input.bind(index))
+		slot.set_drag_forwarding(func(_at: Vector2) -> Variant: return _drag_data(index), Callable(), Callable())
 		slot.mouse_entered.connect(func() -> void: _hover(_player.inventory.get_slot(index)))
 		_bag_grid.add_child(slot)
 	for i in inv.slots.size():
@@ -274,16 +280,37 @@ func _show_details(stack: ItemStack) -> void:
 	_detail_text.text = "\n".join(lines)
 
 
+## O que é arrastado da vaga: só consumíveis (atalho na barra de habilidades).
+func drag_payload(index: int) -> Variant:
+	var stack: ItemStack = _player.inventory.get_slot(index)
+	if stack == null or not (stack.item is ConsumableData):
+		return null
+	return {"item": stack.item, "from_slot": index}
+
+
+## Chamado pela Godot ao começar a arrastar: dados + miniatura que segue o mouse
+## (a Godot assume a miniatura e a apaga ao soltar).
+func _drag_data(index: int) -> Variant:
+	var payload: Variant = drag_payload(index)
+	if payload == null:
+		return null
+	var preview := ColorRect.new()
+	preview.size = Vector2(16, 16)
+	preview.color = (payload["item"] as ItemData).icon_color
+	_bag_grid.get_child(index).set_drag_preview(preview)
+	return payload
+
+
 func _on_bag_slot_input(event: InputEvent, index: int) -> void:
 	var mb := event as InputEventMouseButton
-	if mb and mb.pressed:
+	if mb and not mb.pressed:
 		click_bag_slot(index, mb.button_index)
 		_hover(_player.inventory.get_slot(index))
 
 
 func _on_equip_slot_input(event: InputEvent, is_weapon: bool) -> void:
 	var mb := event as InputEventMouseButton
-	if mb and mb.pressed and mb.button_index == MOUSE_BUTTON_LEFT:
+	if mb and not mb.pressed and mb.button_index == MOUSE_BUTTON_LEFT:
 		if is_weapon:
 			click_weapon_slot()
 		else:
