@@ -82,6 +82,12 @@ conhecidos. Detalhes técnicos de cada etapa ficam em `documentation/worklog/`.
 - [ ] Classes/disciplinas definitivas, Gear Score, masmorras com sincronização
 - [ ] Enigmas, chefes
 
+### Protótipo 3D (só visualização) — `prototypes/preview_3d/`
+- [x] Cena separada, sem afetar o jogo 2D: terceira pessoa, câmera no mouse, andar, atacar,
+  esquivar, monstro com aviso no chão, números de dano, golpe pelas costas. Formas simples, sem arte.
+- Abrir: `godot --path . res://prototypes/preview_3d/preview_3d.tscn`
+- [ ] Decisão do proprietário: seguir só 2D, ou manter as duas versões
+
 ## Problemas conhecidos
 - F5 no editor (jogo embutido na aba "Jogo") não recebe o teclado; clicar dentro não
   resolve. Contorno: desligar o jogo embutido para o projeto (`embed_on_play=false`) —

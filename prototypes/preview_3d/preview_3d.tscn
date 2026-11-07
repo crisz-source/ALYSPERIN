@@ -1,0 +1,6 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://prototypes/preview_3d/preview_3d.gd" id="1_i1pbb"]
+
+[node name="Preview3D" type="Node3D" unique_id=1427272167]
+script = ExtResource("1_i1pbb")
