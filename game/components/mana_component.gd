@@ -1,13 +1,14 @@
 class_name ManaComponent
 extends Node
-## Mana: recurso gasto pelas magias. Recupera sozinha com o tempo.
+## Mana: recurso gasto pelas magias. NÃO recupera sozinha (decisão do
+## proprietário): volta com itens de mana (e cheia ao continuar após a morte).
 ## Como a vida, só guarda e avisa; quem decide gastar é o dono.
 
 signal mana_changed(current: int, maximum: int)
 
 @export var max_mana: int = 30
-## Mana recuperada por segundo.
-@export var regen_per_second: float = 3.0
+## Mana recuperada por segundo. 0 = não recupera sozinha (padrão do jogo).
+@export var regen_per_second: float = 0.0
 
 ## Guardada com fração para a recuperação ser suave; a interface mostra inteiro.
 var _current: float = 0.0
@@ -43,6 +44,13 @@ func spend(amount: int) -> bool:
 	_current -= amount
 	mana_changed.emit(current(), max_mana)
 	return true
+
+
+func restore(amount: int) -> void:
+	if amount <= 0:
+		return
+	_current = minf(_current + amount, max_mana)
+	mana_changed.emit(current(), max_mana)
 
 
 func restore_full() -> void:

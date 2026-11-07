@@ -1,66 +1,55 @@
 class_name CharacterStats
 extends Node
-## Progressão do personagem: experiência, nível e atributos.
+## Progressão do personagem: experiência e nível (máximo 60).
 ##
-## Cada nível dá pontos para distribuir (o jogador escolhe):
-## - Vigor: mais vida máxima.
-## - Força: mais dano com qualquer arma.
-## Só guarda números e avisa por sinal; o Player aplica os efeitos.
+## Sem pontos para distribuir (decisão do proprietário): a cada nível, vida,
+## mana e dano crescem automaticamente e IGUAL para todas as classes. As
+## diferenças entre classes/disciplinas vêm das habilidades.
 
 signal xp_changed(xp: int, xp_to_next: int)
 signal leveled_up(new_level: int)
-signal attributes_changed
 
-enum Attribute { VIGOR, STRENGTH }
-
+@export var max_level: int = 60
 ## Experiência para passar do nível N para N+1 = xp_per_level * N.
 @export var xp_per_level: int = 30
-@export var points_per_level: int = 1
-@export var health_per_vigor: int = 10
-## Dano extra por ponto de Força (0.08 = +8%).
-@export var damage_per_strength: float = 0.08
+@export var health_per_level: int = 8
+@export var mana_per_level: int = 2
+## Dano-base extra por nível (0.1 = +10% do dano do nível 1 a cada nível).
+@export var damage_per_level: float = 0.1
 
 var level: int = 1
 var xp: int = 0
-var unspent_points: int = 0
-var vigor: int = 0
-var strength: int = 0
 
 
 func xp_to_next() -> int:
 	return xp_per_level * level
 
 
-## Soma experiência; pode subir vários níveis de uma vez.
+func is_max_level() -> bool:
+	return level >= max_level
+
+
+## Soma experiência; pode subir vários níveis de uma vez. No nível máximo, para.
 func add_xp(amount: int) -> void:
-	if amount <= 0:
+	if amount <= 0 or is_max_level():
 		return
 	xp += amount
-	while xp >= xp_to_next():
+	while not is_max_level() and xp >= xp_to_next():
 		xp -= xp_to_next()
 		level += 1
-		unspent_points += points_per_level
 		leveled_up.emit(level)
+	if is_max_level():
+		xp = 0
 	xp_changed.emit(xp, xp_to_next())
 
 
-## Gasta 1 ponto no atributo. Devolve false se não há pontos.
-func spend_point(attribute: Attribute) -> bool:
-	if unspent_points <= 0:
-		return false
-	unspent_points -= 1
-	match attribute:
-		Attribute.VIGOR:
-			vigor += 1
-		Attribute.STRENGTH:
-			strength += 1
-	attributes_changed.emit()
-	return true
-
-
 func bonus_max_health() -> int:
-	return vigor * health_per_vigor
+	return (level - 1) * health_per_level
+
+
+func bonus_max_mana() -> int:
+	return (level - 1) * mana_per_level
 
 
 func damage_multiplier() -> float:
-	return 1.0 + strength * damage_per_strength
+	return 1.0 + (level - 1) * damage_per_level

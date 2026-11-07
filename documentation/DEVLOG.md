@@ -22,6 +22,10 @@ conhecidos. Detalhes técnicos de cada etapa ficam em `documentation/worklog/`.
 | 2026-11-07 | Durabilidade: arma/escudo quebrados ficam bem mais fracos, não somem |
 | 2026-11-07 | Progressão por nível com pontos escolhidos (Vigor, Força); sem escudo não há defesa |
 | 2026-11-07 | Inventário não pausa o jogo (pensado para o co-op) |
+| 2026-11-07 | Mana NÃO recupera sozinha: só com itens (Poção de mana) e cheia ao continuar após a morte |
+| 2026-11-07 | Sem sistema de pontos (Vigor/Força removidos): vida, mana e dano crescem por nível, igual para todos |
+| 2026-11-07 | Nível máximo 60; masmorras a partir do nível 20; cada classe usa só os seus tipos de arma |
+| 2026-11-07 | Ponto de descanso removido: continuar após a morte volta ao início da área |
 | 2026-11-07 | ~~Morrer recomeça a área do zero~~ → substituído: morrer mostra "Você morreu!" / "Deseja continuar?"; Sim volta ao último ponto de descanso mantendo itens e experiência |
 
 ## Marcos
@@ -65,7 +69,7 @@ conhecidos. Detalhes técnicos de cada etapa ficam em `documentation/worklog/`.
 - [ ] Reparo de equipamento; ícones reais; salvamento
 
 ### Fase 6 — Mundo e conteúdo — 🔄 em andamento
-- [x] Morte com "continuar" e pontos de descanso (botão "Não" a definir pelo proprietário)
+- [x] Morte com "continuar" (volta ao início da área; botão "Não" a definir pelo proprietário)
 - [x] Mana; magias (Dardo arcano, Cura); NPC com diálogo; missões (derrotar / coletar)
 - [x] Disciplinas PROVISÓRIAS (Vanguarda/Guardião/Arcanista) — a substituir pelo sistema
   de 6 classes × 3 disciplinas definido pelo proprietário

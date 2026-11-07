@@ -2,5 +2,5 @@
 
 [ext_resource type="Script" path="res://game/ui/discipline_select/discipline_select_screen.gd" id="1_i0tut"]
 
-[node name="DisciplineSelectScreen" type="CanvasLayer" unique_id=501228375]
+[node name="DisciplineSelectScreen" type="CanvasLayer" unique_id=1001391637]
 script = ExtResource("1_i0tut")

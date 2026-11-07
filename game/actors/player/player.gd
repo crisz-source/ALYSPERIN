@@ -33,6 +33,7 @@ const DODGE_SUCCESS_COLOR := Color(0.55, 0.95, 1.0)
 const LEVEL_UP_COLOR := Color(1.0, 0.85, 0.35)
 const BROKEN_COLOR := Color(1.0, 0.45, 0.35)
 const MSG_HEALTH_FULL := "A vida já está cheia."
+const MSG_MANA_FULL := "A mana já está cheia."
 const MSG_INVENTORY_FULL := "Inventário cheio."
 const NO_MANA_COLOR := Color(0.5, 0.7, 1.0)
 
@@ -129,7 +130,7 @@ var _dodge_success_this_dodge: bool = false
 var focused_interactable: Interactable = null
 ## true enquanto uma tela (inventário) estiver aberta: o personagem ignora comandos.
 var input_blocked: bool = false
-## Onde o jogador volta ao continuar depois da morte (ponto de descanso).
+## Onde o jogador volta ao continuar depois da morte (início da área).
 var respawn_point: Vector2 = Vector2.ZERO
 ## Invulnerabilidade ao voltar, para não morrer de novo no mesmo instante (s).
 var respawn_invulnerability: float = 1.5
@@ -141,7 +142,6 @@ var _ability_fired: bool = false
 ## Disciplina escolhida (null = nenhuma ainda).
 var discipline: DisciplineData = null
 var _base_max_mana: int = 0
-var _base_mana_regen: float = 0.0
 ## Desgaste fracionário do escudo (Guardião gasta metade: 1 ponto a cada 2 bloqueios).
 var _shield_wear_accumulator: float = 0.0
 
@@ -183,11 +183,9 @@ func _ready() -> void:
 	_interact_prompt.visible = false
 	_base_max_health = health.max_health
 	_base_max_mana = mana.max_mana
-	_base_mana_regen = mana.regen_per_second
 	quest_log.inventory = inventory
 	inventory.changed.connect(quest_log.refresh_collect)
 	respawn_point = global_position
-	stats.attributes_changed.connect(_on_attributes_changed)
 	stats.leveled_up.connect(_on_leveled_up)
 	_ability_cooldowns.resize(abilities.size())
 	_ability_cooldowns.fill(0.0)
@@ -252,22 +250,13 @@ func respawn(at: Vector2) -> void:
 	_camera.reset_smoothing()
 
 
-## Ponto de descanso: marca onde voltar e restaura a vida.
-func rest_at(point: Vector2) -> void:
-	respawn_point = point
-	health.heal(health.max_health)
-	mana.restore_full()
-
-
 ## Aplica a Disciplina: bônus de vida/mana e troca das habilidades.
 func apply_discipline(new_discipline: DisciplineData) -> void:
 	discipline = new_discipline
 	abilities = discipline.abilities.duplicate()
 	_ability_cooldowns.resize(abilities.size())
 	_ability_cooldowns.fill(0.0)
-	_on_attributes_changed()
-	mana.regen_per_second = _base_mana_regen * discipline.mana_regen_multiplier
-	mana.set_max_mana(_base_max_mana + discipline.bonus_mana)
+	_apply_growth()
 	discipline_changed.emit(discipline)
 
 
@@ -353,11 +342,16 @@ func pick_up(stack: ItemStack) -> int:
 	return inventory.add(stack)
 
 
+## Gasta o item só se ele tiver efeito (vida/mana não cheias).
 func _consume(index: int, item: ConsumableData) -> String:
-	if item.heal_amount > 0:
-		if health.current_health >= health.max_health:
-			return MSG_HEALTH_FULL
+	var heals: bool = item.heal_amount > 0 and health.current_health < health.max_health
+	var restores: bool = item.mana_amount > 0 and mana.current() < mana.max_mana
+	if not heals and not restores:
+		return MSG_MANA_FULL if item.mana_amount > 0 and item.heal_amount == 0 else MSG_HEALTH_FULL
+	if heals:
 		health.heal(item.heal_amount)
+	if restores:
+		mana.restore(item.mana_amount)
 	inventory.remove(index, 1)
 	return ""
 
@@ -718,12 +712,16 @@ func _can_block() -> bool:
 	return _input.defend_held and equipment.shield != null
 
 
-func _on_attributes_changed() -> void:
+## Vida e mana máximas = base + crescimento por nível (+ bônus provisório da Disciplina).
+func _apply_growth() -> void:
 	var discipline_health: int = discipline.bonus_health if discipline else 0
+	var discipline_mana: int = discipline.bonus_mana if discipline else 0
 	health.set_max_health(_base_max_health + discipline_health + stats.bonus_max_health())
+	mana.set_max_mana(_base_max_mana + discipline_mana + stats.bonus_max_mana())
 
 
 func _on_leveled_up(new_level: int) -> void:
+	_apply_growth()
 	FloatingText.spawn(self, "Nível %d!" % new_level, global_position + Vector2(0, -40), LEVEL_UP_COLOR)
 
 

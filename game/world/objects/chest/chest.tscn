@@ -9,32 +9,32 @@ size = Vector2(16, 8)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_xvnbp"]
 size = Vector2(26, 22)
 
-[node name="Chest" type="StaticBody2D" unique_id=672042699]
+[node name="Chest" type="StaticBody2D" unique_id=956806456]
 collision_mask = 0
 script = ExtResource("1_kmvbp")
 
-[node name="CollisionShape" type="CollisionShape2D" parent="." unique_id=1180726314]
+[node name="CollisionShape" type="CollisionShape2D" parent="." unique_id=1014659825]
 position = Vector2(0, -4)
 shape = SubResource("RectangleShape2D_wum7h")
 
-[node name="BoxPlaceholder" type="ColorRect" parent="." unique_id=1006577190]
+[node name="BoxPlaceholder" type="ColorRect" parent="." unique_id=559779612]
 offset_left = -8.0
 offset_top = -10.0
 offset_right = 8.0
 color = Color(0.42, 0.28, 0.15, 1)
 
-[node name="LidPlaceholder" type="ColorRect" parent="." unique_id=2030106320]
+[node name="LidPlaceholder" type="ColorRect" parent="." unique_id=588199328]
 offset_left = -8.0
 offset_top = -13.0
 offset_right = 8.0
 offset_bottom = -9.0
 color = Color(0.5, 0.33, 0.18, 1)
 
-[node name="Interactable" type="Area2D" parent="." unique_id=9351321]
+[node name="Interactable" type="Area2D" parent="." unique_id=781384139]
 collision_layer = 32
 collision_mask = 0
 script = ExtResource("2_8qbs0")
 
-[node name="CollisionShape" type="CollisionShape2D" parent="Interactable" unique_id=1467889481]
+[node name="CollisionShape" type="CollisionShape2D" parent="Interactable" unique_id=1584412784]
 position = Vector2(0, -6)
 shape = SubResource("RectangleShape2D_xvnbp")

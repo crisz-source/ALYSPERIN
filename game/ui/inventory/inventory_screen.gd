@@ -3,12 +3,12 @@ extends CanvasLayer
 ## Tela do inventário (Tab) — PROVISÓRIA: quadrados coloridos no lugar de ícones.
 ##
 ## Mostra a bolsa, o equipamento (com durabilidade), detalhes do item sob o
-## mouse e a progressão (nível, experiência, pontos). Não decide regras: cada
+## mouse e a progressão (nível, experiência, vida/mana/dano). Não decide regras: cada
 ## clique chama uma ação do Player, que valida e responde.
 ## Não pausa o jogo (no co-op não dá para pausar para os outros).
 ##
 ## Controles: clique esquerdo = usar/equipar (ou desequipar, no equipamento);
-## clique direito na bolsa = descartar; [+] = gastar ponto; Tab/Esc = fechar.
+## clique direito na bolsa = descartar; Tab/Esc = fechar.
 
 const SLOT_SIZE := Vector2(32, 32)
 const PANEL_RECT := Rect2(70, 40, 500, 270)
@@ -30,12 +30,8 @@ var _detail_name: Label
 var _detail_text: Label
 var _level_label: Label
 var _xp_fill: ColorRect
-var _points_label: Label
-var _vigor_label: Label
-var _strength_label: Label
-var _vigor_button: Button
-var _strength_button: Button
 var _health_label: Label
+var _growth_label: Label
 
 
 func _ready() -> void:
@@ -49,9 +45,9 @@ func bind_player(player: Player) -> void:
 	player.inventory.changed.connect(_refresh)
 	player.equipment.changed.connect(_refresh)
 	player.stats.xp_changed.connect(func(_a: int, _b: int) -> void: _refresh())
-	player.stats.attributes_changed.connect(_refresh)
 	player.stats.leveled_up.connect(func(_l: int) -> void: _refresh())
 	player.health.health_changed.connect(func(_a: int, _b: int) -> void: _refresh())
+	player.mana.mana_changed.connect(func(_a: int, _b: int) -> void: _refresh())
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -148,11 +144,7 @@ func _build() -> void:
 	_xp_fill.color = Color(0.95, 0.8, 0.3)
 	xp_bg.add_child(_xp_fill)
 	_health_label = _label("", Vector2(x1, y0 + 148), TEXT_DIM)
-	_points_label = _label("", Vector2(x1, y0 + 164), TEXT_DIM)
-	_vigor_label = _label("", Vector2(x1, y0 + 182), Color.WHITE)
-	_vigor_button = _plus_button(Vector2(x1 + 170, y0 + 180), CharacterStats.Attribute.VIGOR)
-	_strength_label = _label("", Vector2(x1, y0 + 202), Color.WHITE)
-	_strength_button = _plus_button(Vector2(x1 + 170, y0 + 200), CharacterStats.Attribute.STRENGTH)
+	_growth_label = _label("", Vector2(x1, y0 + 166), TEXT_DIM)
 
 
 func _label(text: String, pos: Vector2, color: Color) -> Label:
@@ -164,18 +156,6 @@ func _label(text: String, pos: Vector2, color: Color) -> Label:
 	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_root.add_child(l)
 	return l
-
-
-func _plus_button(pos: Vector2, attribute: CharacterStats.Attribute) -> Button:
-	var b := Button.new()
-	b.text = "+"
-	b.position = pos
-	b.custom_minimum_size = Vector2(16, 14)
-	b.add_theme_font_size_override("font_size", 10)
-	b.focus_mode = Control.FOCUS_NONE
-	b.pressed.connect(func() -> void: _player.stats.spend_point(attribute))
-	_root.add_child(b)
-	return b
 
 
 ## Vaga: fundo, ícone (cor do item), quantidade e barra de durabilidade.
@@ -234,14 +214,15 @@ func _refresh() -> void:
 	_paint_slot(_shield_slot, _player.equipment.shield)
 
 	var st: CharacterStats = _player.stats
-	_level_label.text = "Nível %d   —   %d / %d exp." % [st.level, st.xp, st.xp_to_next()]
-	_xp_fill.size.x = 200.0 * float(st.xp) / float(st.xp_to_next())
-	_health_label.text = "Vida: %d / %d" % [_player.health.current_health, _player.health.max_health]
-	_points_label.text = "Pontos para distribuir: %d" % st.unspent_points
-	_vigor_label.text = "Vigor %d   (+%d vida)" % [st.vigor, st.health_per_vigor]
-	_strength_label.text = "Força %d   (+%d%% dano)" % [st.strength, roundi(st.damage_per_strength * 100.0)]
-	_vigor_button.disabled = st.unspent_points == 0
-	_strength_button.disabled = st.unspent_points == 0
+	if st.is_max_level():
+		_level_label.text = "Nível %d   —   nível máximo" % st.level
+		_xp_fill.size.x = 200.0
+	else:
+		_level_label.text = "Nível %d   —   %d / %d exp." % [st.level, st.xp, st.xp_to_next()]
+		_xp_fill.size.x = 200.0 * float(st.xp) / float(st.xp_to_next())
+	_health_label.text = "Vida: %d / %d     Mana: %d / %d" % [_player.health.current_health, _player.health.max_health,
+		_player.mana.current(), _player.mana.max_mana]
+	_growth_label.text = "Dano do nível: +%d%%" % roundi((st.damage_multiplier() - 1.0) * 100.0)
 	_show_details(_hovered)
 
 
@@ -281,8 +262,12 @@ func _show_details(stack: ItemStack) -> void:
 		lines.append("Dano %d   Velocidade %s" % [w.damage, "lenta" if w.timing_scale > 1.1 else ("rápida" if w.timing_scale < 0.9 else "normal")])
 	elif stack.item is ShieldData:
 		lines.append("Proteção %d°" % roundi((stack.item as ShieldData).block_half_angle * 2.0))
-	elif stack.item is ConsumableData and (stack.item as ConsumableData).heal_amount > 0:
-		lines.append("Cura %d" % (stack.item as ConsumableData).heal_amount)
+	elif stack.item is ConsumableData:
+		var c := stack.item as ConsumableData
+		if c.heal_amount > 0:
+			lines.append("Cura %d de vida" % c.heal_amount)
+		if c.mana_amount > 0:
+			lines.append("Recupera %d de mana" % c.mana_amount)
 	if stack.item.has_durability():
 		var current: int = stack.durability if stack.durability >= 0 else stack.item.max_durability()
 		lines.append("Durabilidade %d / %d%s" % [current, stack.item.max_durability(), "  (QUEBRADO)" if stack.is_broken() else ""])

@@ -6,22 +6,22 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_21wac"]
 size = Vector2(16, 16)
 
-[node name="ItemPickup" type="Node2D" unique_id=1571580670]
+[node name="ItemPickup" type="Node2D" unique_id=1994859907]
 script = ExtResource("1_7hde6")
 
-[node name="Shadow" type="Polygon2D" parent="." unique_id=1402865173]
+[node name="Shadow" type="Polygon2D" parent="." unique_id=938034307]
 color = Color(0, 0, 0, 0.35)
 polygon = PackedVector2Array(-4, -1, 4, -1, 4, 1, -4, 1)
 
-[node name="IconPlaceholder" type="Polygon2D" parent="." unique_id=282540659]
+[node name="IconPlaceholder" type="Polygon2D" parent="." unique_id=1197728837]
 color = Color(0.8, 0.8, 0.8, 1)
 polygon = PackedVector2Array(0, -4, 4, 0, 0, 4, -4, 0)
 
-[node name="Interactable" type="Area2D" parent="." unique_id=1033724051]
+[node name="Interactable" type="Area2D" parent="." unique_id=1702883020]
 collision_layer = 32
 collision_mask = 0
 script = ExtResource("2_phmmq")
 
-[node name="CollisionShape" type="CollisionShape2D" parent="Interactable" unique_id=1178365154]
+[node name="CollisionShape" type="CollisionShape2D" parent="Interactable" unique_id=516231117]
 position = Vector2(0, -4)
 shape = SubResource("RectangleShape2D_21wac")

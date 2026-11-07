@@ -9,19 +9,19 @@ size = Vector2(10, 6)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_8fado"]
 size = Vector2(26, 30)
 
-[node name="Npc" type="StaticBody2D" unique_id=1917804923]
+[node name="Npc" type="StaticBody2D" unique_id=1564833695]
 collision_mask = 0
 script = ExtResource("1_kuote")
 
-[node name="CollisionShape" type="CollisionShape2D" parent="." unique_id=1421619603]
+[node name="CollisionShape" type="CollisionShape2D" parent="." unique_id=31972517]
 position = Vector2(0, -3)
 shape = SubResource("RectangleShape2D_lfcov")
 
-[node name="BodyPlaceholder" type="Polygon2D" parent="." unique_id=602008478]
+[node name="BodyPlaceholder" type="Polygon2D" parent="." unique_id=237674355]
 color = Color(0.45, 0.75, 0.5, 1)
 polygon = PackedVector2Array(-6, -24, 6, -24, 6, 0, -6, 0)
 
-[node name="QuestMarker" type="Label" parent="." unique_id=786619882]
+[node name="QuestMarker" type="Label" parent="." unique_id=464380530]
 offset_left = -3.0
 offset_top = -40.0
 offset_right = -3.0
@@ -31,11 +31,11 @@ theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 3
 
-[node name="Interactable" type="Area2D" parent="." unique_id=777312961]
+[node name="Interactable" type="Area2D" parent="." unique_id=127484504]
 collision_layer = 32
 collision_mask = 0
 script = ExtResource("2_c8cwq")
 
-[node name="CollisionShape" type="CollisionShape2D" parent="Interactable" unique_id=2003541980]
+[node name="CollisionShape" type="CollisionShape2D" parent="Interactable" unique_id=1921602138]
 position = Vector2(0, -12)
 shape = SubResource("RectangleShape2D_8fado")

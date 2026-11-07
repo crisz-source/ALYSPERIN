@@ -1,158 +1,163 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://game/actors/player/player.gd" id="1_8nq4u"]
-[ext_resource type="Script" path="res://game/abilities/ability_data.gd" id="2_i5w6q"]
-[ext_resource type="Resource" path="res://game/abilities/data/spin_slash.tres" id="3_fxn5h"]
-[ext_resource type="Script" path="res://game/components/health_component.gd" id="4_cxuv5"]
-[ext_resource type="Script" path="res://game/components/hurtbox.gd" id="5_qq66o"]
-[ext_resource type="Script" path="res://game/components/hitbox.gd" id="6_x4qyq"]
-[ext_resource type="Script" path="res://game/inventory/inventory.gd" id="7_i15os"]
-[ext_resource type="Script" path="res://game/items/item_stack.gd" id="8_1svlo"]
-[ext_resource type="Resource" path="res://game/items/data/healing_herb.tres" id="9_a20ea"]
-[ext_resource type="Script" path="res://game/inventory/equipment.gd" id="10_b3c30"]
-[ext_resource type="Resource" path="res://game/items/data/short_sword.tres" id="11_2vult"]
-[ext_resource type="Resource" path="res://game/items/data/wooden_shield.tres" id="12_41lfd"]
-[ext_resource type="Script" path="res://game/components/mana_component.gd" id="13_4s16b"]
-[ext_resource type="Script" path="res://game/quests/quest_log.gd" id="14_m4n5g"]
-[ext_resource type="Script" path="res://game/actors/player/character_stats.gd" id="15_6o7jk"]
-[ext_resource type="Script" path="res://game/actors/player/player_input.gd" id="16_747sf"]
-[ext_resource type="Script" path="res://game/actors/player/player_camera.gd" id="17_5qatl"]
+[ext_resource type="Script" path="res://game/actors/player/player.gd" id="1_i5w6q"]
+[ext_resource type="Script" path="res://game/abilities/ability_data.gd" id="2_fxn5h"]
+[ext_resource type="Resource" path="res://game/abilities/data/spin_slash.tres" id="3_cxuv5"]
+[ext_resource type="Script" path="res://game/components/health_component.gd" id="4_qq66o"]
+[ext_resource type="Script" path="res://game/components/hurtbox.gd" id="5_x4qyq"]
+[ext_resource type="Script" path="res://game/components/hitbox.gd" id="6_i15os"]
+[ext_resource type="Script" path="res://game/inventory/inventory.gd" id="7_1svlo"]
+[ext_resource type="Script" path="res://game/items/item_stack.gd" id="8_a20ea"]
+[ext_resource type="Resource" path="res://game/items/data/healing_herb.tres" id="9_b3c30"]
+[ext_resource type="Resource" path="res://game/items/data/mana_potion.tres" id="10_2vult"]
+[ext_resource type="Script" path="res://game/inventory/equipment.gd" id="11_41lfd"]
+[ext_resource type="Resource" path="res://game/items/data/short_sword.tres" id="12_4s16b"]
+[ext_resource type="Resource" path="res://game/items/data/wooden_shield.tres" id="13_m4n5g"]
+[ext_resource type="Script" path="res://game/components/mana_component.gd" id="14_6o7jk"]
+[ext_resource type="Script" path="res://game/quests/quest_log.gd" id="15_747sf"]
+[ext_resource type="Script" path="res://game/actors/player/character_stats.gd" id="16_5qatl"]
+[ext_resource type="Script" path="res://game/actors/player/player_input.gd" id="17_qsypv"]
+[ext_resource type="Script" path="res://game/actors/player/player_camera.gd" id="18_lje7i"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_qsypv"]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_7c4js"]
 size = Vector2(10, 6)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_lje7i"]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_6xo6p"]
 size = Vector2(10, 20)
 
-[sub_resource type="ConvexPolygonShape2D" id="ConvexPolygonShape2D_7c4js"]
+[sub_resource type="ConvexPolygonShape2D" id="ConvexPolygonShape2D_0nwbe"]
 points = PackedVector2Array(0, 0, 10.142838, -21.751389, 15.824299, -18.044155, 20.241394, -12.895191, 23.041197, -6.7158966, 24, 0, 23.041197, 6.7158966, 20.241394, 12.895191, 15.824299, 18.044155, 10.142838, 21.751389)
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_6xo6p"]
+[sub_resource type="CircleShape2D" id="CircleShape2D_3do8f"]
 radius = 14.0
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_0nwbe"]
+[sub_resource type="CircleShape2D" id="CircleShape2D_0fe1s"]
 radius = 30.0
 
-[sub_resource type="Resource" id="Resource_3do8f"]
-script = ExtResource("8_1svlo")
-item = ExtResource("9_a20ea")
+[sub_resource type="Resource" id="Resource_d4m7k"]
+script = ExtResource("8_a20ea")
+item = ExtResource("9_b3c30")
 
-[sub_resource type="Resource" id="Resource_0fe1s"]
-script = ExtResource("8_1svlo")
-item = ExtResource("11_2vult")
+[sub_resource type="Resource" id="Resource_0g54q"]
+script = ExtResource("8_a20ea")
+item = ExtResource("10_2vult")
+
+[sub_resource type="Resource" id="Resource_bu7in"]
+script = ExtResource("8_a20ea")
+item = ExtResource("12_4s16b")
 durability = 80
 
-[sub_resource type="Resource" id="Resource_d4m7k"]
-script = ExtResource("8_1svlo")
-item = ExtResource("12_41lfd")
+[sub_resource type="Resource" id="Resource_rsjix"]
+script = ExtResource("8_a20ea")
+item = ExtResource("13_m4n5g")
 durability = 40
 
-[node name="Player" type="CharacterBody2D" unique_id=1732134207]
+[node name="Player" type="CharacterBody2D" unique_id=1947586939]
 collision_layer = 2
 motion_mode = 1
-script = ExtResource("1_8nq4u")
-abilities = Array[ExtResource("2_i5w6q")]([ExtResource("3_fxn5h")])
+script = ExtResource("1_i5w6q")
+abilities = Array[ExtResource("2_fxn5h")]([ExtResource("3_cxuv5")])
 
-[node name="CollisionShape" type="CollisionShape2D" parent="." unique_id=1701768015]
+[node name="CollisionShape" type="CollisionShape2D" parent="." unique_id=1507856325]
 position = Vector2(0, -3)
-shape = SubResource("RectangleShape2D_qsypv")
+shape = SubResource("RectangleShape2D_7c4js")
 
-[node name="BodyPlaceholder" type="Polygon2D" parent="." unique_id=1165121122]
+[node name="BodyPlaceholder" type="Polygon2D" parent="." unique_id=1453762469]
 color = Color(0.36, 0.62, 0.92, 1)
 polygon = PackedVector2Array(-6, -24, 6, -24, 6, 0, -6, 0)
 
-[node name="FacingIndicator" type="Polygon2D" parent="." unique_id=449655148]
+[node name="FacingIndicator" type="Polygon2D" parent="." unique_id=1247608890]
 position = Vector2(0, -12)
 color = Color(1, 0.85, 0.3, 1)
 polygon = PackedVector2Array(13, 0, 8, -4, 8, 4)
 
-[node name="HealthComponent" type="Node" parent="." unique_id=843177536]
-script = ExtResource("4_cxuv5")
+[node name="HealthComponent" type="Node" parent="." unique_id=854400]
+script = ExtResource("4_qq66o")
 
-[node name="Hurtbox" type="Area2D" parent="." unique_id=1636181829 node_paths=PackedStringArray("health")]
+[node name="Hurtbox" type="Area2D" parent="." unique_id=328205361 node_paths=PackedStringArray("health")]
 collision_layer = 2
 collision_mask = 0
-script = ExtResource("5_qq66o")
+script = ExtResource("5_x4qyq")
 health = NodePath("../HealthComponent")
 
-[node name="CollisionShape" type="CollisionShape2D" parent="Hurtbox" unique_id=1480449997]
+[node name="CollisionShape" type="CollisionShape2D" parent="Hurtbox" unique_id=1123982338]
 position = Vector2(0, -10)
-shape = SubResource("RectangleShape2D_lje7i")
+shape = SubResource("RectangleShape2D_6xo6p")
 
-[node name="AttackPivot" type="Node2D" parent="." unique_id=1986246806]
+[node name="AttackPivot" type="Node2D" parent="." unique_id=596107762]
 position = Vector2(0, -10)
 
-[node name="SwordHitbox" type="Area2D" parent="AttackPivot" unique_id=921770637 node_paths=PackedStringArray("attacker")]
+[node name="SwordHitbox" type="Area2D" parent="AttackPivot" unique_id=1303607509 node_paths=PackedStringArray("attacker")]
 collision_layer = 8
 collision_mask = 4
-script = ExtResource("6_x4qyq")
+script = ExtResource("6_i15os")
 knockback_force = 170.0
 attacker = NodePath("../..")
 
-[node name="CollisionShape" type="CollisionShape2D" parent="AttackPivot/SwordHitbox" unique_id=1407157726]
-shape = SubResource("ConvexPolygonShape2D_7c4js")
+[node name="CollisionShape" type="CollisionShape2D" parent="AttackPivot/SwordHitbox" unique_id=90314865]
+shape = SubResource("ConvexPolygonShape2D_0nwbe")
 
-[node name="SwingPlaceholder" type="Polygon2D" parent="AttackPivot" unique_id=1008085941]
+[node name="SwingPlaceholder" type="Polygon2D" parent="AttackPivot" unique_id=2143760408]
 color = Color(1, 1, 0.85, 0.75)
 polygon = PackedVector2Array(0, 0, 10.142838, -21.751389, 15.824299, -18.044155, 20.241394, -12.895191, 23.041197, -6.7158966, 24, 0, 23.041197, 6.7158966, 20.241394, 12.895191, 15.824299, 18.044155, 10.142838, 21.751389)
 
-[node name="ShieldPlaceholder" type="Polygon2D" parent="AttackPivot" unique_id=1158955268]
+[node name="ShieldPlaceholder" type="Polygon2D" parent="AttackPivot" unique_id=12615263]
 color = Color(0.75, 0.85, 1, 0.85)
 polygon = PackedVector2Array(7.4999995, -12.990381, 10.606602, -10.606602, 12.990381, -7.5, 14.488887, -3.8822856, 15, 0, 14.488887, 3.8822856, 12.990381, 7.5, 10.606602, 10.606602, 7.4999995, 12.990381, 5.4999995, 9.526279, 7.7781744, 7.7781744, 9.526279, 5.5, 10.625184, 2.8470094, 11, 0, 10.625184, -2.8470094, 9.526279, -5.5, 7.7781744, -7.7781744, 5.4999995, -9.526279)
 
-[node name="InteractionDetector" type="Area2D" parent="." unique_id=200529224]
+[node name="InteractionDetector" type="Area2D" parent="." unique_id=1282614790]
 collision_layer = 0
 collision_mask = 32
 monitorable = false
 
-[node name="CollisionShape" type="CollisionShape2D" parent="InteractionDetector" unique_id=1736034652]
+[node name="CollisionShape" type="CollisionShape2D" parent="InteractionDetector" unique_id=338983895]
 position = Vector2(0, -8)
-shape = SubResource("CircleShape2D_6xo6p")
+shape = SubResource("CircleShape2D_3do8f")
 
-[node name="InteractPrompt" type="Label" parent="." unique_id=661500281]
+[node name="InteractPrompt" type="Label" parent="." unique_id=1424700164]
 z_index = 10
 theme_override_font_sizes/font_size = 10
 theme_override_colors/font_outline_color = Color(0.05, 0.05, 0.08, 1)
 theme_override_constants/outline_size = 3
 
-[node name="SpinHitbox" type="Area2D" parent="." unique_id=630643761 node_paths=PackedStringArray("attacker")]
+[node name="SpinHitbox" type="Area2D" parent="." unique_id=912361798 node_paths=PackedStringArray("attacker")]
 collision_layer = 8
 collision_mask = 4
-script = ExtResource("6_x4qyq")
+script = ExtResource("6_i15os")
 attacker = NodePath("..")
 
-[node name="CollisionShape" type="CollisionShape2D" parent="SpinHitbox" unique_id=889502770]
+[node name="CollisionShape" type="CollisionShape2D" parent="SpinHitbox" unique_id=1652462106]
 position = Vector2(0, -8)
-shape = SubResource("CircleShape2D_0nwbe")
+shape = SubResource("CircleShape2D_0fe1s")
 
-[node name="SpinPlaceholder" type="Polygon2D" parent="." unique_id=223226717]
+[node name="SpinPlaceholder" type="Polygon2D" parent="." unique_id=3892888]
 position = Vector2(0, -8)
 color = Color(1, 1, 0.85, 0.45)
 polygon = PackedVector2Array(0, 0, -25.980762, -15.000002, -21.213203, -21.213203, -15.000002, -25.980762, -7.764571, -28.977774, -1.3113416e-06, -30, 7.764572, -28.977774, 14.999999, -25.980762, 21.213203, -21.213203, 25.980762, -15, 28.977774, -7.764571, 30, 0, 28.977774, 7.764571, 25.980762, 15, 21.213203, 21.213203, 14.999999, 25.980762, 7.764572, 28.977774, -1.3113416e-06, 30, -7.764571, 28.977774, -15.000002, 25.980762, -21.213203, 21.213203, -25.980762, 15.000002)
 
-[node name="Inventory" type="Node" parent="." unique_id=2136053574]
-script = ExtResource("7_i15os")
-starting_items = Array[ExtResource("8_1svlo")]([SubResource("Resource_3do8f")])
+[node name="Inventory" type="Node" parent="." unique_id=89986694]
+script = ExtResource("7_1svlo")
+starting_items = Array[ExtResource("8_a20ea")]([SubResource("Resource_d4m7k"), SubResource("Resource_0g54q")])
 
-[node name="Equipment" type="Node" parent="." unique_id=40804972]
-script = ExtResource("10_b3c30")
-starting_weapon = SubResource("Resource_0fe1s")
-starting_shield = SubResource("Resource_d4m7k")
+[node name="Equipment" type="Node" parent="." unique_id=1596697418]
+script = ExtResource("11_41lfd")
+starting_weapon = SubResource("Resource_bu7in")
+starting_shield = SubResource("Resource_rsjix")
 
-[node name="ManaComponent" type="Node" parent="." unique_id=833774360]
-script = ExtResource("13_4s16b")
+[node name="ManaComponent" type="Node" parent="." unique_id=402225482]
+script = ExtResource("14_6o7jk")
 
-[node name="QuestLog" type="Node" parent="." unique_id=1975318843]
-script = ExtResource("14_m4n5g")
+[node name="QuestLog" type="Node" parent="." unique_id=17624581]
+script = ExtResource("15_747sf")
 
-[node name="CharacterStats" type="Node" parent="." unique_id=1764312966]
-script = ExtResource("15_6o7jk")
+[node name="CharacterStats" type="Node" parent="." unique_id=1813721319]
+script = ExtResource("16_5qatl")
 
-[node name="PlayerInput" type="Node" parent="." unique_id=1143609082]
-script = ExtResource("16_747sf")
+[node name="PlayerInput" type="Node" parent="." unique_id=1271726771]
+script = ExtResource("17_qsypv")
 
-[node name="Camera" type="Camera2D" parent="." unique_id=1423358846]
+[node name="Camera" type="Camera2D" parent="." unique_id=779549179]
 position = Vector2(0, -12)
 position_smoothing_enabled = true
 position_smoothing_speed = 8.0
-script = ExtResource("17_5qatl")
+script = ExtResource("18_lje7i")

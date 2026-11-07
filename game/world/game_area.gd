@@ -7,7 +7,7 @@ extends Node2D
 ## Estrutura esperada na cena: Entities/Player, Hud, InventoryScreen, DeathScreen.
 ## Áreas filhas sobrescrevem map_bounds() e, se precisarem de _ready, chamam super().
 ##
-## Continuar = o jogador volta ao último ponto de descanso com vida cheia e
+## Continuar = o jogador volta ao início da área com vida e mana cheias e
 ## MANTÉM itens, equipamento e experiência. Inimigos vivos voltam ao lugar de
 ## origem com vida cheia; derrotados continuam derrotados; baús abertos continuam abertos.
 
