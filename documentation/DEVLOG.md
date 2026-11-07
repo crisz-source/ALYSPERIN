@@ -21,13 +21,19 @@ conhecidos. Detalhes técnicos de cada etapa ficam em `documentation/worklog/`.
 - Cena `game/world/arenas/test_arena/test_arena.tscn` abre sem erros
   (**provisória**: só fundo e texto, sem jogabilidade).
 
-### Fase 2 — Primeiro personagem jogável — ⏳ próxima
-- [ ] Cena do jogador, movimentação top-down, câmera
+### Fase 2 — Primeiro personagem jogável — 🔄 em andamento
+- [x] Cena do jogador, movimentação top-down (8 dir.), direção em 4, câmera
+  (testes automáticos ok; teste manual ok — "bem fluido")
 - [ ] Ataque básico com espada, esquiva
 - [ ] Inimigo simples e arena de teste com obstáculos (protótipo)
 
 ## Problemas conhecidos
-- Nenhum no momento.
+- F5 no editor (jogo embutido na aba "Jogo") não recebe o teclado; clicar dentro não
+  resolve. Contorno: rodar o jogo em janela própria. Causa ainda em aberto.
+- Câmera sem limites: perto das bordas mostra o vazio cinza fora da arena (resolver na Fase 4).
 
 ## Itens provisórios no projeto
-- `test_arena.tscn`: fundo `ColorRect` e `Label` no lugar de tilemap/arte reais.
+- `test_arena.tscn`: chão quadriculado desenhado por código, paredes e pilares em
+  `ColorRect`, texto de ajuda — no lugar de tilemap/arte reais.
+- `player.tscn`: corpo azul (`BodyPlaceholder`) e seta amarela (`FacingIndicator`)
+  no lugar de sprites.

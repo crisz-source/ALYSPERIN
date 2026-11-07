@@ -1,0 +1,33 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://game/actors/player/player.gd" id="1_28fbu"]
+[ext_resource type="Script" path="res://game/actors/player/player_input.gd" id="2_em52k"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_p81wk"]
+size = Vector2(10, 6)
+
+[node name="Player" type="CharacterBody2D" unique_id=2094421501]
+collision_layer = 2
+motion_mode = 1
+script = ExtResource("1_28fbu")
+
+[node name="CollisionShape" type="CollisionShape2D" parent="." unique_id=571517964]
+position = Vector2(0, -3)
+shape = SubResource("RectangleShape2D_p81wk")
+
+[node name="BodyPlaceholder" type="Polygon2D" parent="." unique_id=970865887]
+color = Color(0.36, 0.62, 0.92, 1)
+polygon = PackedVector2Array(-6, -24, 6, -24, 6, 0, -6, 0)
+
+[node name="FacingIndicator" type="Polygon2D" parent="." unique_id=1249087493]
+position = Vector2(0, -12)
+color = Color(1, 0.85, 0.3, 1)
+polygon = PackedVector2Array(13, 0, 8, -4, 8, 4)
+
+[node name="PlayerInput" type="Node" parent="." unique_id=85136023]
+script = ExtResource("2_em52k")
+
+[node name="Camera" type="Camera2D" parent="." unique_id=242649727]
+position = Vector2(0, -12)
+position_smoothing_enabled = true
+position_smoothing_speed = 8.0
