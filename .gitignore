@@ -1,0 +1,9 @@
+# Cache e importações geradas pela Godot (recriadas automaticamente)
+.godot/
+# Builds exportadas
+/export/
+/builds/
+# Sistema operacional
+Thumbs.db
+desktop.ini
+.DS_Store
