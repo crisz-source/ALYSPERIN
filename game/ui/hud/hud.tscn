@@ -2,30 +2,48 @@
 
 [ext_resource type="Script" path="res://game/ui/hud/hud.gd" id="1_d4vpa"]
 
-[node name="Hud" type="CanvasLayer" unique_id=29004961]
+[node name="Hud" type="CanvasLayer" unique_id=465039626]
 script = ExtResource("1_d4vpa")
 
-[node name="HelpPlaceholder" type="Label" parent="." unique_id=2009310526]
+[node name="HelpPlaceholder" type="Label" parent="." unique_id=85043843]
 offset_left = 8.0
 offset_top = 336.0
 offset_right = 8.0
 offset_bottom = 336.0
 theme_override_font_sizes/font_size = 10
 
-[node name="PlayerHealth" type="ColorRect" parent="." unique_id=1953673608]
+[node name="PlayerHealth" type="ColorRect" parent="." unique_id=1793365529]
 offset_left = 8.0
 offset_top = 8.0
 offset_right = 88.0
 offset_bottom = 14.0
 color = Color(0.1, 0.1, 0.1, 1)
 
-[node name="Fill" type="ColorRect" parent="PlayerHealth" unique_id=1722830477]
+[node name="Fill" type="ColorRect" parent="PlayerHealth" unique_id=615729371]
 layout_mode = 0
 offset_right = 80.0
 offset_bottom = 6.0
 color = Color(0.3, 0.8, 0.35, 1)
 
-[node name="StatusLabel" type="Label" parent="." unique_id=411413912]
+[node name="MessageBox" type="ColorRect" parent="." unique_id=1792363046]
+offset_left = 120.0
+offset_top = 286.0
+offset_right = 520.0
+offset_bottom = 326.0
+color = Color(0.05, 0.05, 0.08, 0.85)
+
+[node name="Text" type="Label" parent="MessageBox" unique_id=1727845672]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 4.0
+offset_right = 392.0
+offset_bottom = 36.0
+theme_override_font_sizes/font_size = 10
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="StatusLabel" type="Label" parent="." unique_id=1179165929]
 offset_left = 250.0
 offset_top = 170.0
 offset_right = 250.0

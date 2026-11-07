@@ -1,0 +1,32 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://game/world/objects/door/door.gd" id="1_21dn7"]
+[ext_resource type="Script" path="res://game/components/interactable.gd" id="2_sj31x"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_sowbx"]
+size = Vector2(16, 48)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_0rh0c"]
+size = Vector2(28, 60)
+
+[node name="Door" type="StaticBody2D" unique_id=207009314]
+collision_mask = 0
+script = ExtResource("1_21dn7")
+
+[node name="CollisionShape" type="CollisionShape2D" parent="." unique_id=1416042529]
+shape = SubResource("RectangleShape2D_sowbx")
+
+[node name="Visual" type="ColorRect" parent="." unique_id=1036099205]
+offset_left = -8.0
+offset_top = -24.0
+offset_right = 8.0
+offset_bottom = 24.0
+color = Color(0.45, 0.3, 0.18, 1)
+
+[node name="Interactable" type="Area2D" parent="." unique_id=25140497]
+collision_layer = 32
+collision_mask = 0
+script = ExtResource("2_sj31x")
+
+[node name="CollisionShape" type="CollisionShape2D" parent="Interactable" unique_id=690613970]
+shape = SubResource("RectangleShape2D_0rh0c")

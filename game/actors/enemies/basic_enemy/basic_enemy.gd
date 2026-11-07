@@ -6,7 +6,9 @@ extends CharacterBody2D
 ## avisa o ataque (fica laranja e pulsa) e dá uma investida em linha reta.
 ## Depois da investida fica vulnerável por um instante. Apanhar interrompe
 ## qualquer ação. O aviso existe para que a esquiva (ou a defesa) seja uma
-## resposta justa. Investida bloqueada pelo escudo deixa o inimigo atordoado.
+## resposta justa: durante a preparação aparece no chão o caminho exato da
+## investida; a mira acompanha o jogador e trava no fim da preparação.
+## Investida bloqueada pelo escudo deixa o inimigo atordoado.
 
 signal died
 
@@ -15,6 +17,10 @@ enum State { IDLE, CHASE, WINDUP, LUNGE, RECOVER, HURT, STAGGER, DEAD }
 const BODY_COLOR := Color(0.78, 0.25, 0.25)
 const WINDUP_COLOR := Color(1.0, 0.6, 0.15)
 const STAGGER_COLOR := Color(0.55, 0.5, 0.7)
+const TELEGRAPH_TRACKING_COLOR := Color(1.0, 0.2, 0.15, 0.22)
+const TELEGRAPH_LOCKED_COLOR := Color(1.0, 0.2, 0.15, 0.5)
+## Metade do tamanho da LungeHitbox (14x14): a faixa cobre tudo que a investida toca.
+const LUNGE_HALF_WIDTH: float = 7.0
 ## Camada "world" (paredes): é o que bloqueia a visão.
 const SIGHT_BLOCKING_MASK: int = 1
 ## A visão sai da altura do tronco, não dos pés.
@@ -38,6 +44,9 @@ const EYE_OFFSET := Vector2(0, -8)
 @export var attack_range: float = 40.0
 ## Duração do aviso antes da investida (s).
 @export var windup_time: float = 0.45
+## Parte final do aviso em que a direção já está travada (s). Antes disso a
+## mira acompanha o jogador.
+@export var aim_lock_time: float = 0.2
 @export var lunge_speed: float = 190.0
 @export var lunge_time: float = 0.22
 ## Tempo parado e vulnerável depois da investida (s).
@@ -65,6 +74,7 @@ var _flash_time: float = 0.0
 @onready var _body: Polygon2D = $BodyPlaceholder
 @onready var _health_bar: Node2D = $HealthBar
 @onready var _health_bar_fill: ColorRect = $HealthBar/Fill
+@onready var _telegraph: Polygon2D = $LungeTelegraph
 
 
 func _ready() -> void:
@@ -73,6 +83,7 @@ func _ready() -> void:
 	health.health_changed.connect(_on_health_changed)
 	_hitbox.hit_blocked.connect(_on_lunge_blocked)
 	_health_bar.visible = false
+	_build_telegraph()
 
 
 func _physics_process(delta: float) -> void:
@@ -87,6 +98,8 @@ func _physics_process(delta: float) -> void:
 			_process_chase(delta)
 		State.WINDUP:
 			velocity = velocity.move_toward(Vector2.ZERO, friction * delta)
+			if not is_aim_locked():
+				_aim_at_target()
 			if _state_time >= windup_time:
 				_start_lunge()
 		State.LUNGE:
@@ -123,23 +136,49 @@ func _process_chase(delta: float) -> void:
 	var to_target: Vector2 = target.global_position - global_position
 	if to_target.length() <= attack_range:
 		_change_state(State.WINDUP)
+		_aim_at_target()
 		return
 	velocity = velocity.move_toward(to_target.normalized() * move_speed, acceleration * delta)
 
 
+## true na parte final do aviso: a direção mostrada no chão não muda mais.
+func is_aim_locked() -> bool:
+	return state == State.WINDUP and _state_time >= windup_time - aim_lock_time
+
+
+func _aim_at_target() -> void:
+	if _is_valid_target(target):
+		var aim: Vector2 = global_position.direction_to(target.global_position)
+		if aim != Vector2.ZERO:
+			_lunge_direction = aim
+
+
+## A investida sai exatamente na direção que o aviso mostrou (travada), não
+## para onde o jogador está agora: é isso que torna a esquiva possível.
 func _start_lunge() -> void:
-	var aim: Vector2 = global_position.direction_to(target.global_position) if _is_valid_target(target) else Vector2.ZERO
-	if aim == Vector2.ZERO:
+	if _lunge_direction == Vector2.ZERO:
 		_change_state(State.RECOVER)
 		return
-	_lunge_direction = aim
 	_change_state(State.LUNGE)
 	_hitbox.activate()
+
+
+## Faixa do tamanho do caminho da investida, calculada dos próprios valores de
+## velocidade e duração (mudar no Inspetor já ajusta o aviso).
+func _build_telegraph() -> void:
+	var length: float = lunge_speed * lunge_time + LUNGE_HALF_WIDTH
+	var w: float = LUNGE_HALF_WIDTH
+	_telegraph.polygon = PackedVector2Array([
+		Vector2(-w, -w), Vector2(length, -w), Vector2(length, w), Vector2(-w, w)])
+	_telegraph.visible = false
 
 
 func _change_state(new_state: State) -> void:
 	if state == State.LUNGE:
 		_hitbox.deactivate()
+	# A direção só vale do aviso até o fim da investida.
+	if new_state != State.WINDUP and new_state != State.LUNGE:
+		_lunge_direction = Vector2.ZERO
 	state = new_state
 	_state_time = 0.0
 
@@ -206,6 +245,10 @@ func _on_health_changed(current: int, maximum: int) -> void:
 ## Apresentação provisória: só lê o estado, nunca muda regras de jogo.
 func _update_visuals(delta: float) -> void:
 	_flash_time = maxf(_flash_time - delta, 0.0)
+	_telegraph.visible = state == State.WINDUP and _lunge_direction != Vector2.ZERO
+	if _telegraph.visible:
+		_telegraph.rotation = _lunge_direction.angle()
+		_telegraph.color = TELEGRAPH_LOCKED_COLOR if is_aim_locked() else TELEGRAPH_TRACKING_COLOR
 	if _flash_time > 0.0:
 		_body.color = Color.WHITE
 		_body.scale = Vector2.ONE

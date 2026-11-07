@@ -16,6 +16,8 @@ conhecidos. Detalhes técnicos de cada etapa ficam em `documentation/worklog/`.
 | 2026-11-07 | Combo de 3 golpes (3º = finalizador mais forte e mais lento); defesa segurando botão direito, protege a frente da mira |
 | 2026-11-07 | Hitstop global (`Engine.time_scale`) no autoload `Hitstop`; vira efeito local no co-op (Fase 7) |
 | 2026-11-07 | Cena principal passa a ser a área de protótipo; arena fica só para testes |
+| 2026-11-07 | Inimigo mostra no chão o caminho do ataque; mira trava nos últimos 0,2 s |
+| 2026-11-07 | "Esquiva perfeita!" quando um golpe passa pela invencibilidade do rolamento |
 
 ## Marcos
 ### Fase 1 — Fundação — ✅ concluída (2026-11-07)
@@ -37,14 +39,16 @@ conhecidos. Detalhes técnicos de cada etapa ficam em `documentation/worklog/`.
 - [x] Reações: empurrão, clarão, atordoamento, invulnerabilidade pós-dano
 - [x] Feedback visual: tremida de câmera, barras de vida, morte e reinício
 - [x] Combo de 3 golpes, defesa (botão direito), inimigo atordoado ao ser bloqueado, hitstop
-  (testes automáticos ok; teste manual pendente)
+  (teste manual ok — "ficou tudo ótimo")
+- [x] Aviso do ataque no chão (mira trava no fim) e "Esquiva perfeita!"
 - [ ] Feedback sonoro (sem áudio no projeto)
 
-### Fase 4 — Primeira área jogável — 🔄 protótipo pronto (teste manual pendente)
+### Fase 4 — Primeira área jogável — ✅ protótipo completo (teste manual do último bloco pendente)
 - [x] Tiles provisórios (chão, parede com colisão), mapa com salas, corredores e pilares
 - [x] Câmera presa às bordas do mapa (inclusive durante a tremida)
 - [x] Inimigos espalhados, sem renascimento; linha de visão (não veem através de parede)
 - [x] HUD como cena reutilizável; morte reinicia a área
+- [x] Objetos interativos (E): placa, porta (trancada por mecanismo), alavanca; caixa de mensagem no HUD
 - [ ] Pathfinding dos inimigos (hoje perseguem em linha reta)
 
 ## Problemas conhecidos
@@ -64,6 +68,9 @@ conhecidos. Detalhes técnicos de cada etapa ficam em `documentation/worklog/`.
 - `assets/environments/tiles/dungeon_tiles_placeholder.png` e
   `game/world/tilesets/dungeon_tileset_placeholder.tres`: tiles gerados por código.
 - `prototype_area.tscn`: mapa, nome e distribuição de inimigos provisórios.
-- `hud.tscn`: barra e textos simples, sem arte.
+- `hud.tscn`: barra, textos e caixa de mensagem simples, sem arte.
+- `door.tscn`, `lever.tscn`, `sign_post.tscn`: formas coloridas no lugar de arte; textos
+  da placa/porta/alavanca são provisórios.
+- `LungeTelegraph` (faixa vermelha) e "Esquiva perfeita!" com fonte padrão: efeitos sem arte.
 - `test_arena.gd`: reaparecimento de inimigos e reinício automático são ferramentas
   de teste, não sistemas finais de spawn/morte.

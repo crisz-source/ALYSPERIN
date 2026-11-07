@@ -1,0 +1,36 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://game/world/objects/lever/lever.gd" id="1_aumwl"]
+[ext_resource type="Script" path="res://game/components/interactable.gd" id="2_vkemy"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_utw2r"]
+size = Vector2(10, 6)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ngwuf"]
+size = Vector2(24, 24)
+
+[node name="Lever" type="StaticBody2D" unique_id=1113457558]
+collision_mask = 0
+script = ExtResource("1_aumwl")
+
+[node name="CollisionShape" type="CollisionShape2D" parent="." unique_id=1453724766]
+position = Vector2(0, -3)
+shape = SubResource("RectangleShape2D_utw2r")
+
+[node name="BasePlaceholder" type="Polygon2D" parent="." unique_id=741539321]
+color = Color(0.35, 0.33, 0.38, 1)
+polygon = PackedVector2Array(-6, -6, 6, -6, 6, 0, -6, 0)
+
+[node name="HandlePlaceholder" type="Polygon2D" parent="." unique_id=1562763366]
+position = Vector2(0, -5)
+color = Color(0.6, 0.6, 0.65, 1)
+polygon = PackedVector2Array(-1, 0, 1, 0, 1, -11, -1, -11)
+
+[node name="Interactable" type="Area2D" parent="." unique_id=1495631937]
+collision_layer = 32
+collision_mask = 0
+script = ExtResource("2_vkemy")
+
+[node name="CollisionShape" type="CollisionShape2D" parent="Interactable" unique_id=2084226522]
+position = Vector2(0, -6)
+shape = SubResource("RectangleShape2D_ngwuf")

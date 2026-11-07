@@ -23,6 +23,7 @@ var defend_held: bool = false
 
 var _attack_buffer: float = 0.0
 var _dodge_buffer: float = 0.0
+var _interact_buffer: float = 0.0
 
 
 ## Atualiza as intenções. O Player chama isto no início do próprio quadro de
@@ -34,6 +35,7 @@ func poll(delta: float) -> void:
 	defend_held = Input.is_action_pressed("defend")
 	_attack_buffer = BUFFER_TIME if Input.is_action_just_pressed("attack") else maxf(_attack_buffer - delta, 0.0)
 	_dodge_buffer = BUFFER_TIME if Input.is_action_just_pressed("dodge") else maxf(_dodge_buffer - delta, 0.0)
+	_interact_buffer = BUFFER_TIME if Input.is_action_just_pressed("interact") else maxf(_interact_buffer - delta, 0.0)
 
 
 func has_attack() -> bool:
@@ -44,6 +46,10 @@ func has_dodge() -> bool:
 	return _dodge_buffer > 0.0
 
 
+func has_interact() -> bool:
+	return _interact_buffer > 0.0
+
+
 ## Consome o comando para que um clique não gere duas ações.
 func consume_attack() -> void:
 	_attack_buffer = 0.0
@@ -51,3 +57,7 @@ func consume_attack() -> void:
 
 func consume_dodge() -> void:
 	_dodge_buffer = 0.0
+
+
+func consume_interact() -> void:
+	_interact_buffer = 0.0

@@ -16,62 +16,80 @@ size = Vector2(10, 20)
 [sub_resource type="ConvexPolygonShape2D" id="ConvexPolygonShape2D_b0bri"]
 points = PackedVector2Array(0, 0, 10.142838, -21.751389, 15.824299, -18.044155, 20.241394, -12.895191, 23.041197, -6.7158966, 24, 0, 23.041197, 6.7158966, 20.241394, 12.895191, 15.824299, 18.044155, 10.142838, 21.751389)
 
-[node name="Player" type="CharacterBody2D" unique_id=1466524765]
+[sub_resource type="CircleShape2D" id="CircleShape2D_64mjj"]
+radius = 14.0
+
+[node name="Player" type="CharacterBody2D" unique_id=793516831]
 collision_layer = 2
 motion_mode = 1
 script = ExtResource("1_pqla1")
 
-[node name="CollisionShape" type="CollisionShape2D" parent="." unique_id=872024218]
+[node name="CollisionShape" type="CollisionShape2D" parent="." unique_id=371561551]
 position = Vector2(0, -3)
 shape = SubResource("RectangleShape2D_qdo3w")
 
-[node name="BodyPlaceholder" type="Polygon2D" parent="." unique_id=1967846623]
+[node name="BodyPlaceholder" type="Polygon2D" parent="." unique_id=1850756935]
 color = Color(0.36, 0.62, 0.92, 1)
 polygon = PackedVector2Array(-6, -24, 6, -24, 6, 0, -6, 0)
 
-[node name="FacingIndicator" type="Polygon2D" parent="." unique_id=2093559585]
+[node name="FacingIndicator" type="Polygon2D" parent="." unique_id=87350146]
 position = Vector2(0, -12)
 color = Color(1, 0.85, 0.3, 1)
 polygon = PackedVector2Array(13, 0, 8, -4, 8, 4)
 
-[node name="HealthComponent" type="Node" parent="." unique_id=1926259223]
+[node name="HealthComponent" type="Node" parent="." unique_id=2068710360]
 script = ExtResource("2_j5vpa")
 
-[node name="Hurtbox" type="Area2D" parent="." unique_id=563932526 node_paths=PackedStringArray("health")]
+[node name="Hurtbox" type="Area2D" parent="." unique_id=1559381355 node_paths=PackedStringArray("health")]
 collision_layer = 2
 collision_mask = 0
 script = ExtResource("3_hlqpx")
 health = NodePath("../HealthComponent")
 
-[node name="CollisionShape" type="CollisionShape2D" parent="Hurtbox" unique_id=155297210]
+[node name="CollisionShape" type="CollisionShape2D" parent="Hurtbox" unique_id=554587514]
 position = Vector2(0, -10)
 shape = SubResource("RectangleShape2D_br5st")
 
-[node name="AttackPivot" type="Node2D" parent="." unique_id=872544660]
+[node name="AttackPivot" type="Node2D" parent="." unique_id=652106655]
 position = Vector2(0, -10)
 
-[node name="SwordHitbox" type="Area2D" parent="AttackPivot" unique_id=1680228213 node_paths=PackedStringArray("attacker")]
+[node name="SwordHitbox" type="Area2D" parent="AttackPivot" unique_id=40925172 node_paths=PackedStringArray("attacker")]
 collision_layer = 8
 collision_mask = 4
 script = ExtResource("4_oawdx")
 knockback_force = 170.0
 attacker = NodePath("../..")
 
-[node name="CollisionShape" type="CollisionShape2D" parent="AttackPivot/SwordHitbox" unique_id=77119900]
+[node name="CollisionShape" type="CollisionShape2D" parent="AttackPivot/SwordHitbox" unique_id=241568559]
 shape = SubResource("ConvexPolygonShape2D_b0bri")
 
-[node name="SwingPlaceholder" type="Polygon2D" parent="AttackPivot" unique_id=1031515327]
+[node name="SwingPlaceholder" type="Polygon2D" parent="AttackPivot" unique_id=1980914125]
 color = Color(1, 1, 0.85, 0.75)
 polygon = PackedVector2Array(0, 0, 10.142838, -21.751389, 15.824299, -18.044155, 20.241394, -12.895191, 23.041197, -6.7158966, 24, 0, 23.041197, 6.7158966, 20.241394, 12.895191, 15.824299, 18.044155, 10.142838, 21.751389)
 
-[node name="ShieldPlaceholder" type="Polygon2D" parent="AttackPivot" unique_id=1638770486]
+[node name="ShieldPlaceholder" type="Polygon2D" parent="AttackPivot" unique_id=287088449]
 color = Color(0.75, 0.85, 1, 0.85)
 polygon = PackedVector2Array(7.4999995, -12.990381, 10.606602, -10.606602, 12.990381, -7.5, 14.488887, -3.8822856, 15, 0, 14.488887, 3.8822856, 12.990381, 7.5, 10.606602, 10.606602, 7.4999995, 12.990381, 5.4999995, 9.526279, 7.7781744, 7.7781744, 9.526279, 5.5, 10.625184, 2.8470094, 11, 0, 10.625184, -2.8470094, 9.526279, -5.5, 7.7781744, -7.7781744, 5.4999995, -9.526279)
 
-[node name="PlayerInput" type="Node" parent="." unique_id=1941218208]
+[node name="InteractionDetector" type="Area2D" parent="." unique_id=70322714]
+collision_layer = 0
+collision_mask = 32
+monitorable = false
+
+[node name="CollisionShape" type="CollisionShape2D" parent="InteractionDetector" unique_id=1659162125]
+position = Vector2(0, -8)
+shape = SubResource("CircleShape2D_64mjj")
+
+[node name="InteractPrompt" type="Label" parent="." unique_id=1091384047]
+z_index = 10
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_outline_color = Color(0.05, 0.05, 0.08, 1)
+theme_override_constants/outline_size = 3
+
+[node name="PlayerInput" type="Node" parent="." unique_id=473027990]
 script = ExtResource("5_tiye0")
 
-[node name="Camera" type="Camera2D" parent="." unique_id=857089216]
+[node name="Camera" type="Camera2D" parent="." unique_id=1585495772]
 position = Vector2(0, -12)
 position_smoothing_enabled = true
 position_smoothing_speed = 8.0

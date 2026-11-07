@@ -8,6 +8,10 @@ extends CharacterBody2D
 ## "atacando e esquivando ao mesmo tempo".
 
 signal died
+## Um golpe passou por dentro da invencibilidade da esquiva.
+signal dodge_succeeded
+## Um objeto pediu para mostrar um texto (placa, porta trancada...). O HUD escuta.
+signal message_requested(text: String)
 
 enum State { MOVE, ATTACK, BLOCK, DODGE, HURT, DEAD }
 
@@ -17,6 +21,8 @@ const PLACEHOLDER_COLOR := Color(0.36, 0.62, 0.92)
 const DEAD_COLOR := Color(0.35, 0.35, 0.4)
 const SHIELD_COLOR := Color(0.75, 0.85, 1.0, 0.85)
 const FINISHER_SWING_TINT := Color(1.0, 0.75, 0.45)
+const DODGE_SUCCESS_TEXT := "Esquiva perfeita!"
+const DODGE_SUCCESS_COLOR := Color(0.55, 0.95, 1.0)
 
 @export_group("Movimento")
 ## Velocidade máxima, em pixels por segundo (16 px = 1 tile).
@@ -95,6 +101,10 @@ var _combo_window_left: float = 0.0
 var _attack_windup_now: float = 0.0
 var _attack_recovery_now: float = 0.0
 var _block_direction: Vector2 = Vector2.DOWN
+## Uma mensagem por esquiva, mesmo que dois inimigos acertem a mesma esquiva.
+var _dodge_success_this_dodge: bool = false
+## Objeto usável mais próximo (o que recebe o "[E]"), ou null.
+var focused_interactable: Interactable = null
 
 @onready var health: HealthComponent = $HealthComponent
 @onready var _input: PlayerInput = $PlayerInput
@@ -105,6 +115,8 @@ var _block_direction: Vector2 = Vector2.DOWN
 @onready var _swing_visual: CanvasItem = $AttackPivot/SwingPlaceholder
 @onready var _shield_visual: Polygon2D = $AttackPivot/ShieldPlaceholder
 @onready var _camera: PlayerCamera = $Camera
+@onready var _interaction_detector: Area2D = $InteractionDetector
+@onready var _interact_prompt: Label = $InteractPrompt
 
 
 func _ready() -> void:
@@ -118,8 +130,11 @@ func _ready() -> void:
 	health.block_filter = _is_hit_blocked
 	health.damaged.connect(_on_damaged)
 	health.blocked.connect(_on_blocked)
+	health.hit_ignored.connect(_on_hit_ignored)
 	health.died.connect(_on_died)
 	_sword_hitbox.hit_landed.connect(_on_sword_hit)
+	_interact_prompt.top_level = true
+	_interact_prompt.visible = false
 
 
 func _physics_process(delta: float) -> void:
@@ -127,6 +142,7 @@ func _physics_process(delta: float) -> void:
 	_state_time += delta
 	_dodge_cooldown_left = maxf(_dodge_cooldown_left - delta, 0.0)
 	_combo_window_left = maxf(_combo_window_left - delta, 0.0)
+	_update_focus()
 	match state:
 		State.MOVE:
 			_process_move(delta)
@@ -154,6 +170,11 @@ func set_camera_bounds(bounds: Rect2) -> void:
 func _process_move(delta: float) -> void:
 	if _try_start_dodge():
 		return
+	if _input.has_interact():
+		_input.consume_interact()
+		if focused_interactable:
+			_interact_with(focused_interactable)
+			return
 	# Defesa vence o ataque: segurando o botão direito, cliques são ignorados.
 	if _input.defend_held:
 		_start_block()
@@ -273,9 +294,16 @@ func _try_start_dodge() -> bool:
 	_dodge_direction = _input.move_direction.normalized() if _input.move_direction != Vector2.ZERO else facing
 	_set_facing(to_cardinal(_dodge_direction))
 	_dodge_cooldown_left = dodge_cooldown
+	_dodge_success_this_dodge = false
 	_change_state(State.DODGE)
 	health.set_invulnerable(true)
 	return true
+
+
+func _interact_with(target: Interactable) -> void:
+	var message: String = target.interact(self)
+	if not message.is_empty():
+		message_requested.emit(message)
 
 
 # --- Reações ---------------------------------------------------------------
@@ -300,6 +328,16 @@ func _on_blocked(info: DamageInfo) -> void:
 	_shield_flash_time = 0.08
 	_camera.shake(1.5, 0.08)
 	Hitstop.request(hitstop_block)
+
+
+## Golpe ignorado pela invulnerabilidade: só conta como esquiva perfeita se
+## veio durante o rolamento (não durante a invulnerabilidade pós-dano).
+func _on_hit_ignored(_info: DamageInfo) -> void:
+	if state != State.DODGE or _dodge_success_this_dodge:
+		return
+	_dodge_success_this_dodge = true
+	FloatingText.spawn(self, DODGE_SUCCESS_TEXT, global_position + Vector2(0, -30), DODGE_SUCCESS_COLOR)
+	dodge_succeeded.emit()
 
 
 func _on_sword_hit(_target: Hurtbox) -> void:
@@ -328,6 +366,26 @@ func _on_died() -> void:
 
 
 # --- Auxiliares ------------------------------------------------------------
+
+## Escolhe o objeto usável mais próximo dentro do alcance e posiciona o aviso.
+func _update_focus() -> void:
+	var best: Interactable = null
+	var best_distance: float = INF
+	if state != State.DEAD:
+		for area: Area2D in _interaction_detector.get_overlapping_areas():
+			var candidate := area as Interactable
+			if candidate == null or not candidate.enabled:
+				continue
+			var distance: float = global_position.distance_squared_to(candidate.global_position)
+			if distance < best_distance:
+				best = candidate
+				best_distance = distance
+	focused_interactable = best
+	_interact_prompt.visible = best != null
+	if best:
+		_interact_prompt.text = "[E] " + best.prompt_text
+		_interact_prompt.global_position = (best.prompt_position() - _interact_prompt.get_combined_minimum_size() / 2.0).round()
+
 
 func _aim_direction() -> Vector2:
 	var aim: Vector2 = _attack_pivot.global_position.direction_to(_input.aim_position)

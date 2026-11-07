@@ -11,6 +11,9 @@ signal damaged(info: DamageInfo)
 signal died
 ## O golpe chegou, mas foi bloqueado (escudo, defesa). Nenhum dano aplicado.
 signal blocked(info: DamageInfo)
+## O golpe chegou durante uma invulnerabilidade e foi ignorado (ex.: esquiva no
+## tempo certo). Quem quiser recompensar isso escuta este sinal.
+signal hit_ignored(info: DamageInfo)
 
 @export var max_health: int = 100
 
@@ -50,7 +53,10 @@ func set_invulnerable(value: bool) -> void:
 
 ## Retorna true se o dano foi aplicado.
 func apply_damage(info: DamageInfo) -> bool:
-	if is_dead or is_invulnerable() or info.amount <= 0:
+	if is_dead or info.amount <= 0:
+		return false
+	if is_invulnerable():
+		hit_ignored.emit(info)
 		return false
 	if block_filter.is_valid() and block_filter.call(info):
 		info.blocked = true

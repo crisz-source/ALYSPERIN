@@ -71,6 +71,15 @@ Timers que podem sobreviver ao nó: usar `create_timer().timeout.connect(...)`, 
 Defesa/escudo: o dono registra `HealthComponent.block_filter`; golpe bloqueado não
 causa dano, marca `DamageInfo.blocked` e emite `blocked` / `Hitbox.hit_blocked`.
 
+Esquiva perfeita: golpe barrado por invulnerabilidade emite `HealthComponent.hit_ignored`;
+o Player só conta se estiver no estado DODGE.
+
+## Interação (tecla E)
+`Interactable` (Area2D na camada `interactable`) fica no objeto; o dono registra
+`handler: func(by: Player) -> String` (mensagem para o HUD, ou ""). O jogador procura
+com o `InteractionDetector` e emite `message_requested`; o HUD escuta o jogador.
+Objetos ficam em `game/world/objects/<nome>/`.
+
 ## Autoloads (game/systems)
 | Nome | Para quê |
 |---|---|
