@@ -1,0 +1,68 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://game/actors/enemies/basic_enemy/basic_enemy.gd" id="1_6huk2"]
+[ext_resource type="Script" path="res://game/components/health_component.gd" id="2_dkhml"]
+[ext_resource type="Script" path="res://game/components/hurtbox.gd" id="3_65ebo"]
+[ext_resource type="Script" path="res://game/components/hitbox.gd" id="4_vb8ev"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ukgti"]
+size = Vector2(12, 6)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_jfe3p"]
+size = Vector2(14, 14)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_mle0g"]
+size = Vector2(14, 14)
+
+[node name="BasicEnemy" type="CharacterBody2D" unique_id=1502425973]
+collision_layer = 4
+collision_mask = 5
+motion_mode = 1
+script = ExtResource("1_6huk2")
+
+[node name="CollisionShape" type="CollisionShape2D" parent="." unique_id=1196703443]
+position = Vector2(0, -3)
+shape = SubResource("RectangleShape2D_ukgti")
+
+[node name="BodyPlaceholder" type="Polygon2D" parent="." unique_id=1197934838]
+color = Color(0.78, 0.25, 0.25, 1)
+polygon = PackedVector2Array(-7, -14, 7, -14, 7, 0, -7, 0)
+
+[node name="HealthComponent" type="Node" parent="." unique_id=1231936725]
+script = ExtResource("2_dkhml")
+max_health = 30
+
+[node name="Hurtbox" type="Area2D" parent="." unique_id=621763848 node_paths=PackedStringArray("health")]
+collision_layer = 4
+collision_mask = 0
+script = ExtResource("3_65ebo")
+health = NodePath("../HealthComponent")
+
+[node name="CollisionShape" type="CollisionShape2D" parent="Hurtbox" unique_id=30866326]
+position = Vector2(0, -7)
+shape = SubResource("RectangleShape2D_jfe3p")
+
+[node name="LungeHitbox" type="Area2D" parent="." unique_id=798248336 node_paths=PackedStringArray("attacker")]
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("4_vb8ev")
+damage = 15
+knockback_force = 200.0
+attacker = NodePath("..")
+
+[node name="CollisionShape" type="CollisionShape2D" parent="LungeHitbox" unique_id=513161578]
+position = Vector2(0, -7)
+shape = SubResource("RectangleShape2D_mle0g")
+
+[node name="HealthBar" type="Node2D" parent="." unique_id=2112509012]
+position = Vector2(-8, -20)
+
+[node name="Background" type="ColorRect" parent="HealthBar" unique_id=437821213]
+offset_right = 16.0
+offset_bottom = 2.0
+color = Color(0.1, 0.1, 0.1, 1)
+
+[node name="Fill" type="ColorRect" parent="HealthBar" unique_id=163302417]
+offset_right = 16.0
+offset_bottom = 2.0
+color = Color(0.85, 0.2, 0.2, 1)

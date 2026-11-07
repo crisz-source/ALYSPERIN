@@ -1,33 +1,74 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://game/actors/player/player.gd" id="1_28fbu"]
-[ext_resource type="Script" path="res://game/actors/player/player_input.gd" id="2_em52k"]
+[ext_resource type="Script" path="res://game/actors/player/player.gd" id="1_pqla1"]
+[ext_resource type="Script" path="res://game/components/health_component.gd" id="2_j5vpa"]
+[ext_resource type="Script" path="res://game/components/hurtbox.gd" id="3_hlqpx"]
+[ext_resource type="Script" path="res://game/components/hitbox.gd" id="4_oawdx"]
+[ext_resource type="Script" path="res://game/actors/player/player_input.gd" id="5_tiye0"]
+[ext_resource type="Script" path="res://game/actors/player/player_camera.gd" id="6_iuwj5"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_p81wk"]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_qdo3w"]
 size = Vector2(10, 6)
 
-[node name="Player" type="CharacterBody2D" unique_id=2094421501]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_br5st"]
+size = Vector2(10, 20)
+
+[sub_resource type="ConvexPolygonShape2D" id="ConvexPolygonShape2D_b0bri"]
+points = PackedVector2Array(0, 0, 10.142838, -21.751389, 15.824299, -18.044155, 20.241394, -12.895191, 23.041197, -6.7158966, 24, 0, 23.041197, 6.7158966, 20.241394, 12.895191, 15.824299, 18.044155, 10.142838, 21.751389)
+
+[node name="Player" type="CharacterBody2D" unique_id=1489162219]
 collision_layer = 2
 motion_mode = 1
-script = ExtResource("1_28fbu")
+script = ExtResource("1_pqla1")
 
-[node name="CollisionShape" type="CollisionShape2D" parent="." unique_id=571517964]
+[node name="CollisionShape" type="CollisionShape2D" parent="." unique_id=1609944677]
 position = Vector2(0, -3)
-shape = SubResource("RectangleShape2D_p81wk")
+shape = SubResource("RectangleShape2D_qdo3w")
 
-[node name="BodyPlaceholder" type="Polygon2D" parent="." unique_id=970865887]
+[node name="BodyPlaceholder" type="Polygon2D" parent="." unique_id=262045809]
 color = Color(0.36, 0.62, 0.92, 1)
 polygon = PackedVector2Array(-6, -24, 6, -24, 6, 0, -6, 0)
 
-[node name="FacingIndicator" type="Polygon2D" parent="." unique_id=1249087493]
+[node name="FacingIndicator" type="Polygon2D" parent="." unique_id=620177720]
 position = Vector2(0, -12)
 color = Color(1, 0.85, 0.3, 1)
 polygon = PackedVector2Array(13, 0, 8, -4, 8, 4)
 
-[node name="PlayerInput" type="Node" parent="." unique_id=85136023]
-script = ExtResource("2_em52k")
+[node name="HealthComponent" type="Node" parent="." unique_id=229017804]
+script = ExtResource("2_j5vpa")
 
-[node name="Camera" type="Camera2D" parent="." unique_id=242649727]
+[node name="Hurtbox" type="Area2D" parent="." unique_id=1052103215 node_paths=PackedStringArray("health")]
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_hlqpx")
+health = NodePath("../HealthComponent")
+
+[node name="CollisionShape" type="CollisionShape2D" parent="Hurtbox" unique_id=268449122]
+position = Vector2(0, -10)
+shape = SubResource("RectangleShape2D_br5st")
+
+[node name="AttackPivot" type="Node2D" parent="." unique_id=560547274]
+position = Vector2(0, -10)
+
+[node name="SwordHitbox" type="Area2D" parent="AttackPivot" unique_id=2085447024 node_paths=PackedStringArray("attacker")]
+collision_layer = 8
+collision_mask = 4
+script = ExtResource("4_oawdx")
+knockback_force = 170.0
+attacker = NodePath("../..")
+
+[node name="CollisionShape" type="CollisionShape2D" parent="AttackPivot/SwordHitbox" unique_id=1813165741]
+shape = SubResource("ConvexPolygonShape2D_b0bri")
+
+[node name="SwingPlaceholder" type="Polygon2D" parent="AttackPivot" unique_id=1219132341]
+color = Color(1, 1, 0.85, 0.75)
+polygon = PackedVector2Array(0, 0, 10.142838, -21.751389, 15.824299, -18.044155, 20.241394, -12.895191, 23.041197, -6.7158966, 24, 0, 23.041197, 6.7158966, 20.241394, 12.895191, 15.824299, 18.044155, 10.142838, 21.751389)
+
+[node name="PlayerInput" type="Node" parent="." unique_id=107935481]
+script = ExtResource("5_tiye0")
+
+[node name="Camera" type="Camera2D" parent="." unique_id=258331374]
 position = Vector2(0, -12)
 position_smoothing_enabled = true
 position_smoothing_speed = 8.0
+script = ExtResource("6_iuwj5")

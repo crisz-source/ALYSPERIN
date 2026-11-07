@@ -63,12 +63,18 @@ ficam na mesma pasta.
 3. **Estado do jogo separado da apresentação.** Animação, partículas e som reagem a
    sinais; não decidem regras.
 
+## Combate: como o dano viaja
+`Hitbox` (quem bate, só machuca enquanto ativa) → detecta `Hurtbox` (quem apanha)
+→ `HealthComponent.apply_damage(DamageInfo)` → sinais `damaged` / `died`.
+Todo dano passa por `apply_damage`: nunca alterar `current_health` direto.
+Timers que podem sobreviver ao nó: usar `create_timer().timeout.connect(...)`, não `await`.
+
 ## Camadas de física (2D)
 | # | Nome | Uso |
 |---|---|---|
 | 1 | world | paredes e obstáculos |
-| 2 | player | corpo dos jogadores |
-| 3 | enemy | corpo dos inimigos |
+| 2 | player | corpo e Hurtbox dos jogadores |
+| 3 | enemy | corpo e Hurtbox dos inimigos |
 | 4 | player_hitbox | golpes dos jogadores |
 | 5 | enemy_hitbox | golpes dos inimigos |
 | 6 | interactable | baús, portas, NPCs |

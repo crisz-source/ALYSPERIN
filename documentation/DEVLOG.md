@@ -24,8 +24,17 @@ conhecidos. Detalhes técnicos de cada etapa ficam em `documentation/worklog/`.
 ### Fase 2 — Primeiro personagem jogável — 🔄 em andamento
 - [x] Cena do jogador, movimentação top-down (8 dir.), direção em 4, câmera
   (testes automáticos ok; teste manual ok — "bem fluido")
-- [ ] Ataque básico com espada, esquiva
-- [ ] Inimigo simples e arena de teste com obstáculos (protótipo)
+- [x] Ataque básico com espada mirando no mouse, input buffer
+- [x] Esquiva (rolamento, invencibilidade, recarga, cancela recuperação do ataque)
+  (teste manual ok — "tudo funcionando perfeitamente")
+
+### Fase 3 — Fundamentos do combate — 🔄 protótipo pronto (teste manual ok em 2026-11-07)
+- [x] Sistema de vida e dano (HealthComponent, Hitbox, Hurtbox, DamageInfo)
+- [x] Inimigo básico com IA (perseguir, avisar, investir)
+- [x] Reações: empurrão, clarão, atordoamento, invulnerabilidade pós-dano
+- [x] Feedback visual: tremida de câmera, barras de vida, morte e reinício
+- [ ] Feedback sonoro (sem áudio no projeto)
+- [ ] Combo, defesa com botão direito, hitstop
 
 ## Problemas conhecidos
 - F5 no editor (jogo embutido na aba "Jogo") não recebe o teclado; clicar dentro não
@@ -35,5 +44,9 @@ conhecidos. Detalhes técnicos de cada etapa ficam em `documentation/worklog/`.
 ## Itens provisórios no projeto
 - `test_arena.tscn`: chão quadriculado desenhado por código, paredes e pilares em
   `ColorRect`, texto de ajuda — no lugar de tilemap/arte reais.
-- `player.tscn`: corpo azul (`BodyPlaceholder`) e seta amarela (`FacingIndicator`)
-  no lugar de sprites.
+- `player.tscn`: corpo azul (`BodyPlaceholder`), seta amarela (`FacingIndicator`) e
+  arco claro do golpe (`SwingPlaceholder`) no lugar de sprites/efeitos.
+- `basic_enemy.tscn`: inimigo inteiro é provisório (quadrado vermelho, sem nome nem
+  conceito definido) — serve só para testar combate.
+- `test_arena.gd`: reaparecimento de inimigos e reinício automático são ferramentas
+  de teste, não sistemas finais de spawn/morte.
