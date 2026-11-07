@@ -13,5 +13,7 @@ extends Resource
 @export var cooldown: float = 4.0
 ## Nível do personagem a partir do qual a habilidade pode ser usada.
 @export var unlock_level: int = 1
+## Mana gasta ao usar (0 = não usa mana).
+@export var mana_cost: int = 0
 ## Cor do quadrado na barra de habilidades (provisório, até haver ícones).
 @export var icon_color: Color = Color(0.8, 0.8, 0.8)

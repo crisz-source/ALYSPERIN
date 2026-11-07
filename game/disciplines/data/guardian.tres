@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="DisciplineData" format=3]
+
+[ext_resource type="Script" path="res://game/abilities/ability_data.gd" id="1_g2kjy"]
+[ext_resource type="Resource" path="res://game/abilities/data/spin_slash.tres" id="2_fm5wa"]
+[ext_resource type="Resource" path="res://game/abilities/data/heal.tres" id="3_e5urf"]
+[ext_resource type="Script" path="res://game/disciplines/discipline_data.gd" id="4_8p1vt"]
+
+[resource]
+script = ExtResource("4_8p1vt")
+id = &"guardian"
+display_name = "Guardião"
+description = "Defesa sólida. +40 de vida; o escudo protege mais e gasta metade."
+icon_color = Color(0.4, 0.6, 0.9, 1)
+bonus_health = 40
+block_angle_bonus = 15.0
+shield_wear_multiplier = 0.5
+abilities = Array[ExtResource("1_g2kjy")]([ExtResource("2_fm5wa"), ExtResource("3_e5urf")])

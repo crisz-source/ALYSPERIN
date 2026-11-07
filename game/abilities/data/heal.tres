@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="HealSpellData" format=3]
+
+[ext_resource type="Script" path="res://game/abilities/heal_spell_data.gd" id="1_y7n83"]
+
+[resource]
+script = ExtResource("1_y7n83")
+id = &"heal"
+display_name = "Cura"
+description = "Recupera 30 de vida."
+cooldown = 6.0
+unlock_level = 2
+mana_cost = 20
+icon_color = Color(0.45, 0.9, 0.5, 1)

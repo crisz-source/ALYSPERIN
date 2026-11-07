@@ -67,6 +67,8 @@ ficam na mesma pasta.
 `Hitbox` (quem bate, só machuca enquanto ativa) → detecta `Hurtbox` (quem apanha)
 → `HealthComponent.apply_damage(DamageInfo)` → sinais `damaged` / `died`.
 Todo dano passa por `apply_damage`: nunca alterar `current_health` direto.
+Área que precisa detectar paredes/portas (corpos estáticos) deve ter `monitorable = true`:
+com `monitorable = false` a física da Godot não compara a área com corpos estáticos.
 Timers que podem sobreviver ao nó: usar `create_timer().timeout.connect(...)`, não `await`.
 Defesa/escudo: o dono registra `HealthComponent.block_filter`; golpe bloqueado não
 causa dano, marca `DamageInfo.blocked` e emite `blocked` / `Hitbox.hit_blocked`.

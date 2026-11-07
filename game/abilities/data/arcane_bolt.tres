@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ProjectileSpellData" format=3]
+
+[ext_resource type="Script" path="res://game/abilities/projectile_spell_data.gd" id="1_5fohw"]
+
+[resource]
+script = ExtResource("1_5fohw")
+id = &"arcane_bolt"
+display_name = "Dardo arcano"
+description = "Dispara um projétil mágico na direção do mouse."
+cooldown = 0.6
+mana_cost = 8
+icon_color = Color(0.6, 0.5, 1, 1)

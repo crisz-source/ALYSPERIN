@@ -1,10 +1,10 @@
 class_name Hud
 extends CanvasLayer
-## HUD provisório: barra de vida do jogador, texto de ajuda, caixa de mensagem
-## (placas, portas...) e aviso de morte.
+## HUD provisório: barra de vida do jogador, nível, experiência, habilidades,
+## texto de ajuda e caixa de mensagem (placas, portas...).
 ##
-## Só escuta sinais do jogador; não decide nada do jogo. Quem reinicia a cena
-## depois da morte é a própria área/arena.
+## Só escuta sinais do jogador; não decide nada do jogo. A morte tem tela
+## própria (DeathScreen), controlada pela área.
 
 ## Texto de controles mostrado no rodapé (provisório, some quando houver tutorial).
 @export_multiline var help_text: String = ""
@@ -16,17 +16,17 @@ var _message_time_left: float = 0.0
 var _player: Player
 
 @onready var _health_fill: ColorRect = $PlayerHealth/Fill
-@onready var _status_label: Label = $StatusLabel
 @onready var _help_label: Label = $HelpPlaceholder
 @onready var _message_box: Control = $MessageBox
 @onready var _message_label: Label = $MessageBox/Text
 @onready var _level_label: Label = $LevelLabel
 @onready var _xp_fill: ColorRect = $XpBar/Fill
 @onready var _ability_bar: HBoxContainer = $AbilityBar
+@onready var _mana_fill: ColorRect = $PlayerMana/Fill
+@onready var _quest_tracker: Label = $QuestTracker
 
 
 func _ready() -> void:
-	_status_label.visible = false
 	_help_label.text = help_text
 	_message_box.visible = false
 
@@ -34,11 +34,17 @@ func _ready() -> void:
 func bind_player(player: Player) -> void:
 	_player = player
 	player.health.health_changed.connect(_on_player_health_changed)
-	player.died.connect(_on_player_died)
 	player.message_requested.connect(show_message)
 	player.stats.xp_changed.connect(_on_xp_changed)
 	_on_xp_changed(player.stats.xp, player.stats.xp_to_next())
 	_build_ability_bar()
+	player.discipline_changed.connect(func(_d: DisciplineData) -> void: _build_ability_bar())
+	player.mana.mana_changed.connect(_on_mana_changed)
+	player.quest_log.quest_started.connect(func(_q: QuestData) -> void: _update_quest_tracker())
+	player.quest_log.quest_progressed.connect(func(_q: QuestData, _p: int) -> void: _update_quest_tracker())
+	player.quest_log.quest_completed.connect(func(_q: QuestData) -> void: _update_quest_tracker())
+	_update_quest_tracker()
+	_on_mana_changed(player.mana.current(), player.mana.max_mana)
 
 
 ## Mostra um texto na caixa de baixo. Uma mensagem nova substitui a anterior.
@@ -64,6 +70,9 @@ func _process(delta: float) -> void:
 ## Um quadrado por habilidade: cor, número da tecla, sombra da recarga e
 ## cadeado (nível) enquanto bloqueada. Provisório até haver ícones.
 func _build_ability_bar() -> void:
+	for old: Node in _ability_bar.get_children():
+		_ability_bar.remove_child(old)
+		old.queue_free()
 	for i in _player.abilities.size():
 		var ability: AbilityData = _player.abilities[i]
 		if ability == null:
@@ -110,6 +119,23 @@ func _update_ability_bar() -> void:
 		shade.position.y = 18.0 - shade.size.y
 
 
+## Canto superior direito: a primeira missão ativa e o progresso.
+func _update_quest_tracker() -> void:
+	var active: Array[QuestData] = _player.quest_log.active_quests()
+	if active.is_empty():
+		_quest_tracker.text = ""
+		return
+	var quest: QuestData = active[0]
+	if _player.quest_log.is_ready(quest):
+		_quest_tracker.text = "Missão: %s\nConcluída! Volte para entregar." % quest.title
+	else:
+		_quest_tracker.text = "Missão: %s (%d/%d)" % [quest.title, _player.quest_log.progress_of(quest), quest.required_count]
+
+
+func _on_mana_changed(current: int, maximum: int) -> void:
+	_mana_fill.scale.x = float(current) / float(maxi(maximum, 1))
+
+
 func _on_xp_changed(xp: int, xp_to_next: int) -> void:
 	_level_label.text = "Nv %d" % _player.stats.level
 	_xp_fill.scale.x = float(xp) / float(xp_to_next)
@@ -118,6 +144,3 @@ func _on_xp_changed(xp: int, xp_to_next: int) -> void:
 func _on_player_health_changed(current: int, maximum: int) -> void:
 	_health_fill.scale.x = float(current) / float(maximum)
 
-
-func _on_player_died() -> void:
-	_status_label.visible = true

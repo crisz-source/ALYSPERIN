@@ -22,7 +22,7 @@ conhecidos. Detalhes técnicos de cada etapa ficam em `documentation/worklog/`.
 | 2026-11-07 | Durabilidade: arma/escudo quebrados ficam bem mais fracos, não somem |
 | 2026-11-07 | Progressão por nível com pontos escolhidos (Vigor, Força); sem escudo não há defesa |
 | 2026-11-07 | Inventário não pausa o jogo (pensado para o co-op) |
-| 2026-11-07 | Morrer recomeça a área do zero (até existir salvamento) |
+| 2026-11-07 | ~~Morrer recomeça a área do zero~~ → substituído: morrer mostra "Você morreu!" / "Deseja continuar?"; Sim volta ao último ponto de descanso mantendo itens e experiência |
 
 ## Marcos
 ### Fase 1 — Fundação — ✅ concluída (2026-11-07)
@@ -63,6 +63,14 @@ conhecidos. Detalhes técnicos de cada etapa ficam em `documentation/worklog/`.
 - [x] Experiência, níveis, pontos (Vigor/Força); HUD com nível e exp.
 - [x] Habilidades (teclas 1–6): Golpe giratório (nível 2)
 - [ ] Reparo de equipamento; ícones reais; salvamento
+
+### Fase 6 — Mundo e conteúdo — 🔄 em andamento
+- [x] Morte com "continuar" e pontos de descanso (botão "Não" a definir pelo proprietário)
+- [x] Mana; magias (Dardo arcano, Cura); NPC com diálogo; missões (derrotar / coletar)
+- [x] Disciplinas PROVISÓRIAS (Vanguarda/Guardião/Arcanista) — a substituir pelo sistema
+  de 6 classes × 3 disciplinas definido pelo proprietário
+- [ ] Classes/disciplinas definitivas, Gear Score, masmorras com sincronização
+- [ ] Enigmas, chefes
 
 ## Problemas conhecidos
 - F5 no editor (jogo embutido na aba "Jogo") não recebe o teclado; clicar dentro não

@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://game/items/item_stack.gd" id="1_fbcap"]
+[ext_resource type="Resource" path="res://game/items/data/healing_herb.tres" id="2_p6vjn"]
+[ext_resource type="Script" path="res://game/quests/quest_data.gd" id="3_bjvnn"]
+
+[sub_resource type="Resource" id="Resource_n2tmu"]
+script = ExtResource("1_fbcap")
+item = ExtResource("2_p6vjn")
+count = 2
+
+[resource]
+script = ExtResource("3_bjvnn")
+id = &"clear_the_hall"
+title = "Ameaça no salão"
+description = "Derrote 3 inimigos."
+target_kind = &"basic_enemy"
+required_count = 3
+reward_xp = 40
+reward_items = Array[ExtResource("1_fbcap")]([SubResource("Resource_n2tmu")])
+offer_lines = Array[String](["Você aí! Criaturas tomaram o salão adiante.", "Derrote três delas e eu te recompenso."])
+in_progress_lines = Array[String](["Ainda há criaturas no salão. Volte quando tiver derrotado três."])
+complete_lines = Array[String](["Muito bem! Tome, você mereceu."])

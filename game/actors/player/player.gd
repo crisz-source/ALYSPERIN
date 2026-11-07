@@ -15,6 +15,10 @@ signal dodge_succeeded
 signal message_requested(text: String)
 ## O jogador descartou um item: a área decide onde ele aparece no chão.
 signal item_dropped(stack: ItemStack, at_position: Vector2)
+## Disciplina escolhida/trocada: habilidades e bônus mudaram (HUD refaz a barra).
+signal discipline_changed(discipline: DisciplineData)
+## Um NPC quer conversar: a área abre a caixa de diálogo e chama on_finished no fim.
+signal dialogue_requested(speaker: String, lines: Array[String], on_finished: Callable)
 
 enum State { MOVE, ATTACK, BLOCK, DODGE, HURT, ABILITY, DEAD }
 
@@ -30,6 +34,7 @@ const LEVEL_UP_COLOR := Color(1.0, 0.85, 0.35)
 const BROKEN_COLOR := Color(1.0, 0.45, 0.35)
 const MSG_HEALTH_FULL := "A vida já está cheia."
 const MSG_INVENTORY_FULL := "Inventário cheio."
+const NO_MANA_COLOR := Color(0.5, 0.7, 1.0)
 
 @export_group("Movimento")
 ## Velocidade máxima, em pixels por segundo (16 px = 1 tile).
@@ -124,14 +129,28 @@ var _dodge_success_this_dodge: bool = false
 var focused_interactable: Interactable = null
 ## true enquanto uma tela (inventário) estiver aberta: o personagem ignora comandos.
 var input_blocked: bool = false
+## Onde o jogador volta ao continuar depois da morte (ponto de descanso).
+var respawn_point: Vector2 = Vector2.ZERO
+## Invulnerabilidade ao voltar, para não morrer de novo no mesmo instante (s).
+var respawn_invulnerability: float = 1.5
 ## Segundos restantes de recarga por habilidade (mesma posição da lista).
 var _ability_cooldowns: Array[float] = []
 var _active_ability: AbilityData = null
+## A habilidade em andamento já fez efeito (disparou/curou)?
+var _ability_fired: bool = false
+## Disciplina escolhida (null = nenhuma ainda).
+var discipline: DisciplineData = null
+var _base_max_mana: int = 0
+var _base_mana_regen: float = 0.0
+## Desgaste fracionário do escudo (Guardião gasta metade: 1 ponto a cada 2 bloqueios).
+var _shield_wear_accumulator: float = 0.0
 
 @onready var health: HealthComponent = $HealthComponent
 @onready var inventory: Inventory = $Inventory
 @onready var equipment: Equipment = $Equipment
 @onready var stats: CharacterStats = $CharacterStats
+@onready var mana: ManaComponent = $ManaComponent
+@onready var quest_log: QuestLog = $QuestLog
 @onready var _input: PlayerInput = $PlayerInput
 @onready var _facing_indicator: Node2D = $FacingIndicator
 @onready var _body: Polygon2D = $BodyPlaceholder
@@ -163,6 +182,11 @@ func _ready() -> void:
 	_interact_prompt.top_level = true
 	_interact_prompt.visible = false
 	_base_max_health = health.max_health
+	_base_max_mana = mana.max_mana
+	_base_mana_regen = mana.regen_per_second
+	quest_log.inventory = inventory
+	inventory.changed.connect(quest_log.refresh_collect)
+	respawn_point = global_position
 	stats.attributes_changed.connect(_on_attributes_changed)
 	stats.leveled_up.connect(_on_leveled_up)
 	_ability_cooldowns.resize(abilities.size())
@@ -211,12 +235,82 @@ func current_attack_damage(step: int) -> int:
 	var base: float = float(weapon.damage) if weapon else float(unarmed_damage)
 	if weapon and equipment.weapon.is_broken():
 		base *= weapon.broken_damage_multiplier
-	return maxi(roundi(base * combo_damage_multiplier[step] * stats.damage_multiplier()), 1)
+	var discipline_bonus: float = 1.0 + (discipline.damage_bonus if discipline else 0.0)
+	return maxi(roundi(base * combo_damage_multiplier[step] * stats.damage_multiplier() * discipline_bonus), 1)
+
+
+## Volta à vida no ponto indicado, com vida cheia. Itens, equipamento e
+## experiência são mantidos (nada é recarregado).
+func respawn(at: Vector2) -> void:
+	global_position = at
+	velocity = Vector2.ZERO
+	health.revive()
+	mana.restore_full()
+	health.grant_invulnerability(respawn_invulnerability)
+	input_blocked = false
+	_change_state(State.MOVE)
+	_camera.reset_smoothing()
+
+
+## Ponto de descanso: marca onde voltar e restaura a vida.
+func rest_at(point: Vector2) -> void:
+	respawn_point = point
+	health.heal(health.max_health)
+	mana.restore_full()
+
+
+## Aplica a Disciplina: bônus de vida/mana e troca das habilidades.
+func apply_discipline(new_discipline: DisciplineData) -> void:
+	discipline = new_discipline
+	abilities = discipline.abilities.duplicate()
+	_ability_cooldowns.resize(abilities.size())
+	_ability_cooldowns.fill(0.0)
+	_on_attributes_changed()
+	mana.regen_per_second = _base_mana_regen * discipline.mana_regen_multiplier
+	mana.set_max_mana(_base_max_mana + discipline.bonus_mana)
+	discipline_changed.emit(discipline)
 
 
 ## Experiência ganha (ex.: inimigo derrotado).
 func gain_xp(amount: int) -> void:
 	stats.add_xp(amount)
+
+
+## Chamado pelo inimigo derrotado por este jogador.
+func on_enemy_defeated(kind: StringName, xp: int) -> void:
+	gain_xp(xp)
+	quest_log.notify_kill(kind)
+
+
+func request_dialogue(speaker: String, lines: Array[String], on_finished: Callable = Callable()) -> void:
+	dialogue_requested.emit(speaker, lines, on_finished)
+
+
+## Entrega a missão: tira os itens pedidos (coleta), dá experiência e itens.
+## Recompensa que não couber na bolsa cai no chão.
+func turn_in_quest(quest: QuestData) -> void:
+	# Concluir ANTES de tirar os itens: a conclusão confere o objetivo, e na
+	# coleta ele é contado na própria bolsa.
+	if not quest_log.complete(quest):
+		return
+	if quest.objective == QuestData.Objective.COLLECT:
+		_remove_items(quest.target_item, quest.required_count)
+	gain_xp(quest.reward_xp)
+	for reward: ItemStack in quest.reward_items:
+		var piece: ItemStack = reward.copy()
+		var left: int = inventory.add(piece)
+		if left > 0:
+			piece.count = left
+			item_dropped.emit(piece, global_position + facing * 14.0)
+	_say("Missão concluída: %s" % quest.title)
+
+
+func _remove_items(item: ItemData, amount: int) -> void:
+	var remaining: int = amount
+	for i in inventory.slots.size():
+		var stack: ItemStack = inventory.get_slot(i)
+		if remaining > 0 and stack and stack.item == item:
+			remaining -= inventory.remove(i, remaining).count
 
 
 # --- Itens -----------------------------------------------------------------
@@ -362,6 +456,26 @@ func _process_ability(delta: float) -> void:
 		_spin_visual.rotation = _state_time * TAU * 3.0
 		if _state_time >= spin.duration:
 			_change_state(State.MOVE)
+		return
+	var bolt := _active_ability as ProjectileSpellData
+	if bolt:
+		if not _ability_fired and _state_time >= bolt.cast_time:
+			_ability_fired = true
+			var aim: Vector2 = _aim_direction()
+			_set_facing(to_cardinal(aim))
+			Projectile.fire(self, _attack_pivot.global_position + aim * 8.0, aim, bolt)
+		if _state_time >= bolt.cast_time + 0.08:
+			_change_state(State.MOVE)
+		return
+	var heal_spell := _active_ability as HealSpellData
+	if heal_spell:
+		if not _ability_fired and _state_time >= heal_spell.cast_time:
+			_ability_fired = true
+			health.heal(heal_spell.heal_amount)
+			FloatingText.spawn(self, "+%d" % heal_spell.heal_amount, global_position + Vector2(0, -30), Color(0.5, 1.0, 0.5))
+			_change_state(State.MOVE)
+		return
+	_change_state(State.MOVE)
 
 
 func _process_dodge() -> void:
@@ -447,9 +561,13 @@ func _try_start_ability() -> bool:
 		return false
 	if _ability_cooldowns[slot] > 0.0:
 		return false
+	if not mana.spend(ability.mana_cost):
+		FloatingText.spawn(self, "Sem mana", global_position + Vector2(0, -30), NO_MANA_COLOR)
+		return false
 	_ability_cooldowns[slot] = ability.cooldown
 	_change_state(State.ABILITY)
 	_active_ability = ability
+	_ability_fired = false
 	var spin := ability as SpinSlashData
 	if spin:
 		_spin_hitbox.damage = maxi(roundi(current_attack_damage(0) * spin.damage_multiplier), 1)
@@ -501,7 +619,7 @@ func _is_hit_blocked(info: DamageInfo) -> bool:
 		from_direction = -info.knockback.normalized()
 	var shield: ShieldData = equipment.shield_data()
 	var in_front: bool = from_direction == Vector2.ZERO \
-		or absf(_block_direction.angle_to(from_direction)) <= deg_to_rad(shield.block_half_angle)
+		or absf(_block_direction.angle_to(from_direction)) <= deg_to_rad(shield.block_half_angle + _block_angle_bonus())
 	if not in_front:
 		return false
 	# Escudo quebrado ainda segura parte do golpe: o dano passa reduzido.
@@ -513,8 +631,11 @@ func _is_hit_blocked(info: DamageInfo) -> bool:
 
 func _on_blocked(info: DamageInfo) -> void:
 	velocity = info.knockback * equipment.shield_data().knockback_multiplier
-	if equipment.shield.wear(1):
-		FloatingText.spawn(self, "Escudo quebrou!", global_position + Vector2(0, -30), BROKEN_COLOR)
+	_shield_wear_accumulator += discipline.shield_wear_multiplier if discipline else 1.0
+	while _shield_wear_accumulator >= 1.0:
+		_shield_wear_accumulator -= 1.0
+		if equipment.shield.wear(1):
+			FloatingText.spawn(self, "Escudo quebrou!", global_position + Vector2(0, -30), BROKEN_COLOR)
 	equipment.notify_wear()
 	_shield_flash_time = 0.08
 	_camera.shake(1.5, 0.08)
@@ -589,12 +710,17 @@ func _update_focus() -> void:
 		_interact_prompt.global_position = (best.prompt_position() - _interact_prompt.get_combined_minimum_size() / 2.0).round()
 
 
+func _block_angle_bonus() -> float:
+	return discipline.block_angle_bonus if discipline else 0.0
+
+
 func _can_block() -> bool:
 	return _input.defend_held and equipment.shield != null
 
 
 func _on_attributes_changed() -> void:
-	health.set_max_health(_base_max_health + stats.bonus_max_health())
+	var discipline_health: int = discipline.bonus_health if discipline else 0
+	health.set_max_health(_base_max_health + discipline_health + stats.bonus_max_health())
 
 
 func _on_leveled_up(new_level: int) -> void:

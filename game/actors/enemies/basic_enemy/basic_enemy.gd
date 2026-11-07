@@ -62,6 +62,8 @@ const EYE_OFFSET := Vector2(0, -8)
 @export_group("Recompensa")
 ## Experiência dada a quem derrotou este inimigo.
 @export var xp_reward: int = 10
+## Tipo do inimigo (usado por missões "derrote N do tipo X").
+@export var kind: StringName = &"basic_enemy"
 @export var death_fade_time: float = 0.4
 
 var state: State = State.IDLE
@@ -72,6 +74,8 @@ var _lunge_direction: Vector2 = Vector2.ZERO
 var _flash_time: float = 0.0
 ## Último jogador que causou dano: recebe a experiência na morte.
 var _last_attacker: Player = null
+## Onde o inimigo começou (volta para cá quando o jogador continua após morrer).
+var _spawn_position: Vector2 = Vector2.ZERO
 
 @onready var health: HealthComponent = $HealthComponent
 @onready var _hitbox: Hitbox = $LungeHitbox
@@ -89,6 +93,7 @@ func _ready() -> void:
 	health.health_changed.connect(_on_health_changed)
 	_hitbox.hit_blocked.connect(_on_lunge_blocked)
 	_health_bar.visible = false
+	_spawn_position = global_position
 	_build_telegraph()
 
 
@@ -145,6 +150,18 @@ func _process_chase(delta: float) -> void:
 		_aim_at_target()
 		return
 	velocity = velocity.move_toward(to_target.normalized() * move_speed, acceleration * delta)
+
+
+## Volta ao lugar de origem com vida cheia, sem alvo (jogador continuou após morrer).
+func reset_to_spawn() -> void:
+	if health.is_dead:
+		return
+	global_position = _spawn_position
+	velocity = Vector2.ZERO
+	target = null
+	_last_attacker = null
+	health.revive()
+	_change_state(State.IDLE)
 
 
 ## true na parte final do aviso: a direção mostrada no chão não muda mais.
@@ -244,7 +261,7 @@ func _on_died() -> void:
 	_change_state(State.DEAD)
 	# No co-op a divisão da experiência será decidida pelo host (Fase 7).
 	if is_instance_valid(_last_attacker):
-		_last_attacker.gain_xp(xp_reward)
+		_last_attacker.on_enemy_defeated(kind, xp_reward)
 	died.emit()
 
 

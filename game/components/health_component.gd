@@ -82,6 +82,15 @@ func set_max_health(new_max: int) -> void:
 	health_changed.emit(current_health, max_health)
 
 
+## Volta à vida com vida cheia (continuar depois da morte, ponto de descanso).
+func revive() -> void:
+	is_dead = false
+	current_health = max_health
+	_invulnerable_time = 0.0
+	_invulnerable_flag = false
+	health_changed.emit(current_health, max_health)
+
+
 func heal(amount: int) -> void:
 	if is_dead or amount <= 0:
 		return

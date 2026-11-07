@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="DisciplineData" format=3]
+
+[ext_resource type="Script" path="res://game/abilities/ability_data.gd" id="1_seewy"]
+[ext_resource type="Resource" path="res://game/abilities/data/arcane_bolt.tres" id="2_8yeoy"]
+[ext_resource type="Resource" path="res://game/abilities/data/heal.tres" id="3_kvcqn"]
+[ext_resource type="Script" path="res://game/disciplines/discipline_data.gd" id="4_dpl1d"]
+
+[resource]
+script = ExtResource("4_dpl1d")
+id = &"arcanist"
+display_name = "Arcanista"
+description = "Magia à distância. +40 de mana; a mana volta 2x mais rápido."
+icon_color = Color(0.65, 0.5, 1, 1)
+bonus_mana = 40
+mana_regen_multiplier = 2.0
+abilities = Array[ExtResource("1_seewy")]([ExtResource("2_8yeoy"), ExtResource("3_kvcqn")])
