@@ -118,7 +118,7 @@ contam por um relógio diferente do real. Para medir tempo real, usar `Time.get_
 
 ## Controles (ações já mapeadas)
 `move_up/down/left/right` (WASD), `attack` (botão esq.), `defend` (botão dir.),
-`dodge` (Espaço), `special` (Q), `interact` (E), `ability_1..6` (1–6),
+`dodge` (Espaço), `special` (Q), `interact` (F), `ability_1..9` (1–9), `ability_f1..f12` (F1–F12),
 `inventory` (Tab), `pause` (Esc). Teclas físicas: valem para teclado ABNT ou US.
 
 ## Git

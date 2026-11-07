@@ -1,6 +1,6 @@
 class_name DialogueBox
 extends CanvasLayer
-## Caixa de diálogo (PROVISÓRIA: sem arte). Mostra uma fala por vez; E (ou
+## Caixa de diálogo (PROVISÓRIA: sem arte). Mostra uma fala por vez; F (ou
 ## Enter) avança. Ao terminar, chama a função recebida em start().
 
 signal finished
@@ -45,7 +45,7 @@ func _ready() -> void:
 	_text.add_theme_font_size_override("font_size", 10)
 	_root.add_child(_text)
 	var hint := Label.new()
-	hint.text = "[E] continuar"
+	hint.text = "[F] continuar"
 	hint.position = Vector2(484, 330)
 	hint.add_theme_font_size_override("font_size", 8)
 	hint.add_theme_color_override("font_color", Color(0.7, 0.7, 0.75))

@@ -96,7 +96,7 @@ const NO_MANA_COLOR := Color(0.5, 0.7, 1.0)
 @export var post_hit_invulnerability: float = 0.7
 
 @export_group("Habilidades")
-## Habilidades nas teclas 1-6 (posição na lista = tecla). Vazio = sem habilidade.
+## Habilidades da barra: posições 0-8 = teclas 1-9, 9-20 = F1-F12. Vazio = sem habilidade.
 @export var abilities: Array[AbilityData] = []
 
 @export_group("Hitstop (pausa de impacto)")
@@ -700,7 +700,7 @@ func _update_focus() -> void:
 	focused_interactable = best
 	_interact_prompt.visible = best != null
 	if best:
-		_interact_prompt.text = "[E] " + best.prompt_text
+		_interact_prompt.text = "[F] " + best.prompt_text
 		_interact_prompt.global_position = (best.prompt_position() - _interact_prompt.get_combined_minimum_size() / 2.0).round()
 
 

@@ -26,6 +26,7 @@ conhecidos. Detalhes técnicos de cada etapa ficam em `documentation/worklog/`.
 | 2026-11-07 | Sem sistema de pontos (Vigor/Força removidos): vida, mana e dano crescem por nível, igual para todos |
 | 2026-11-07 | Nível máximo 60; masmorras a partir do nível 20; cada classe usa só os seus tipos de arma |
 | 2026-11-07 | Ponto de descanso removido: continuar após a morte volta ao início da área |
+| 2026-11-07 | Interagir na tecla F (antes E); barra de habilidades no centro embaixo com 21 espaços: 1-9 e F1-F12 |
 | 2026-11-07 | ~~Morrer recomeça a área do zero~~ → substituído: morrer mostra "Você morreu!" / "Deseja continuar?"; Sim volta ao último ponto de descanso mantendo itens e experiência |
 
 ## Marcos

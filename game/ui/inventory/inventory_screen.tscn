@@ -2,5 +2,5 @@
 
 [ext_resource type="Script" path="res://game/ui/inventory/inventory_screen.gd" id="1_rc65b"]
 
-[node name="InventoryScreen" type="CanvasLayer" unique_id=936463647]
+[node name="InventoryScreen" type="CanvasLayer" unique_id=1025967672]
 script = ExtResource("1_rc65b")

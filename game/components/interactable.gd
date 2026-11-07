@@ -1,6 +1,6 @@
 class_name Interactable
 extends Area2D
-## Área que torna um objeto "usável" com a tecla de interagir (E).
+## Área que torna um objeto "usável" com a tecla de interagir (F).
 ##
 ## O objeto dono (porta, alavanca, placa, baú no futuro) registra em `handler`
 ## a função que diz o que acontece; ela recebe quem interagiu e devolve uma
@@ -9,7 +9,7 @@ extends Area2D
 
 signal interacted(by: Player)
 
-## Verbo mostrado no aviso acima do objeto: "[E] <prompt_text>".
+## Verbo mostrado no aviso acima do objeto: "[F] <prompt_text>".
 @export var prompt_text: String = "Usar"
 ## Onde o aviso aparece, relativo ao objeto (px).
 @export var prompt_offset: Vector2 = Vector2(0, -24)

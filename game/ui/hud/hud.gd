@@ -12,6 +12,13 @@ extends CanvasLayer
 @export var message_min_time: float = 2.5
 @export var message_max_time: float = 7.0
 
+const SLOT: float = 20.0
+const SLOT_GAP: float = 2.0
+const EMPTY_SLOT_COLOR := Color(0.1, 0.1, 0.13, 0.75)
+## Topo de cada fileira (tela 640x360): F1-F12 em cima, 1-9 embaixo.
+const ROW_F_Y: float = 314.0
+const ROW_NUMBERS_Y: float = 337.0
+
 var _message_time_left: float = 0.0
 var _player: Player
 
@@ -21,7 +28,7 @@ var _player: Player
 @onready var _message_label: Label = $MessageBox/Text
 @onready var _level_label: Label = $LevelLabel
 @onready var _xp_fill: ColorRect = $XpBar/Fill
-@onready var _ability_bar: HBoxContainer = $AbilityBar
+@onready var _ability_bar: Control = $AbilityBar
 @onready var _mana_fill: ColorRect = $PlayerMana/Fill
 @onready var _quest_tracker: Label = $QuestTracker
 
@@ -67,37 +74,41 @@ func _process(delta: float) -> void:
 		_message_box.visible = false
 
 
-## Um quadrado por habilidade: cor, número da tecla, sombra da recarga e
-## cadeado (nível) enquanto bloqueada. Provisório até haver ícones.
+## Barra de habilidades no centro, embaixo: fileira de cima F1-F12, de baixo
+## 1-9. Todo espaço aparece (vazio = só o número). Espaço com habilidade: cor,
+## sombra da recarga e cadeado (nível) enquanto bloqueada. Provisório até ícones.
 func _build_ability_bar() -> void:
 	for old: Node in _ability_bar.get_children():
 		_ability_bar.remove_child(old)
 		old.queue_free()
-	for i in _player.abilities.size():
-		var ability: AbilityData = _player.abilities[i]
-		if ability == null:
-			continue
+	for i in PlayerInput.ABILITY_SLOTS:
+		var ability: AbilityData = _player.abilities[i] if i < _player.abilities.size() else null
 		var box := ColorRect.new()
 		box.name = "Ability%d" % (i + 1)
-		box.custom_minimum_size = Vector2(18, 18)
-		box.color = ability.icon_color
-		var shade := ColorRect.new()
-		shade.name = "Cooldown"
-		shade.size = Vector2(18, 18)
-		shade.color = Color(0, 0, 0, 0.7)
-		box.add_child(shade)
+		box.size = Vector2(SLOT, SLOT)
+		box.position = _slot_position(i)
+		box.color = ability.icon_color if ability else EMPTY_SLOT_COLOR
 		var key := Label.new()
 		key.name = "Key"
-		key.text = str(i + 1)
+		key.text = PlayerInput.ABILITY_KEY_LABELS[i]
 		key.position = Vector2(1, -2)
 		key.add_theme_font_size_override("font_size", 8)
 		key.add_theme_constant_override("outline_size", 2)
 		key.add_theme_color_override("font_outline_color", Color.BLACK)
+		if ability == null:
+			box.add_child(key)
+			_ability_bar.add_child(box)
+			continue
+		var shade := ColorRect.new()
+		shade.name = "Cooldown"
+		shade.size = Vector2(SLOT, SLOT)
+		shade.color = Color(0, 0, 0, 0.7)
+		box.add_child(shade)
 		box.add_child(key)
 		var lock := Label.new()
 		lock.name = "Lock"
 		lock.text = "Nv%d" % ability.unlock_level
-		lock.position = Vector2(1, 7)
+		lock.position = Vector2(1, 9)
 		lock.add_theme_font_size_override("font_size", 8)
 		lock.add_theme_constant_override("outline_size", 2)
 		lock.add_theme_color_override("font_outline_color", Color.BLACK)
@@ -105,18 +116,30 @@ func _build_ability_bar() -> void:
 		_ability_bar.add_child(box)
 
 
+## Posição do espaço na tela: 0-8 = fileira de baixo (1-9), 9-20 = de cima (F1-F12).
+func _slot_position(slot: int) -> Vector2:
+	var in_numbers: bool = slot < 9
+	var count: int = 9 if in_numbers else 12
+	var index: int = slot if in_numbers else slot - 9
+	var width: float = count * SLOT + (count - 1) * SLOT_GAP
+	var x0: float = roundf((640.0 - width) / 2.0)
+	return Vector2(x0 + index * (SLOT + SLOT_GAP), ROW_NUMBERS_Y if in_numbers else ROW_F_Y)
+
+
 func _update_ability_bar() -> void:
 	if _player == null:
 		return
 	for box: Node in _ability_bar.get_children():
+		if not box.has_node("Cooldown"):
+			continue
 		var slot: int = int(String(box.name).trim_prefix("Ability")) - 1
 		var unlocked: bool = _player.is_ability_unlocked(slot)
 		var shade: ColorRect = box.get_node("Cooldown")
 		(box.get_node("Lock") as Label).visible = not unlocked
 		# Sombra cobre tudo se bloqueada; senão, encolhe conforme a recarga acaba.
 		var ratio: float = 1.0 if not unlocked else _player.ability_cooldown_ratio(slot)
-		shade.size.y = 18.0 * ratio
-		shade.position.y = 18.0 - shade.size.y
+		shade.size.y = SLOT * ratio
+		shade.position.y = SLOT - shade.size.y
 
 
 ## Canto superior direito: a primeira missão ativa e o progresso.
