@@ -1,6 +1,7 @@
 # ALYSPERIN — Classes, Disciplinas, Progressão, Gear Score e Masmorras
 
-- **Status:** PROPOSTA para aprovação do proprietário (v1, 2026-11-07)
+- **Status:** v2 (2026-11-07) — decisões do proprietário aplicadas (ver §10). Nomes das
+  habilidades aprovados ("quero o nome habilidades mesmo").
 - **Origem:** especificação do proprietário "Sistema de Classes, Disciplinas, Progressão
   e Masmorras" (6 classes × 3 disciplinas, GS, Dungeon Sync).
 - **O que é decisão do proprietário:** classes e disciplinas (definidas por ele), e os
@@ -25,7 +26,7 @@
 
 ## 2. Nível de Disciplina e habilidades ⚑
 
-- Nível máximo inicial: **50** (expansões podem aumentar).
+- Nível máximo: **60** (decisão do proprietário; expansões podem aumentar).
 - Experiência para o nível N+1 = 30 × N (curva atual do protótipo; ajustável).
 - **6 habilidades por disciplina**, nas teclas 1–6, liberadas por nível:
 
@@ -33,23 +34,27 @@
 |---|---|---|---|
 | Inicial | 1 | 1 | habilidade principal da identidade |
 | Inicial | 1 | 2 | segunda ferramenta básica (mobilidade, defesa ou utilidade) |
-| Nova | 8 | 3 | amplia o estilo |
-| Intermediária | 18 | 4 | abre combinações (sinergia com 1–3) |
-| Avançada | 30 | 5 | poder forte, recarga longa |
-| Domínio | 45 | 6 | especial: o domínio máximo da disciplina |
+| Nova | 10 | 3 | amplia o estilo |
+| Intermediária | 20 | 4 | abre combinações (sinergia com 1–3) |
+| Avançada | 35 | 5 | poder forte, recarga longa |
+| Domínio | 50 | 6 | especial: o domínio máximo da disciplina |
+
+*(Na §7 os números entre parênteses seguem a versão anterior — 1, 1, 8, 18, 30, 45 —
+e devem ser lidos como 1, 1, 10, 20, 35, 50.)*
 
 - Além das 6 ativas, cada disciplina tem **1 traço passivo** desde o nível 1 que define
   sua mecânica central (ex.: Hemomante paga habilidades com vida).
-- **Atributos manuais (Vigor/Força do protótipo):** proposta ⚑ **remover**. Com base igual
-  para todos, HP/MP/dano crescem **automaticamente e igual** por nível. Isso simplifica o
-  equilíbrio e a sincronização. *(Decisão pendente do proprietário — ver §10.)*
+- **Sem sistema de pontos** (decisão do proprietário): HP/MP/dano crescem
+  **automaticamente e igual** por nível. **Já implementado** (commit a331599).
+- **Mana não recupera sozinha** (decisão do proprietário): volta com itens de mana.
+  **Já implementado.**
 
 ### Base por nível (igual para todas as classes) ⚑
-| | Nível 1 | Por nível | Nível 50 |
+| | Nível 1 | Por nível | Nível 60 |
 |---|---|---|---|
-| HP | 100 | +8 | 492 |
-| MP | 30 | +2 | 128 |
-| Dano-base | 10 | +1 | 59 |
+| HP | 100 | +8 | 572 |
+| MP | 30 | +2 | 148 |
+| Dano-base | ×1,0 | +10% | ×6,9 |
 
 O dano final de um golpe = dano-base × multiplicador da arma (GS) × multiplicador da habilidade.
 
@@ -66,17 +71,18 @@ O dano final de um golpe = dano-base × multiplicador da arma (GS) × multiplica
 
 ## 4. Masmorras ⚑ (nomes e GS: exemplos do proprietário)
 
-| Masmorra | GS de entrada | Teto de sync (GS) | Teto de nível | Jogadores |
-|---|---|---|---|---|
-| Ruínas Esquecidas | 300 | 300 | 10 | 1–4 |
-| Catacumbas Sombrias | 500 | 500 | 16 | 1–4 |
-| Fortaleza Abandonada | 700 | 700 | 22 | 1–4 |
-| Templo dos Condenados | 1000 | 1000 | 30 | 1–4 |
-| Abismo Ancestral | 1500 | 1500 | 38 | 1–4 |
-| Cidadela do Caos | 2000 | 2000 | 46 | 1–4 |
+| Masmorra | GS de entrada | Teto de sync (GS) | Nível mínimo | Teto de nível | Jogadores |
+|---|---|---|---|---|---|
+| Ruínas Esquecidas | 300 | 300 | 20 | 24 | 1–4 |
+| Catacumbas Sombrias | 500 | 500 | 26 | 30 | 1–4 |
+| Fortaleza Abandonada | 700 | 700 | 32 | 36 | 1–4 |
+| Templo dos Condenados | 1000 | 1000 | 40 | 44 | 1–4 |
+| Abismo Ancestral | 1500 | 1500 | 48 | 52 | 1–4 |
+| Cidadela do Caos | 2000 | 2000 | 56 | 60 | 1–4 |
 
-- **Requisito de entrada:** GS do personagem ≥ GS de entrada **e** nível ≥ teto de nível − 4 ⚑
-  (impede entrar muito abaixo do conteúdo só por ter um item bom).
+- **Masmorras começam no nível 20** (decisão do proprietário). Antes disso, o jogador
+  progride em áreas abertas, missões e chefes de área.
+- **Requisito de entrada:** GS ≥ GS de entrada **e** nível ≥ nível mínimo da masmorra ⚑.
 - Cada masmorra é um arquivo de dados (`DungeonData`): nome, requisitos, tetos, cena,
   inimigos, chefe e recompensas. Criar uma nova = criar um arquivo + a cena do mapa.
 
@@ -116,6 +122,17 @@ principal forte** e **uma secundária fraca**, e nenhuma tem cura forte + dano f
 ## 7. As 18 disciplinas — habilidades propostas ⚑
 
 Formato: **Nome** (nível) — efeito. Recargas e números exatos ficam para a etapa de equilíbrio.
+
+**Armas por classe (decisão do proprietário: cada classe usa só as suas):**
+
+| Classe | Armas permitidas | Mão secundária |
+|---|---|---|
+| Guardião | espada, maça, machado | escudo |
+| Arcanista | cajado | foco arcano |
+| Errante | adagas, espada leve, facas de arremesso | — (adaga secundária) |
+| Devoto | maça, cetro | relíquia |
+| Caçador | arco, besta | aljava |
+| Profano | foice, grimório | talismã |
 
 ### 1. Guardião (espada/maça + escudo)
 **Bastião** — *passivo Muralha: bloquear gera Firmeza (reduz dano por alguns segundos).*
@@ -299,12 +316,15 @@ Formato: **Nome** (nível) — efeito. Recargas e números exatos ficam para a e
 
 Cada etapa com testes automáticos, worklog e commit.
 
-## 10. Decisões pendentes do proprietário
+## 10. Decisões do proprietário (2026-11-07)
 
-1. **Lista de habilidades** da §7: aprovar, trocar nomes ou efeitos.
-2. **Atributos manuais (Vigor/Força):** remover (recomendado: base igual e automática) ou manter?
-3. **Nível máximo 50** e a curva de experiência.
-4. **Requisito de nível** para masmorras (além do GS): manter a regra "teto − 4"?
-5. **Armas por classe:** cada classe só usa os tipos de arma listados (recomendado, reforça a
-   identidade) ou qualquer arma?
-6. **Ordem das etapas** da §9.
+1. Nomes das habilidades da §7: **aprovados**.
+2. Sistema de pontos: **não** — crescimento automático por nível (implementado).
+3. Nível máximo: **60**.
+4. Masmorras: **a partir do nível 20**.
+5. Armas: **cada classe usa só os seus tipos**.
+6. Mana: **não recupera sozinha**; só com itens.
+7. Ponto de descanso: **removido**; continuar após a morte volta ao início da área.
+8. Ordem das etapas (§9): mantida.
+
+Os 3 primeiros chefes estão em `documentation/design/chefes-iniciais.md`.
