@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="Script" path="res://game/items/weapon_data.gd" id="1_45lrm"]
+
+[resource]
+script = ExtResource("1_45lrm")
+damage = 18
+timing_scale = 1.35
+reach_scale = 1.1
+knockback_multiplier = 1.5
+durability = 45
+id = &"heavy_axe"
+display_name = "Machado pesado"
+description = "Golpes lentos que derrubam. Gasta rápido."
+icon_color = Color(0.6, 0.45, 0.3, 1)

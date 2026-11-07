@@ -1,136 +1,139 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://game/world/arenas/test_arena/test_arena.gd" id="1_uac8s"]
-[ext_resource type="PackedScene" path="res://game/actors/enemies/basic_enemy/basic_enemy.tscn" id="2_vf2pg"]
-[ext_resource type="Script" path="res://game/world/arenas/test_arena/ground_placeholder.gd" id="3_274wh"]
-[ext_resource type="PackedScene" path="res://game/actors/player/player.tscn" id="4_rgs4t"]
-[ext_resource type="PackedScene" path="res://game/ui/hud/hud.tscn" id="5_w5yd4"]
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_runn2"]
-size = Vector2(1024, 16)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_ljlan"]
-size = Vector2(1024, 16)
+[ext_resource type="Script" path="res://game/world/arenas/test_arena/test_arena.gd" id="1_vf2pg"]
+[ext_resource type="PackedScene" path="res://game/actors/enemies/basic_enemy/basic_enemy.tscn" id="2_274wh"]
+[ext_resource type="Script" path="res://game/world/arenas/test_arena/ground_placeholder.gd" id="3_rgs4t"]
+[ext_resource type="PackedScene" path="res://game/actors/player/player.tscn" id="4_w5yd4"]
+[ext_resource type="PackedScene" path="res://game/ui/hud/hud.tscn" id="5_runn2"]
+[ext_resource type="PackedScene" path="res://game/ui/inventory/inventory_screen.tscn" id="6_ljlan"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_xit53"]
-size = Vector2(16, 576)
+size = Vector2(1024, 16)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_cktml"]
-size = Vector2(16, 576)
+size = Vector2(1024, 16)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_te1sv"]
-size = Vector2(32, 16)
+size = Vector2(16, 576)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_t0jte"]
-size = Vector2(32, 16)
+size = Vector2(16, 576)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_dl5pp"]
 size = Vector2(32, 16)
 
-[node name="TestArena" type="Node2D" unique_id=1660644703]
-script = ExtResource("1_uac8s")
-enemy_scene = ExtResource("2_vf2pg")
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_81t7n"]
+size = Vector2(32, 16)
 
-[node name="GroundPlaceholder" type="Node2D" parent="." unique_id=952659715]
-script = ExtResource("3_274wh")
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_fh8n2"]
+size = Vector2(32, 16)
 
-[node name="Walls" type="StaticBody2D" parent="." unique_id=543990121]
+[node name="TestArena" type="Node2D" unique_id=1329806633]
+script = ExtResource("1_vf2pg")
+enemy_scene = ExtResource("2_274wh")
+
+[node name="GroundPlaceholder" type="Node2D" parent="." unique_id=963377328]
+script = ExtResource("3_rgs4t")
+
+[node name="Walls" type="StaticBody2D" parent="." unique_id=366610175]
 collision_mask = 0
 
-[node name="TopShape" type="CollisionShape2D" parent="Walls" unique_id=714711539]
+[node name="TopShape" type="CollisionShape2D" parent="Walls" unique_id=1989993746]
 position = Vector2(512, 8)
-shape = SubResource("RectangleShape2D_runn2")
+shape = SubResource("RectangleShape2D_xit53")
 
-[node name="TopPlaceholder" type="ColorRect" parent="Walls" unique_id=1430313281]
+[node name="TopPlaceholder" type="ColorRect" parent="Walls" unique_id=473958345]
 offset_right = 1024.0
 offset_bottom = 16.0
 color = Color(0.42, 0.36, 0.3, 1)
 
-[node name="BottomShape" type="CollisionShape2D" parent="Walls" unique_id=282017895]
+[node name="BottomShape" type="CollisionShape2D" parent="Walls" unique_id=1895796737]
 position = Vector2(512, 568)
-shape = SubResource("RectangleShape2D_ljlan")
+shape = SubResource("RectangleShape2D_cktml")
 
-[node name="BottomPlaceholder" type="ColorRect" parent="Walls" unique_id=137105725]
+[node name="BottomPlaceholder" type="ColorRect" parent="Walls" unique_id=552546888]
 offset_top = 560.0
 offset_right = 1024.0
 offset_bottom = 576.0
 color = Color(0.42, 0.36, 0.3, 1)
 
-[node name="LeftShape" type="CollisionShape2D" parent="Walls" unique_id=1791412018]
+[node name="LeftShape" type="CollisionShape2D" parent="Walls" unique_id=2043169884]
 position = Vector2(8, 288)
-shape = SubResource("RectangleShape2D_xit53")
+shape = SubResource("RectangleShape2D_te1sv")
 
-[node name="LeftPlaceholder" type="ColorRect" parent="Walls" unique_id=785579135]
+[node name="LeftPlaceholder" type="ColorRect" parent="Walls" unique_id=1785700338]
 offset_right = 16.0
 offset_bottom = 576.0
 color = Color(0.42, 0.36, 0.3, 1)
 
-[node name="RightShape" type="CollisionShape2D" parent="Walls" unique_id=1322695066]
+[node name="RightShape" type="CollisionShape2D" parent="Walls" unique_id=727746664]
 position = Vector2(1016, 288)
-shape = SubResource("RectangleShape2D_cktml")
+shape = SubResource("RectangleShape2D_t0jte")
 
-[node name="RightPlaceholder" type="ColorRect" parent="Walls" unique_id=1874721410]
+[node name="RightPlaceholder" type="ColorRect" parent="Walls" unique_id=1970815942]
 offset_left = 1008.0
 offset_right = 1024.0
 offset_bottom = 576.0
 color = Color(0.42, 0.36, 0.3, 1)
 
-[node name="Entities" type="Node2D" parent="." unique_id=2038886470]
+[node name="Entities" type="Node2D" parent="." unique_id=1723965467]
 y_sort_enabled = true
 
-[node name="PillarPlaceholder1" type="StaticBody2D" parent="Entities" unique_id=1792419160]
+[node name="PillarPlaceholder1" type="StaticBody2D" parent="Entities" unique_id=1519816979]
 position = Vector2(352, 200)
 collision_mask = 0
 
-[node name="CollisionShape" type="CollisionShape2D" parent="Entities/PillarPlaceholder1" unique_id=1539695373]
-position = Vector2(0, -8)
-shape = SubResource("RectangleShape2D_te1sv")
-
-[node name="Visual" type="ColorRect" parent="Entities/PillarPlaceholder1" unique_id=1808376846]
-offset_left = -16.0
-offset_top = -48.0
-offset_right = 16.0
-color = Color(0.5, 0.45, 0.4, 1)
-
-[node name="PillarPlaceholder2" type="StaticBody2D" parent="Entities" unique_id=1019847878]
-position = Vector2(672, 200)
-collision_mask = 0
-
-[node name="CollisionShape" type="CollisionShape2D" parent="Entities/PillarPlaceholder2" unique_id=1926997762]
-position = Vector2(0, -8)
-shape = SubResource("RectangleShape2D_t0jte")
-
-[node name="Visual" type="ColorRect" parent="Entities/PillarPlaceholder2" unique_id=1531143250]
-offset_left = -16.0
-offset_top = -48.0
-offset_right = 16.0
-color = Color(0.5, 0.45, 0.4, 1)
-
-[node name="PillarPlaceholder3" type="StaticBody2D" parent="Entities" unique_id=758447139]
-position = Vector2(512, 420)
-collision_mask = 0
-
-[node name="CollisionShape" type="CollisionShape2D" parent="Entities/PillarPlaceholder3" unique_id=1946267565]
+[node name="CollisionShape" type="CollisionShape2D" parent="Entities/PillarPlaceholder1" unique_id=1019243097]
 position = Vector2(0, -8)
 shape = SubResource("RectangleShape2D_dl5pp")
 
-[node name="Visual" type="ColorRect" parent="Entities/PillarPlaceholder3" unique_id=465213104]
+[node name="Visual" type="ColorRect" parent="Entities/PillarPlaceholder1" unique_id=1104029056]
 offset_left = -16.0
 offset_top = -48.0
 offset_right = 16.0
 color = Color(0.5, 0.45, 0.4, 1)
 
-[node name="Player" parent="Entities" unique_id=793516831 instance=ExtResource("4_rgs4t")]
+[node name="PillarPlaceholder2" type="StaticBody2D" parent="Entities" unique_id=1089074906]
+position = Vector2(672, 200)
+collision_mask = 0
+
+[node name="CollisionShape" type="CollisionShape2D" parent="Entities/PillarPlaceholder2" unique_id=2006890594]
+position = Vector2(0, -8)
+shape = SubResource("RectangleShape2D_81t7n")
+
+[node name="Visual" type="ColorRect" parent="Entities/PillarPlaceholder2" unique_id=1951268695]
+offset_left = -16.0
+offset_top = -48.0
+offset_right = 16.0
+color = Color(0.5, 0.45, 0.4, 1)
+
+[node name="PillarPlaceholder3" type="StaticBody2D" parent="Entities" unique_id=1927309450]
+position = Vector2(512, 420)
+collision_mask = 0
+
+[node name="CollisionShape" type="CollisionShape2D" parent="Entities/PillarPlaceholder3" unique_id=926993630]
+position = Vector2(0, -8)
+shape = SubResource("RectangleShape2D_fh8n2")
+
+[node name="Visual" type="ColorRect" parent="Entities/PillarPlaceholder3" unique_id=257674337]
+offset_left = -16.0
+offset_top = -48.0
+offset_right = 16.0
+color = Color(0.5, 0.45, 0.4, 1)
+
+[node name="Player" parent="Entities" unique_id=1999558546 instance=ExtResource("4_w5yd4")]
 position = Vector2(512, 288)
 
-[node name="BasicEnemy1" parent="Entities" unique_id=318734181 groups=["arena_enemies"] instance=ExtResource("2_vf2pg")]
+[node name="BasicEnemy1" parent="Entities" unique_id=283283302 groups=["arena_enemies"] instance=ExtResource("2_274wh")]
 position = Vector2(200, 120)
 
-[node name="BasicEnemy2" parent="Entities" unique_id=41579834 groups=["arena_enemies"] instance=ExtResource("2_vf2pg")]
+[node name="BasicEnemy2" parent="Entities" unique_id=1122479747 groups=["arena_enemies"] instance=ExtResource("2_274wh")]
 position = Vector2(820, 140)
 
-[node name="BasicEnemy3" parent="Entities" unique_id=1158951542 groups=["arena_enemies"] instance=ExtResource("2_vf2pg")]
+[node name="BasicEnemy3" parent="Entities" unique_id=391537015 groups=["arena_enemies"] instance=ExtResource("2_274wh")]
 position = Vector2(800, 470)
 
-[node name="Hud" parent="." unique_id=465039626 instance=ExtResource("5_w5yd4")]
-help_text = "WASD mover | Clique esq. atacar (combo x3) | Botão dir. defender | Espaço esquivar | E interagir  (arena provisória)"
+[node name="Hud" parent="." unique_id=689229547 instance=ExtResource("5_runn2")]
+help_text = "WASD mover | Clique atacar | Botão dir. defender | Espaço esquivar | E interagir | Tab inventário  (arena provisória)"
+
+[node name="InventoryScreen" parent="." unique_id=411979170 instance=ExtResource("6_ljlan")]

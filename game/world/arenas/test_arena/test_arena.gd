@@ -18,8 +18,10 @@ extends Node2D
 
 func _ready() -> void:
 	_hud.bind_player(_player)
+	($InventoryScreen as InventoryScreen).bind_player(_player)
 	_player.set_camera_bounds(bounds)
 	_player.died.connect(_on_player_died)
+	_player.item_dropped.connect(func(stack: ItemStack, at: Vector2) -> void: ItemPickup.spawn(_entities, stack, at))
 	for node: Node in get_tree().get_nodes_in_group(&"arena_enemies"):
 		_watch_enemy(node as BasicEnemy)
 

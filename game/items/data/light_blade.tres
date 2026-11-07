@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="Script" path="res://game/items/weapon_data.gd" id="1_utbsk"]
+
+[resource]
+script = ExtResource("1_utbsk")
+damage = 7
+timing_scale = 0.75
+reach_scale = 0.9
+knockback_multiplier = 0.7
+durability = 60
+id = &"light_blade"
+display_name = "Lâmina leve"
+description = "Rápida e de alcance curto."
+icon_color = Color(0.75, 0.9, 0.95, 1)

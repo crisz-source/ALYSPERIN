@@ -58,6 +58,10 @@ const EYE_OFFSET := Vector2(0, -8)
 @export var stagger_time: float = 0.7
 ## Velocidade do recuo ao bater no escudo (px/s).
 @export var blocked_recoil_speed: float = 150.0
+
+@export_group("Recompensa")
+## Experiência dada a quem derrotou este inimigo.
+@export var xp_reward: int = 10
 @export var death_fade_time: float = 0.4
 
 var state: State = State.IDLE
@@ -66,6 +70,8 @@ var target: Player = null
 var _state_time: float = 0.0
 var _lunge_direction: Vector2 = Vector2.ZERO
 var _flash_time: float = 0.0
+## Último jogador que causou dano: recebe a experiência na morte.
+var _last_attacker: Player = null
 
 @onready var health: HealthComponent = $HealthComponent
 @onready var _hitbox: Hitbox = $LungeHitbox
@@ -216,6 +222,8 @@ func _on_damaged(info: DamageInfo) -> void:
 		return
 	velocity = info.knockback
 	_flash_time = 0.08
+	if info.source is Player:
+		_last_attacker = info.source
 	if target == null and info.source is Player:
 		target = info.source
 	_change_state(State.HURT)
@@ -234,6 +242,9 @@ func _on_died() -> void:
 	# Corpo desvanecendo não pode bloquear outros inimigos nem jogadores.
 	_body_shape.set_deferred("disabled", true)
 	_change_state(State.DEAD)
+	# No co-op a divisão da experiência será decidida pelo host (Fase 7).
+	if is_instance_valid(_last_attacker):
+		_last_attacker.gain_xp(xp_reward)
 	died.emit()
 
 

@@ -71,6 +71,17 @@ func apply_damage(info: DamageInfo) -> bool:
 	return true
 
 
+## Muda a vida máxima (ex.: ponto de Vigor). Aumento também enche a vida atual
+## na mesma quantia; redução só corta o que passar do novo máximo.
+func set_max_health(new_max: int) -> void:
+	new_max = maxi(new_max, 1)
+	var increase: int = new_max - max_health
+	max_health = new_max
+	if not is_dead:
+		current_health = clampi(current_health + maxi(increase, 0), 1, max_health)
+	health_changed.emit(current_health, max_health)
+
+
 func heal(amount: int) -> void:
 	if is_dead or amount <= 0:
 		return

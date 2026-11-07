@@ -80,6 +80,17 @@ o Player só conta se estiver no estado DODGE.
 com o `InteractionDetector` e emite `message_requested`; o HUD escuta o jogador.
 Objetos ficam em `game/world/objects/<nome>/`.
 
+## Itens, inventário e progressão
+- Tipo de item = `Resource` (`ItemData` e filhas: `WeaponData`, `ShieldData`,
+  `ConsumableData`) em `game/items/data/*.tres`. Item carregado = `ItemStack`
+  (item + quantidade + durabilidade); ao entrar num inventário/baú é sempre **copiado**.
+- `Inventory` e `Equipment` só guardam e emitem `changed`; quem valida ações é o Player
+  (`use_inventory_slot`, `unequip_*`, `discard_inventory_slot`, `pick_up`).
+- Ações do Player devolvem a mensagem e emitem `message_requested`.
+- Habilidade = `AbilityData` (e filhas, ex.: `SpinSlashData`) em `game/abilities/data/`;
+  a posição em `Player.abilities` é a tecla (0 = tecla 1).
+- Telas que tomam o controle (inventário) ligam `Player.input_blocked`.
+
 ## Autoloads (game/systems)
 | Nome | Para quê |
 |---|---|

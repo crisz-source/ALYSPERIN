@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="Script" path="res://game/items/weapon_data.gd" id="1_njuid"]
+
+[resource]
+script = ExtResource("1_njuid")
+id = &"short_sword"
+display_name = "Espada curta"
+description = "Equilibrada: nem rápida nem lenta."
+icon_color = Color(0.7, 0.75, 0.85, 1)

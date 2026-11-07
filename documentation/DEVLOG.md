@@ -18,6 +18,11 @@ conhecidos. Detalhes técnicos de cada etapa ficam em `documentation/worklog/`.
 | 2026-11-07 | Cena principal passa a ser a área de protótipo; arena fica só para testes |
 | 2026-11-07 | Inimigo mostra no chão o caminho do ataque; mira trava nos últimos 0,2 s |
 | 2026-11-07 | "Esquiva perfeita!" quando um golpe passa pela invencibilidade do rolamento |
+| 2026-11-07 | Inventário de 8 vagas fixas; equipamento (arma + escudo) separado da bolsa |
+| 2026-11-07 | Durabilidade: arma/escudo quebrados ficam bem mais fracos, não somem |
+| 2026-11-07 | Progressão por nível com pontos escolhidos (Vigor, Força); sem escudo não há defesa |
+| 2026-11-07 | Inventário não pausa o jogo (pensado para o co-op) |
+| 2026-11-07 | Morrer recomeça a área do zero (até existir salvamento) |
 
 ## Marcos
 ### Fase 1 — Fundação — ✅ concluída (2026-11-07)
@@ -51,6 +56,14 @@ conhecidos. Detalhes técnicos de cada etapa ficam em `documentation/worklog/`.
 - [x] Objetos interativos (E): placa, porta (trancada por mecanismo), alavanca; caixa de mensagem no HUD
 - [ ] Pathfinding dos inimigos (hoje perseguem em linha reta)
 
+### Fase 5 — Sistemas de gameplay — 🔄 protótipo pronto (teste manual pendente)
+- [x] Itens (dados .tres), inventário de 8 vagas, equipamento arma + escudo
+- [x] 3 armas com estilos diferentes, 2 escudos, erva de cura; durabilidade
+- [x] Itens no chão, baús, descartar; tela de inventário (Tab)
+- [x] Experiência, níveis, pontos (Vigor/Força); HUD com nível e exp.
+- [x] Habilidades (teclas 1–6): Golpe giratório (nível 2)
+- [ ] Reparo de equipamento; ícones reais; salvamento
+
 ## Problemas conhecidos
 - F5 no editor (jogo embutido na aba "Jogo") não recebe o teclado; clicar dentro não
   resolve. Contorno: desligar o jogo embutido para o projeto (`embed_on_play=false`) —
@@ -71,6 +84,10 @@ conhecidos. Detalhes técnicos de cada etapa ficam em `documentation/worklog/`.
 - `hud.tscn`: barra, textos e caixa de mensagem simples, sem arte.
 - `door.tscn`, `lever.tscn`, `sign_post.tscn`: formas coloridas no lugar de arte; textos
   da placa/porta/alavanca são provisórios.
+- Itens e habilidade (`game/items/data/`, `game/abilities/data/`): nomes, números e
+  cores provisórios; quadrados coloridos no lugar de ícones.
+- `inventory_screen`: tela montada por código, sem arte.
+- `item_pickup.tscn`, `chest.tscn`: formas coloridas; distribuição dos itens na área provisória.
 - `LungeTelegraph` (faixa vermelha) e "Esquiva perfeita!" com fonte padrão: efeitos sem arte.
 - `test_arena.gd`: reaparecimento de inimigos e reinício automático são ferramentas
   de teste, não sistemas finais de spawn/morte.

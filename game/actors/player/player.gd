@@ -1,6 +1,7 @@
 class_name Player
 extends CharacterBody2D
-## Personagem controlável: movimento, combo de espada, defesa, esquiva, dano e morte.
+## Personagem controlável: movimento, combo, defesa, esquiva, dano, morte,
+## itens (inventário/equipamento) e progressão (nível e atributos).
 ##
 ## Organizado como uma máquina de estados simples: em cada momento o personagem
 ## está em exatamente um estado (andando, atacando, defendendo...), e cada
@@ -12,8 +13,10 @@ signal died
 signal dodge_succeeded
 ## Um objeto pediu para mostrar um texto (placa, porta trancada...). O HUD escuta.
 signal message_requested(text: String)
+## O jogador descartou um item: a área decide onde ele aparece no chão.
+signal item_dropped(stack: ItemStack, at_position: Vector2)
 
-enum State { MOVE, ATTACK, BLOCK, DODGE, HURT, DEAD }
+enum State { MOVE, ATTACK, BLOCK, DODGE, HURT, ABILITY, DEAD }
 
 const GROUP: StringName = &"players"
 const COMBO_LENGTH: int = 3
@@ -23,6 +26,10 @@ const SHIELD_COLOR := Color(0.75, 0.85, 1.0, 0.85)
 const FINISHER_SWING_TINT := Color(1.0, 0.75, 0.45)
 const DODGE_SUCCESS_TEXT := "Esquiva perfeita!"
 const DODGE_SUCCESS_COLOR := Color(0.55, 0.95, 1.0)
+const LEVEL_UP_COLOR := Color(1.0, 0.85, 0.35)
+const BROKEN_COLOR := Color(1.0, 0.45, 0.35)
+const MSG_HEALTH_FULL := "A vida já está cheia."
+const MSG_INVENTORY_FULL := "Inventário cheio."
 
 @export_group("Movimento")
 ## Velocidade máxima, em pixels por segundo (16 px = 1 tile).
@@ -43,9 +50,9 @@ const DODGE_SUCCESS_COLOR := Color(0.55, 0.95, 1.0)
 @export_range(0.0, 1.0) var attack_move_multiplier: float = 0.3
 
 @export_group("Combo")
-## Dano de cada golpe do combo (1º, 2º, 3º = finalizador).
-@export var combo_damage: Array[int] = [10, 10, 20]
-## Empurrão de cada golpe no inimigo (px/s).
+## Multiplicador do dano da arma em cada golpe do combo (1º, 2º, 3º = finalizador).
+@export var combo_damage_multiplier: Array[float] = [1.0, 1.0, 2.0]
+## Empurrão de cada golpe no inimigo (px/s), antes do multiplicador da arma.
 @export var combo_knockback: Array[float] = [140.0, 140.0, 260.0]
 ## Passo à frente que o personagem dá em cada golpe (px/s).
 @export var combo_step_impulse: Array[float] = [40.0, 40.0, 110.0]
@@ -57,13 +64,16 @@ const DODGE_SUCCESS_COLOR := Color(0.55, 0.95, 1.0)
 ## Alcance do finalizador em relação ao golpe normal.
 @export var finisher_reach_scale: float = 1.25
 
+@export_group("Sem arma")
+## Dano do soco (sem arma equipada).
+@export var unarmed_damage: int = 4
+@export var unarmed_reach_scale: float = 0.7
+@export var unarmed_knockback_multiplier: float = 0.6
+
 @export_group("Defesa")
 ## Fração da velocidade normal enquanto defende.
+## (Ângulo protegido e empurrão vêm do escudo equipado: ShieldData.)
 @export_range(0.0, 1.0) var block_move_multiplier: float = 0.4
-## Metade do ângulo protegido pelo escudo, à frente da mira (graus).
-@export_range(0.0, 180.0) var block_half_angle: float = 75.0
-## Quanto do empurrão do golpe ainda chega ao defender.
-@export_range(0.0, 1.0) var block_knockback_multiplier: float = 0.35
 
 @export_group("Esquiva")
 @export var dodge_speed: float = 230.0
@@ -78,6 +88,10 @@ const DODGE_SUCCESS_COLOR := Color(0.55, 0.95, 1.0)
 @export var hurt_duration: float = 0.18
 ## Invulnerabilidade depois de levar um golpe, para não morrer em sequência (s).
 @export var post_hit_invulnerability: float = 0.7
+
+@export_group("Habilidades")
+## Habilidades nas teclas 1-6 (posição na lista = tecla). Vazio = sem habilidade.
+@export var abilities: Array[AbilityData] = []
 
 @export_group("Hitstop (pausa de impacto)")
 @export var hitstop_hit: float = 0.05
@@ -99,14 +113,25 @@ var _blink_clock: float = 0.0
 var _combo_step: int = 0
 var _combo_window_left: float = 0.0
 var _attack_windup_now: float = 0.0
+var _attack_active_now: float = 0.0
 var _attack_recovery_now: float = 0.0
+## Vida máxima sem bônus de Vigor (o valor configurado no HealthComponent).
+var _base_max_health: int = 0
 var _block_direction: Vector2 = Vector2.DOWN
 ## Uma mensagem por esquiva, mesmo que dois inimigos acertem a mesma esquiva.
 var _dodge_success_this_dodge: bool = false
 ## Objeto usável mais próximo (o que recebe o "[E]"), ou null.
 var focused_interactable: Interactable = null
+## true enquanto uma tela (inventário) estiver aberta: o personagem ignora comandos.
+var input_blocked: bool = false
+## Segundos restantes de recarga por habilidade (mesma posição da lista).
+var _ability_cooldowns: Array[float] = []
+var _active_ability: AbilityData = null
 
 @onready var health: HealthComponent = $HealthComponent
+@onready var inventory: Inventory = $Inventory
+@onready var equipment: Equipment = $Equipment
+@onready var stats: CharacterStats = $CharacterStats
 @onready var _input: PlayerInput = $PlayerInput
 @onready var _facing_indicator: Node2D = $FacingIndicator
 @onready var _body: Polygon2D = $BodyPlaceholder
@@ -117,10 +142,12 @@ var focused_interactable: Interactable = null
 @onready var _camera: PlayerCamera = $Camera
 @onready var _interaction_detector: Area2D = $InteractionDetector
 @onready var _interact_prompt: Label = $InteractPrompt
+@onready var _spin_hitbox: Hitbox = $SpinHitbox
+@onready var _spin_visual: Polygon2D = $SpinPlaceholder
 
 
 func _ready() -> void:
-	assert(combo_damage.size() == COMBO_LENGTH and combo_knockback.size() == COMBO_LENGTH \
+	assert(combo_damage_multiplier.size() == COMBO_LENGTH and combo_knockback.size() == COMBO_LENGTH \
 		and combo_step_impulse.size() == COMBO_LENGTH,
 		"Player: listas do combo precisam ter %d valores cada" % COMBO_LENGTH)
 	add_to_group(GROUP)
@@ -135,13 +162,24 @@ func _ready() -> void:
 	_sword_hitbox.hit_landed.connect(_on_sword_hit)
 	_interact_prompt.top_level = true
 	_interact_prompt.visible = false
+	_base_max_health = health.max_health
+	stats.attributes_changed.connect(_on_attributes_changed)
+	stats.leveled_up.connect(_on_leveled_up)
+	_ability_cooldowns.resize(abilities.size())
+	_ability_cooldowns.fill(0.0)
+	_spin_hitbox.hit_landed.connect(_on_ability_hit)
+	_spin_visual.visible = false
 
 
 func _physics_process(delta: float) -> void:
 	_input.poll(delta)
+	if input_blocked:
+		_input.clear()
 	_state_time += delta
 	_dodge_cooldown_left = maxf(_dodge_cooldown_left - delta, 0.0)
 	_combo_window_left = maxf(_combo_window_left - delta, 0.0)
+	for i in _ability_cooldowns.size():
+		_ability_cooldowns[i] = maxf(_ability_cooldowns[i] - delta, 0.0)
 	_update_focus()
 	match state:
 		State.MOVE:
@@ -154,6 +192,8 @@ func _physics_process(delta: float) -> void:
 			_process_dodge()
 		State.HURT:
 			_process_hurt(delta)
+		State.ABILITY:
+			_process_ability(delta)
 		State.DEAD:
 			velocity = velocity.move_toward(Vector2.ZERO, friction * delta)
 	move_and_slide()
@@ -163,6 +203,85 @@ func _physics_process(delta: float) -> void:
 ## A área avisa o tamanho do mapa; o jogador repassa para a própria câmera.
 func set_camera_bounds(bounds: Rect2) -> void:
 	_camera.set_world_bounds(bounds)
+
+
+## Dano do golpe `step` do combo com a arma atual, Força e estado da arma.
+func current_attack_damage(step: int) -> int:
+	var weapon: WeaponData = equipment.weapon_data()
+	var base: float = float(weapon.damage) if weapon else float(unarmed_damage)
+	if weapon and equipment.weapon.is_broken():
+		base *= weapon.broken_damage_multiplier
+	return maxi(roundi(base * combo_damage_multiplier[step] * stats.damage_multiplier()), 1)
+
+
+## Experiência ganha (ex.: inimigo derrotado).
+func gain_xp(amount: int) -> void:
+	stats.add_xp(amount)
+
+
+# --- Itens -----------------------------------------------------------------
+# As ações devolvem a mensagem para mostrar ("" = nenhuma) e também a emitem em
+# message_requested, para o HUD mostrar igual não importa quem chamou.
+
+## Usa ou equipa o item da vaga: consumível é gasto; arma/escudo vai para o
+## equipamento e o que estava equipado volta para a mesma vaga.
+func use_inventory_slot(index: int) -> String:
+	var stack: ItemStack = inventory.get_slot(index)
+	if stack == null or state == State.DEAD:
+		return ""
+	var message := ""
+	if stack.item is ConsumableData:
+		message = _consume(index, stack.item as ConsumableData)
+	elif stack.item is WeaponData or stack.item is ShieldData:
+		inventory.set_slot(index, equipment.equip(stack))
+	return _say(message)
+
+
+func unequip_weapon() -> String:
+	return _unequip(equipment.weapon, equipment.unequip_weapon)
+
+
+func unequip_shield() -> String:
+	return _unequip(equipment.shield, equipment.unequip_shield)
+
+
+## Joga fora o item da vaga; a área o coloca no chão (se ninguém escutar, some).
+func discard_inventory_slot(index: int) -> void:
+	var stack: ItemStack = inventory.get_slot(index)
+	if stack == null:
+		return
+	inventory.set_slot(index, null)
+	item_dropped.emit(stack, global_position + facing * 14.0)
+
+
+## Pega um item do mundo. Devolve quantos NÃO couberam.
+func pick_up(stack: ItemStack) -> int:
+	return inventory.add(stack)
+
+
+func _consume(index: int, item: ConsumableData) -> String:
+	if item.heal_amount > 0:
+		if health.current_health >= health.max_health:
+			return MSG_HEALTH_FULL
+		health.heal(item.heal_amount)
+	inventory.remove(index, 1)
+	return ""
+
+
+func _unequip(stack: ItemStack, remove_from_equipment: Callable) -> String:
+	if stack == null:
+		return ""
+	if inventory.is_full():
+		return _say(MSG_INVENTORY_FULL)
+	remove_from_equipment.call()
+	inventory.add(stack)
+	return ""
+
+
+func _say(message: String) -> String:
+	if not message.is_empty():
+		message_requested.emit(message)
+	return message
 
 
 # --- Estados ---------------------------------------------------------------
@@ -176,8 +295,10 @@ func _process_move(delta: float) -> void:
 			_interact_with(focused_interactable)
 			return
 	# Defesa vence o ataque: segurando o botão direito, cliques são ignorados.
-	if _input.defend_held:
+	if _can_block():
 		_start_block()
+		return
+	if _try_start_ability():
 		return
 	if _input.has_attack():
 		_start_attack()
@@ -189,7 +310,7 @@ func _process_move(delta: float) -> void:
 
 func _process_attack(delta: float) -> void:
 	var active_start: float = _attack_windup_now
-	var recovery_start: float = active_start + attack_active
+	var recovery_start: float = active_start + _attack_active_now
 	var attack_end: float = recovery_start + _attack_recovery_now
 
 	if _state_time >= active_start and _state_time < recovery_start and not _sword_hitbox.is_active:
@@ -203,7 +324,7 @@ func _process_attack(delta: float) -> void:
 	if _state_time >= recovery_start:
 		if _try_start_dodge():
 			return
-		if _input.defend_held:
+		if _can_block():
 			_start_block()
 			return
 	_apply_movement(_input.move_direction, max_speed * attack_move_multiplier, delta)
@@ -221,11 +342,26 @@ func _process_attack(delta: float) -> void:
 func _process_block(delta: float) -> void:
 	if _try_start_dodge():
 		return
-	if not _input.defend_held:
+	if not _can_block():
 		_change_state(State.MOVE)
 		return
 	_update_block_direction()
 	_apply_movement(_input.move_direction, max_speed * block_move_multiplier, delta)
+
+
+func _process_ability(delta: float) -> void:
+	velocity = velocity.move_toward(Vector2.ZERO, friction * delta)
+	var spin := _active_ability as SpinSlashData
+	if spin:
+		var active: bool = _state_time >= spin.active_start and _state_time < spin.active_end
+		if active and not _spin_hitbox.is_active:
+			_spin_hitbox.activate()
+		elif not active and _spin_hitbox.is_active:
+			_spin_hitbox.deactivate()
+		_spin_visual.visible = active
+		_spin_visual.rotation = _state_time * TAU * 3.0
+		if _state_time >= spin.duration:
+			_change_state(State.MOVE)
 
 
 func _process_dodge() -> void:
@@ -255,6 +391,10 @@ func _change_state(new_state: State) -> void:
 		_shield_visual.visible = false
 	elif state == State.DODGE:
 		health.set_invulnerable(false)
+	elif state == State.ABILITY:
+		_spin_hitbox.deactivate()
+		_spin_visual.visible = false
+		_active_ability = null
 	state = new_state
 	_state_time = 0.0
 
@@ -271,11 +411,16 @@ func _start_attack() -> void:
 	_attack_pivot.scale = Vector2.ONE * (finisher_reach_scale if is_finisher else 1.0)
 	_set_facing(to_cardinal(aim))
 
-	_sword_hitbox.damage = combo_damage[_combo_step]
-	_sword_hitbox.knockback_force = combo_knockback[_combo_step]
+	var weapon: WeaponData = equipment.weapon_data()
+	var timing: float = weapon.timing_scale if weapon else 1.0
+	_attack_pivot.scale *= weapon.reach_scale if weapon else unarmed_reach_scale
+	_sword_hitbox.damage = current_attack_damage(_combo_step)
+	_sword_hitbox.knockback_force = combo_knockback[_combo_step] \
+		* (weapon.knockback_multiplier if weapon else unarmed_knockback_multiplier)
 	_swing_visual.modulate = FINISHER_SWING_TINT if is_finisher else Color.WHITE
-	_attack_windup_now = attack_windup + (finisher_extra_windup if is_finisher else 0.0)
-	_attack_recovery_now = attack_recovery + (finisher_extra_recovery if is_finisher else 0.0)
+	_attack_windup_now = (attack_windup + (finisher_extra_windup if is_finisher else 0.0)) * timing
+	_attack_active_now = attack_active * timing
+	_attack_recovery_now = (attack_recovery + (finisher_extra_recovery if is_finisher else 0.0)) * timing
 
 	_change_state(State.ATTACK)
 	velocity = aim * combo_step_impulse[_combo_step]
@@ -285,6 +430,42 @@ func _start_block() -> void:
 	_change_state(State.BLOCK)
 	_shield_visual.visible = true
 	_update_block_direction()
+
+
+## Habilidades: liberada pelo nível e fora da recarga. Tecla de habilidade
+## bloqueada avisa em que nível ela libera.
+func _try_start_ability() -> bool:
+	var slot: int = _input.pending_ability()
+	if slot == -1:
+		return false
+	_input.consume_ability(slot)
+	if slot >= abilities.size() or abilities[slot] == null:
+		return false
+	var ability: AbilityData = abilities[slot]
+	if not is_ability_unlocked(slot):
+		_say("%s: liberada no nível %d." % [ability.display_name, ability.unlock_level])
+		return false
+	if _ability_cooldowns[slot] > 0.0:
+		return false
+	_ability_cooldowns[slot] = ability.cooldown
+	_change_state(State.ABILITY)
+	_active_ability = ability
+	var spin := ability as SpinSlashData
+	if spin:
+		_spin_hitbox.damage = maxi(roundi(current_attack_damage(0) * spin.damage_multiplier), 1)
+		_spin_hitbox.knockback_force = spin.knockback
+	return true
+
+
+func is_ability_unlocked(slot: int) -> bool:
+	return slot < abilities.size() and abilities[slot] != null and stats.level >= abilities[slot].unlock_level
+
+
+## 0 = pronta, 1 = acabou de usar.
+func ability_cooldown_ratio(slot: int) -> float:
+	if slot >= abilities.size() or abilities[slot] == null or abilities[slot].cooldown <= 0.0:
+		return 0.0
+	return _ability_cooldowns[slot] / abilities[slot].cooldown
 
 
 func _try_start_dodge() -> bool:
@@ -318,13 +499,23 @@ func _is_hit_blocked(info: DamageInfo) -> bool:
 		from_direction = global_position.direction_to((info.source as Node2D).global_position)
 	else:
 		from_direction = -info.knockback.normalized()
-	if from_direction == Vector2.ZERO:
-		return true
-	return absf(_block_direction.angle_to(from_direction)) <= deg_to_rad(block_half_angle)
+	var shield: ShieldData = equipment.shield_data()
+	var in_front: bool = from_direction == Vector2.ZERO \
+		or absf(_block_direction.angle_to(from_direction)) <= deg_to_rad(shield.block_half_angle)
+	if not in_front:
+		return false
+	# Escudo quebrado ainda segura parte do golpe: o dano passa reduzido.
+	if equipment.shield.is_broken():
+		info.amount = ceili(info.amount * shield.broken_damage_through)
+		return false
+	return true
 
 
 func _on_blocked(info: DamageInfo) -> void:
-	velocity = info.knockback * block_knockback_multiplier
+	velocity = info.knockback * equipment.shield_data().knockback_multiplier
+	if equipment.shield.wear(1):
+		FloatingText.spawn(self, "Escudo quebrou!", global_position + Vector2(0, -30), BROKEN_COLOR)
+	equipment.notify_wear()
 	_shield_flash_time = 0.08
 	_camera.shake(1.5, 0.08)
 	Hitstop.request(hitstop_block)
@@ -340,7 +531,18 @@ func _on_hit_ignored(_info: DamageInfo) -> void:
 	dodge_succeeded.emit()
 
 
+func _on_ability_hit(_target: Hurtbox) -> void:
+	if equipment.weapon and equipment.weapon.wear(1):
+		FloatingText.spawn(self, "Arma quebrou!", global_position + Vector2(0, -30), BROKEN_COLOR)
+	equipment.notify_wear()
+	Hitstop.request(hitstop_hit)
+
+
 func _on_sword_hit(_target: Hurtbox) -> void:
+	if equipment.weapon:
+		if equipment.weapon.wear(1):
+			FloatingText.spawn(self, "Arma quebrou!", global_position + Vector2(0, -30), BROKEN_COLOR)
+		equipment.notify_wear()
 	var is_finisher: bool = _combo_step == COMBO_LENGTH - 1
 	Hitstop.request(hitstop_finisher if is_finisher else hitstop_hit)
 	if is_finisher:
@@ -385,6 +587,18 @@ func _update_focus() -> void:
 	if best:
 		_interact_prompt.text = "[E] " + best.prompt_text
 		_interact_prompt.global_position = (best.prompt_position() - _interact_prompt.get_combined_minimum_size() / 2.0).round()
+
+
+func _can_block() -> bool:
+	return _input.defend_held and equipment.shield != null
+
+
+func _on_attributes_changed() -> void:
+	health.set_max_health(_base_max_health + stats.bonus_max_health())
+
+
+func _on_leveled_up(new_level: int) -> void:
+	FloatingText.spawn(self, "Nível %d!" % new_level, global_position + Vector2(0, -40), LEVEL_UP_COLOR)
 
 
 func _aim_direction() -> Vector2:

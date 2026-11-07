@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ShieldData" format=3]
+
+[ext_resource type="Script" path="res://game/items/shield_data.gd" id="1_v58p4"]
+
+[resource]
+script = ExtResource("1_v58p4")
+block_half_angle = 85.0
+knockback_multiplier = 0.25
+durability = 80
+id = &"reinforced_shield"
+display_name = "Escudo reforçado"
+description = "Cobre mais e aguenta mais golpes."
+icon_color = Color(0.5, 0.55, 0.6, 1)

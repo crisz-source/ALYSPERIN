@@ -2,37 +2,37 @@
 
 [ext_resource type="Script" path="res://game/ui/hud/hud.gd" id="1_d4vpa"]
 
-[node name="Hud" type="CanvasLayer" unique_id=465039626]
+[node name="Hud" type="CanvasLayer" unique_id=689229547]
 script = ExtResource("1_d4vpa")
 
-[node name="HelpPlaceholder" type="Label" parent="." unique_id=85043843]
+[node name="HelpPlaceholder" type="Label" parent="." unique_id=484254889]
 offset_left = 8.0
 offset_top = 336.0
 offset_right = 8.0
 offset_bottom = 336.0
 theme_override_font_sizes/font_size = 10
 
-[node name="PlayerHealth" type="ColorRect" parent="." unique_id=1793365529]
+[node name="PlayerHealth" type="ColorRect" parent="." unique_id=45473171]
 offset_left = 8.0
 offset_top = 8.0
 offset_right = 88.0
 offset_bottom = 14.0
 color = Color(0.1, 0.1, 0.1, 1)
 
-[node name="Fill" type="ColorRect" parent="PlayerHealth" unique_id=615729371]
+[node name="Fill" type="ColorRect" parent="PlayerHealth" unique_id=1886241129]
 layout_mode = 0
 offset_right = 80.0
 offset_bottom = 6.0
 color = Color(0.3, 0.8, 0.35, 1)
 
-[node name="MessageBox" type="ColorRect" parent="." unique_id=1792363046]
+[node name="MessageBox" type="ColorRect" parent="." unique_id=379487254]
 offset_left = 120.0
 offset_top = 286.0
 offset_right = 520.0
 offset_bottom = 326.0
 color = Color(0.05, 0.05, 0.08, 0.85)
 
-[node name="Text" type="Label" parent="MessageBox" unique_id=1727845672]
+[node name="Text" type="Label" parent="MessageBox" unique_id=2049204458]
 layout_mode = 0
 offset_left = 8.0
 offset_top = 4.0
@@ -43,7 +43,36 @@ horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
 
-[node name="StatusLabel" type="Label" parent="." unique_id=1179165929]
+[node name="AbilityBar" type="HBoxContainer" parent="." unique_id=856441258]
+offset_left = 8.0
+offset_top = 22.0
+offset_right = 8.0
+offset_bottom = 22.0
+theme_override_constants/separation = 3
+
+[node name="LevelLabel" type="Label" parent="." unique_id=1659843422]
+offset_left = 92.0
+offset_top = 3.0
+offset_right = 92.0
+offset_bottom = 3.0
+theme_override_font_sizes/font_size = 10
+text = "Nv 1"
+
+[node name="XpBar" type="ColorRect" parent="." unique_id=787930415]
+offset_left = 8.0
+offset_top = 16.0
+offset_right = 88.0
+offset_bottom = 18.0
+color = Color(0.1, 0.1, 0.1, 1)
+
+[node name="Fill" type="ColorRect" parent="XpBar" unique_id=1267877031]
+layout_mode = 0
+offset_right = 80.0
+offset_bottom = 2.0
+scale = Vector2(1e-05, 1)
+color = Color(0.95, 0.8, 0.3, 1)
+
+[node name="StatusLabel" type="Label" parent="." unique_id=901779231]
 offset_left = 250.0
 offset_top = 170.0
 offset_right = 250.0

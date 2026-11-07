@@ -9,28 +9,28 @@ size = Vector2(10, 6)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ngwuf"]
 size = Vector2(24, 24)
 
-[node name="Lever" type="StaticBody2D" unique_id=1113457558]
+[node name="Lever" type="StaticBody2D" unique_id=1857494007]
 collision_mask = 0
 script = ExtResource("1_aumwl")
 
-[node name="CollisionShape" type="CollisionShape2D" parent="." unique_id=1453724766]
+[node name="CollisionShape" type="CollisionShape2D" parent="." unique_id=685917689]
 position = Vector2(0, -3)
 shape = SubResource("RectangleShape2D_utw2r")
 
-[node name="BasePlaceholder" type="Polygon2D" parent="." unique_id=741539321]
+[node name="BasePlaceholder" type="Polygon2D" parent="." unique_id=863771835]
 color = Color(0.35, 0.33, 0.38, 1)
 polygon = PackedVector2Array(-6, -6, 6, -6, 6, 0, -6, 0)
 
-[node name="HandlePlaceholder" type="Polygon2D" parent="." unique_id=1562763366]
+[node name="HandlePlaceholder" type="Polygon2D" parent="." unique_id=842753879]
 position = Vector2(0, -5)
 color = Color(0.6, 0.6, 0.65, 1)
 polygon = PackedVector2Array(-1, 0, 1, 0, 1, -11, -1, -11)
 
-[node name="Interactable" type="Area2D" parent="." unique_id=1495631937]
+[node name="Interactable" type="Area2D" parent="." unique_id=650807029]
 collision_layer = 32
 collision_mask = 0
 script = ExtResource("2_vkemy")
 
-[node name="CollisionShape" type="CollisionShape2D" parent="Interactable" unique_id=2084226522]
+[node name="CollisionShape" type="CollisionShape2D" parent="Interactable" unique_id=1367783433]
 position = Vector2(0, -6)
 shape = SubResource("RectangleShape2D_ngwuf")

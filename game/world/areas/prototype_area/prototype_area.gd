@@ -9,14 +9,17 @@ extends Node2D
 @export var restart_delay: float = 2.0
 
 @onready var _player: Player = $Entities/Player
+@onready var _entities: Node2D = $Entities
 @onready var _walls: TileMapLayer = $Walls
 @onready var _hud: Hud = $Hud
 
 
 func _ready() -> void:
 	_hud.bind_player(_player)
+	($InventoryScreen as InventoryScreen).bind_player(_player)
 	_player.set_camera_bounds(map_bounds())
 	_player.died.connect(_on_player_died)
+	_player.item_dropped.connect(func(stack: ItemStack, at: Vector2) -> void: ItemPickup.spawn(_entities, stack, at))
 
 
 ## Retângulo do mapa em pixels, calculado a partir das paredes desenhadas.

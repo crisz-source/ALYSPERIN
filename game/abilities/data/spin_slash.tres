@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="SpinSlashData" format=3]
+
+[ext_resource type="Script" path="res://game/abilities/spin_slash_data.gd" id="1_khsls"]
+
+[resource]
+script = ExtResource("1_khsls")
+id = &"spin_slash"
+display_name = "Golpe giratório"
+description = "Gira a arma e acerta tudo em volta. 1,5x o dano da arma."
+unlock_level = 2
+icon_color = Color(0.95, 0.75, 0.4, 1)
