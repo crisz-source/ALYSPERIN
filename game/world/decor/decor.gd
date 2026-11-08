@@ -60,6 +60,8 @@ static func stone_material(color: Color, scale: float = 0.6) -> StandardMaterial
 	m.uv1_triplanar = true
 	m.uv1_scale = Vector3.ONE * scale
 	m.roughness = 0.95
+	# Visual de anime também nos blocos do mapa (GridMap não passa pelo ToonStyle).
+	m.diffuse_mode = BaseMaterial3D.DIFFUSE_TOON
 	m.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST_WITH_MIPMAPS
 	return m
 

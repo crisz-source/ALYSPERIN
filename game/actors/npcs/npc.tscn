@@ -18,20 +18,20 @@ height = 1.6
 [sub_resource type="BoxShape3D" id="BoxShape3D_pfrpn"]
 size = Vector3(1.8, 1.8, 1.8)
 
-[node name="Npc" type="StaticBody3D" unique_id=243131014]
+[node name="Npc" type="StaticBody3D" unique_id=170445743]
 collision_mask = 0
 script = ExtResource("1_kuote")
 
-[node name="CollisionShape" type="CollisionShape3D" parent="." unique_id=249186627]
+[node name="CollisionShape" type="CollisionShape3D" parent="." unique_id=799155793]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
 shape = SubResource("CapsuleShape3D_lfcov")
 
-[node name="BodyPlaceholder" type="MeshInstance3D" parent="." unique_id=678188998]
+[node name="BodyPlaceholder" type="MeshInstance3D" parent="." unique_id=768620749]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
 material_override = SubResource("StandardMaterial3D_8fado")
 mesh = SubResource("CapsuleMesh_cok6a")
 
-[node name="QuestMarker" type="Label3D" parent="." unique_id=1623465206]
+[node name="QuestMarker" type="Label3D" parent="." unique_id=1566128976]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2, 0)
 pixel_size = 0.0015
 billboard = 1
@@ -39,12 +39,12 @@ fixed_size = true
 modulate = Color(1, 0.85, 0.3, 1)
 font_size = 48
 
-[node name="Interactable" type="Area3D" parent="." unique_id=603975845]
+[node name="Interactable" type="Area3D" parent="." unique_id=1417775196]
 collision_layer = 32
 collision_mask = 0
 script = ExtResource("2_c8cwq")
 prompt_offset = Vector3(0, 2.6, 0)
 
-[node name="CollisionShape" type="CollisionShape3D" parent="Interactable" unique_id=1266815042]
+[node name="CollisionShape" type="CollisionShape3D" parent="Interactable" unique_id=617584781]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
 shape = SubResource("BoxShape3D_pfrpn")

@@ -23,29 +23,29 @@ size = Vector3(0.9, 0.5, 0.08)
 [sub_resource type="BoxShape3D" id="BoxShape3D_lb062"]
 size = Vector3(1.6, 1.6, 1.6)
 
-[node name="SignPost" type="StaticBody3D" unique_id=1038790646]
+[node name="SignPost" type="StaticBody3D" unique_id=802039197]
 collision_mask = 0
 script = ExtResource("1_04wps")
 
-[node name="CollisionShape" type="CollisionShape3D" parent="." unique_id=872748068]
+[node name="CollisionShape" type="CollisionShape3D" parent="." unique_id=316567569]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
 shape = SubResource("BoxShape3D_pwa13")
 
-[node name="PostPlaceholder" type="MeshInstance3D" parent="." unique_id=1093602684]
+[node name="PostPlaceholder" type="MeshInstance3D" parent="." unique_id=1818488804]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
 material_override = SubResource("StandardMaterial3D_vm7gd")
 mesh = SubResource("BoxMesh_yif46")
 
-[node name="BoardPlaceholder" type="MeshInstance3D" parent="." unique_id=555245527]
+[node name="BoardPlaceholder" type="MeshInstance3D" parent="." unique_id=1308717878]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, 0)
 material_override = SubResource("StandardMaterial3D_xafeq")
 mesh = SubResource("BoxMesh_1c2y7")
 
-[node name="Interactable" type="Area3D" parent="." unique_id=2086824543]
+[node name="Interactable" type="Area3D" parent="." unique_id=393356728]
 collision_layer = 32
 collision_mask = 0
 script = ExtResource("2_h7jn2")
 
-[node name="CollisionShape" type="CollisionShape3D" parent="Interactable" unique_id=720482093]
+[node name="CollisionShape" type="CollisionShape3D" parent="Interactable" unique_id=1100995055]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
 shape = SubResource("BoxShape3D_lb062")

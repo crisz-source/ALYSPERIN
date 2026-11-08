@@ -97,6 +97,11 @@ conhecidos. Detalhes técnicos de cada etapa ficam em `documentation/worklog/`.
 - [x] 173 verificações automáticas passando
 - Ver `documentation/worklog/2026-11-07-migracao-3d.md`
 
+### Visual de anime e Vila de Brisaclara
+- [x] ToonStyle: luz em faixas e contorno escuro em todos os modelos (masmorras continuam escuras)
+- [x] Vila de Brisaclara (portal verde na sala inicial): dia, céu azul, casas, mercado, moinho, aldeões com diálogo
+- Ver `documentation/worklog/2026-11-08-anime-e-vila.md`
+
 ### Arte CC0 (KayKit) e texto nítido
 - [x] Cavaleiro (Guardião) e mago (Devoto) com animações reais; esqueletos animados como monstros
 - [x] Decoração (barris, caixotes, velas, ossos, lápides, caixões, pilares, lanternas) e pedra texturizada

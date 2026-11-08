@@ -18,6 +18,7 @@ config/features=PackedStringArray("4.7")
 
 Hitstop="*res://game/systems/hitstop.gd"
 WorldText="*res://game/systems/world_text.gd"
+ToonStyle="*res://game/systems/toon_style.gd"
 
 [debug]
 

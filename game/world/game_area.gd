@@ -20,6 +20,18 @@ extends Node3D
 @export var dungeon: DungeonData
 @export var dungeon_entrance_position: Vector3 = Vector3.ZERO
 
+@export_group("Vila")
+## Liga o portal da Vila de Brisaclara nesta área.
+@export var has_village: bool = false
+@export var village_entrance_position: Vector3 = Vector3.ZERO
+## A vila fica longe da área e da masmorra, na mesma cena.
+const VILLAGE_ORIGIN := Vector3(600, 0, 0)
+var current_village: VillageMap = null
+var _area_environment: Environment
+var _area_sun_color: Color
+var _area_sun_energy: float = 0.0
+var _area_sun_rotation: Vector3
+
 ## Longe da área: a masmorra é montada aqui, na mesma cena (o jogador e tudo
 ## que ele carrega continuam os mesmos; sem troca de cena).
 const DUNGEON_ORIGIN := Vector3(0, 0, -600)
@@ -55,6 +67,12 @@ func _ready() -> void:
 	console.name = "AdminConsole"
 	add_child(console)
 	console.bind(self)
+	if has_village:
+		var portal := TravelPortal.create(VillageMap.DISPLAY_NAME, "Viajar", Color(0.4, 0.95, 0.55, 0.7))
+		portal.name = "VillagePortal"
+		entities.add_child(portal)
+		portal.global_position = village_entrance_position
+		portal.used.connect(func(_by: Player) -> void: enter_village())
 	if dungeon:
 		var entrance := DungeonEntrance.create(dungeon)
 		entities.add_child(entrance)
@@ -85,6 +103,83 @@ func _on_dialogue_requested(speaker: String, lines: Array[String], on_finished: 
 func _on_class_chosen(chosen_class: ClassData) -> void:
 	player.apply_class(chosen_class)
 	player.input_blocked = false
+
+
+## Vai para a vila: dia, céu azul, sol, sem monstros. O ambiente da área é guardado.
+func enter_village() -> void:
+	if current_village or current_dungeon:
+		return
+	current_village = VillageMap.new()
+	add_child(current_village)
+	current_village.global_position = VILLAGE_ORIGIN
+	current_village.exit_requested.connect(func(_by: Player) -> void: exit_village())
+	_return_point = player.global_position
+	_area_respawn_point = player.respawn_point
+	_set_daylight(true)
+	player.respawn_point = current_village.start_point()
+	player.global_position = current_village.start_point()
+	player.velocity = Vector3.ZERO
+	player.camera_rig().face(Vector3.FORWARD)
+	player.message_requested.emit("%s — aqui as sombras não entram." % VillageMap.DISPLAY_NAME)
+
+
+func exit_village() -> void:
+	if current_village == null:
+		return
+	current_village.queue_free()
+	current_village = null
+	_set_daylight(false)
+	player.respawn_point = _area_respawn_point
+	player.global_position = _return_point
+	player.velocity = Vector3.ZERO
+
+
+## Troca céu, luz e cor entre a área (noite, neblina) e a vila (dia).
+func _set_daylight(on: bool) -> void:
+	var env_node := get_node_or_null("WorldEnvironment") as WorldEnvironment
+	var sun := get_node_or_null("MoonLight") as DirectionalLight3D
+	if env_node == null:
+		return
+	if on:
+		_area_environment = env_node.environment
+		env_node.environment = village_environment()
+		if sun:
+			_area_sun_color = sun.light_color
+			_area_sun_energy = sun.light_energy
+			_area_sun_rotation = sun.rotation_degrees
+			sun.light_color = Color(1.0, 0.96, 0.88)
+			sun.light_energy = 0.9
+			sun.rotation_degrees = Vector3(-68, -25, 0)  # sol alto: sombras curtas
+	else:
+		if _area_environment:
+			env_node.environment = _area_environment
+		if sun and _area_sun_energy > 0.0:
+			sun.light_color = _area_sun_color
+			sun.light_energy = _area_sun_energy
+			sun.rotation_degrees = _area_sun_rotation
+
+
+## Céu de dia em tons de anime: azul forte em cima, claro no horizonte, cores vivas.
+static func village_environment() -> Environment:
+	var sky_mat := ProceduralSkyMaterial.new()
+	sky_mat.sky_top_color = Color(0.25, 0.55, 0.95)
+	sky_mat.sky_horizon_color = Color(0.75, 0.88, 1.0)
+	sky_mat.ground_horizon_color = Color(0.75, 0.88, 1.0)
+	sky_mat.ground_bottom_color = Color(0.35, 0.5, 0.35)
+	var sky := Sky.new()
+	sky.sky_material = sky_mat
+	var e := Environment.new()
+	e.background_mode = Environment.BG_SKY
+	e.sky = sky
+	e.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
+	# Luz moderada: com céu + sol fortes o toon "estoura" (céu branco, cores lavadas).
+	e.ambient_light_energy = 0.55
+	e.tonemap_mode = Environment.TONE_MAPPER_FILMIC
+	e.tonemap_white = 1.4
+	e.adjustment_enabled = true
+	e.adjustment_saturation = 1.15
+	e.adjustment_contrast = 1.05
+	return e
 
 
 ## Leva o jogador para a masmorra (sincronizado). Devolve o motivo se não puder.

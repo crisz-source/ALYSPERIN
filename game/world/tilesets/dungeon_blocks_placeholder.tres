@@ -16,6 +16,7 @@ color_ramp = SubResource("Gradient_o2fx2")
 seamless = true
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3y7dy"]
+diffuse_mode = 3
 albedo_texture = SubResource("NoiseTexture2D_gyp7w")
 roughness = 0.95
 uv1_scale = Vector3(0.6, 0.6, 0.6)
@@ -45,6 +46,7 @@ color_ramp = SubResource("Gradient_snutj")
 seamless = true
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vaxq2"]
+diffuse_mode = 3
 albedo_texture = SubResource("NoiseTexture2D_t4ng6")
 roughness = 0.95
 uv1_scale = Vector3(0.6, 0.6, 0.6)
@@ -74,6 +76,7 @@ color_ramp = SubResource("Gradient_vi22u")
 seamless = true
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nqyrf"]
+diffuse_mode = 3
 albedo_texture = SubResource("NoiseTexture2D_g8nt4")
 roughness = 0.95
 uv1_scale = Vector3(0.6, 0.6, 0.6)
