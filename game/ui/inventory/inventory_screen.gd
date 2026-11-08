@@ -135,8 +135,9 @@ func _build() -> void:
 	var x1: float = PANEL_RECT.position.x + 270
 	_detail_name = _label("", Vector2(x1, y0 + 18), Color.WHITE)
 	_detail_text = _label("", Vector2(x1, y0 + 34), TEXT_DIM)
-	_detail_text.size = Vector2(210, 70)
+	# Quebra de linha antes do tamanho (senão o texto alarga até caber numa linha).
 	_detail_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_detail_text.size = Vector2(210, 70)
 
 	_level_label = _label("", Vector2(x1, y0 + 122), Color.WHITE)
 	var xp_bg := ColorRect.new()

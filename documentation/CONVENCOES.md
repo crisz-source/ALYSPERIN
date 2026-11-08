@@ -80,6 +80,8 @@ ficam na mesma pasta.
 `Hitbox` (quem bate, só machuca enquanto ativa) → detecta `Hurtbox` (quem apanha)
 → `HealthComponent.apply_damage(DamageInfo)` → sinais `damaged` / `died`.
 Todo dano passa por `apply_damage`: nunca alterar `current_health` direto.
+Label criado por código com quebra de linha: definir `autowrap_mode`, fonte e tamanho ANTES de `text`
+(senão a largura fica a de uma linha só e invade os vizinhos).
 Controle de tela cheia numa camada de interface (raiz de tela) deve ter `mouse_filter = IGNORE`,
 senão engole cliques e arrastes destinados a outras camadas (ex.: barra do HUD).
 Área que precisa detectar paredes/portas (corpos estáticos) deve ter `monitorable = true`:

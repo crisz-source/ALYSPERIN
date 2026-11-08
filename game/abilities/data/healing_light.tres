@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="HealSpellData" format=3]
+
+[ext_resource type="Script" path="res://game/abilities/heal_spell_data.gd" id="1_n58r5"]
+
+[resource]
+script = ExtResource("1_n58r5")
+heal_amount = 25
+cast_time = 0.3
+id = &"healing_light"
+display_name = "Luz curativa"
+description = "Cura 25 de vida (no co-op: o aliado na mira)."
+cooldown = 3.0
+mana_cost = 15
+icon_color = Color(1, 0.95, 0.6, 1)

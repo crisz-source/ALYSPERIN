@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="TauntData" format=3]
+
+[ext_resource type="Script" path="res://game/abilities/taunt_data.gd" id="1_ys6g2"]
+
+[resource]
+script = ExtResource("1_ys6g2")
+id = &"taunt"
+display_name = "Provocar"
+description = "Inimigos próximos atacam você por 4 s."
+cooldown = 10.0
+mana_cost = 5
+icon_color = Color(1, 0.55, 0.3, 1)

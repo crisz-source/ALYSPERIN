@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="AbilityData" format=3]
+
+[ext_resource type="Script" path="res://game/abilities/ability_data.gd" id="1_lmwms"]
+
+[resource]
+script = ExtResource("1_lmwms")
+id = &"eternal_bastion"
+display_name = "Bastião eterno"
+description = "Por 5 s não cai abaixo de 1 de vida. (em desenvolvimento)"
+cooldown = 10.0
+unlock_level = 35
+icon_color = Color(0.45, 0.45, 0.5, 1)

@@ -17,7 +17,7 @@ signal dodge_succeeded
 signal message_requested(text: String)
 ## O jogador descartou um item: a área decide onde ele aparece no chão.
 signal item_dropped(stack: ItemStack, at_position: Vector3)
-## Disciplina escolhida/trocada: habilidades e bônus mudaram (HUD refaz a barra).
+## Disciplina escolhida/trocada: habilidades mudaram (HUD refaz a barra).
 signal discipline_changed(discipline: DisciplineData)
 ## Itens colocados na barra de habilidades mudaram.
 signal hotbar_changed
@@ -44,6 +44,9 @@ const MSG_INVENTORY_FULL := "Inventário cheio."
 const NO_MANA_COLOR := Color(0.5, 0.7, 1.0)
 ## Altura (acima dos pés) onde aparecem textos flutuantes.
 const TEXT_HEIGHT: float = 2.1
+## Passivo Muralha (Bastião): duração e redução de dano da Firmeza.
+const FIRMEZA_TIME: float = 3.0
+const FIRMEZA_REDUCTION: float = 0.3
 
 @export_group("Movimento")
 ## Velocidade máxima (m/s).
@@ -151,11 +154,12 @@ var _ability_cooldowns: Array[float] = []
 var _active_ability: AbilityData = null
 ## A habilidade em andamento já fez efeito (disparou/curou)?
 var _ability_fired: bool = false
-## Disciplina escolhida (null = nenhuma ainda).
+## Classe e disciplina escolhidas (null = nenhuma ainda).
+var player_class: ClassData = null
 var discipline: DisciplineData = null
+## Passivo Muralha (Bastião): tempo restante de Firmeza (menos dano).
+var _firmeza_left: float = 0.0
 var _base_max_mana: int = 0
-## Desgaste fracionário do escudo (Guardião gasta metade: 1 ponto a cada 2 bloqueios).
-var _shield_wear_accumulator: float = 0.0
 var _body_material: StandardMaterial3D
 var _swing_material: StandardMaterial3D
 var _shield_material: StandardMaterial3D
@@ -197,6 +201,7 @@ func _ready() -> void:
 	_camera.player = self
 	_input.camera_rig = _camera
 	health.block_filter = _is_hit_blocked
+	health.damage_modifier = _apply_damage_modifiers
 	health.damaged.connect(_on_damaged)
 	health.blocked.connect(_on_blocked)
 	health.hit_ignored.connect(_on_hit_ignored)
@@ -225,6 +230,7 @@ func _physics_process(delta: float) -> void:
 	_state_time += delta
 	_dodge_cooldown_left = maxf(_dodge_cooldown_left - delta, 0.0)
 	_combo_window_left = maxf(_combo_window_left - delta, 0.0)
+	_firmeza_left = maxf(_firmeza_left - delta, 0.0)
 	for i in _ability_cooldowns.size():
 		_ability_cooldowns[i] = maxf(_ability_cooldowns[i] - delta, 0.0)
 	_update_focus()
@@ -262,8 +268,7 @@ func current_attack_damage(step: int) -> int:
 	var base: float = float(weapon.damage) if weapon else float(unarmed_damage)
 	if weapon and equipment.weapon.is_broken():
 		base *= weapon.broken_damage_multiplier
-	var discipline_bonus: float = 1.0 + (discipline.damage_bonus if discipline else 0.0)
-	return maxi(roundi(base * combo_damage_multiplier[step] * stats.damage_multiplier() * discipline_bonus), 1)
+	return maxi(roundi(base * combo_damage_multiplier[step] * stats.damage_multiplier()), 1)
 
 
 ## Volta à vida no ponto indicado, com vida e mana cheias. Itens, equipamento e
@@ -278,7 +283,17 @@ func respawn(at: Vector3) -> void:
 	_change_state(State.MOVE)
 
 
-## Aplica a Disciplina: bônus de vida/mana e troca das habilidades.
+## Aplica classe e disciplina: equipamento inicial da classe e habilidades da
+## disciplina. A base de vida/mana/dano não muda (igual para todos).
+func apply_class(new_class: ClassData, new_discipline: DisciplineData) -> void:
+	player_class = new_class
+	equipment.weapon = new_class.starting_weapon.copy() if new_class.starting_weapon else null
+	equipment.shield = new_class.starting_shield.copy() if new_class.uses_shield and new_class.starting_shield else null
+	equipment.notify_wear()
+	apply_discipline(new_discipline)
+
+
+## Troca as habilidades pelas da disciplina.
 func apply_discipline(new_discipline: DisciplineData) -> void:
 	discipline = new_discipline
 	abilities = discipline.abilities.duplicate()
@@ -355,8 +370,22 @@ func use_inventory_slot(index: int) -> String:
 	if stack.item is ConsumableData:
 		message = _consume(index, stack.item as ConsumableData)
 	elif stack.item is WeaponData or stack.item is ShieldData:
+		var refusal: String = equip_refusal(stack.item)
+		if not refusal.is_empty():
+			return _say(refusal)
 		inventory.set_slot(index, equipment.equip(stack))
 	return _say(message)
+
+
+## Motivo para não poder equipar ("" = pode). Cada classe usa só as suas armas.
+func equip_refusal(item: ItemData) -> String:
+	if player_class == null:
+		return ""
+	if item is WeaponData and not player_class.allows_weapon(item as WeaponData):
+		return "Sua classe não usa %s." % item.display_name
+	if item is ShieldData and not player_class.uses_shield:
+		return "Sua classe não usa escudo."
+	return ""
 
 
 func unequip_weapon() -> String:
@@ -491,6 +520,21 @@ func _process_ability(delta: float) -> void:
 		if _state_time >= spin.duration:
 			_change_state(State.MOVE)
 		return
+	var bash := _active_ability as ShieldBashData
+	if bash:
+		var active: bool = _state_time >= bash.active_start and _state_time < bash.active_end
+		if active and not _sword_hitbox.is_active:
+			_sword_hitbox.activate()
+			_shield_visual.visible = true
+		elif not active and _sword_hitbox.is_active:
+			_sword_hitbox.deactivate()
+		if _state_time >= bash.duration:
+			_change_state(State.MOVE)
+		return
+	if _active_ability is TauntData:
+		if _state_time >= 0.2:
+			_change_state(State.MOVE)
+		return
 	var bolt := _active_ability as ProjectileSpellData
 	if bolt:
 		if not _ability_fired and _state_time >= bolt.cast_time:
@@ -505,6 +549,10 @@ func _process_ability(delta: float) -> void:
 	if heal_spell:
 		if not _ability_fired and _state_time >= heal_spell.cast_time:
 			_ability_fired = true
+			# Passivo Graça: cura com a vida cheia vira escudo de vida.
+			if _has_passive(&"graca") and health.current_health >= health.max_health:
+				health.add_shield(heal_spell.heal_amount / 2)
+				FloatingText.spawn(self, "Escudo +%d" % (heal_spell.heal_amount / 2), global_position + Vector3.UP * (TEXT_HEIGHT + 0.3), Color(1.0, 0.95, 0.6))
 			health.heal(heal_spell.heal_amount)
 			FloatingText.spawn(self, "+%d" % heal_spell.heal_amount, global_position + Vector3.UP * TEXT_HEIGHT, Color(0.5, 1.0, 0.5))
 			_change_state(State.MOVE)
@@ -542,6 +590,9 @@ func _change_state(new_state: State) -> void:
 	elif state == State.ABILITY:
 		_spin_hitbox.deactivate()
 		_spin_visual.visible = false
+		_sword_hitbox.deactivate()
+		_shield_visual.visible = false
+		_attack_pivot.scale = Vector3.ONE
 		_active_ability = null
 	state = new_state
 	_state_time = 0.0
@@ -597,6 +648,12 @@ func _try_start_ability() -> bool:
 	if not is_ability_unlocked(slot):
 		_say("%s: liberada no nível %d." % [ability.display_name, ability.unlock_level])
 		return false
+	if not ability.is_implemented():
+		_say("%s: ainda em desenvolvimento." % ability.display_name)
+		return false
+	if ability is ShieldBashData and equipment.shield == null:
+		_say("Golpe de escudo precisa de um escudo.")
+		return false
 	if _ability_cooldowns[slot] > 0.0:
 		return false
 	if not mana.spend(ability.mana_cost):
@@ -610,6 +667,17 @@ func _try_start_ability() -> bool:
 	if spin:
 		_spin_hitbox.damage = maxi(roundi(current_attack_damage(0) * spin.damage_multiplier), 1)
 		_spin_hitbox.knockback_force = spin.knockback
+	var bash := ability as ShieldBashData
+	if bash:
+		var aim: Vector3 = _aim_direction()
+		_attack_pivot.rotation.y = yaw_of(aim)
+		_attack_pivot.scale = Vector3(0.8, 1.0, 0.8)
+		_set_facing(aim)
+		_sword_hitbox.damage = maxi(roundi(current_attack_damage(0) * bash.damage_multiplier), 1)
+		_sword_hitbox.knockback_force = bash.knockback
+	var taunt := ability as TauntData
+	if taunt:
+		_do_taunt(taunt)
 	return true
 
 
@@ -686,7 +754,7 @@ func _is_hit_blocked(info: DamageInfo) -> bool:
 		from_direction = -flat(info.knockback).normalized()
 	var shield: ShieldData = equipment.shield_data()
 	var in_front: bool = from_direction == Vector3.ZERO \
-		or _block_direction.angle_to(from_direction) <= deg_to_rad(shield.block_half_angle + _block_angle_bonus())
+		or _block_direction.angle_to(from_direction) <= deg_to_rad(shield.block_half_angle)
 	if not in_front:
 		return false
 	# Escudo quebrado ainda segura parte do golpe: o dano passa reduzido.
@@ -698,11 +766,13 @@ func _is_hit_blocked(info: DamageInfo) -> bool:
 
 func _on_blocked(info: DamageInfo) -> void:
 	velocity = info.knockback * equipment.shield_data().knockback_multiplier
-	_shield_wear_accumulator += discipline.shield_wear_multiplier if discipline else 1.0
-	while _shield_wear_accumulator >= 1.0:
-		_shield_wear_accumulator -= 1.0
-		if equipment.shield.wear(1):
-			FloatingText.spawn(self, "Escudo quebrou!", global_position + Vector3.UP * TEXT_HEIGHT, BROKEN_COLOR)
+	if equipment.shield.wear(1):
+		FloatingText.spawn(self, "Escudo quebrou!", global_position + Vector3.UP * TEXT_HEIGHT, BROKEN_COLOR)
+	# Passivo Muralha: bloquear dá Firmeza (menos dano por alguns segundos).
+	if _has_passive(&"muralha"):
+		if _firmeza_left <= 0.0:
+			FloatingText.spawn(self, "Firmeza", global_position + Vector3.UP * (TEXT_HEIGHT + 0.3), Color(0.75, 0.85, 1.0))
+		_firmeza_left = FIRMEZA_TIME
 	equipment.notify_wear()
 	_shield_flash_time = 0.08
 	_camera.shake(1.5, 0.08)
@@ -726,7 +796,15 @@ func _on_ability_hit(_target: Hurtbox) -> void:
 	Hitstop.request(hitstop_hit)
 
 
-func _on_sword_hit(_target: Hurtbox) -> void:
+func _on_sword_hit(target: Hurtbox) -> void:
+	# Golpe de escudo usa a mesma área de golpe: atordoa e não gasta a arma.
+	var bash := _active_ability as ShieldBashData
+	if state == State.ABILITY and bash:
+		var enemy := target.owner as BasicEnemy
+		if enemy:
+			enemy.apply_stun(bash.stun_time)
+		Hitstop.request(hitstop_hit)
+		return
 	if equipment.weapon:
 		if equipment.weapon.wear(1):
 			FloatingText.spawn(self, "Arma quebrou!", global_position + Vector3.UP * TEXT_HEIGHT, BROKEN_COLOR)
@@ -778,20 +856,35 @@ func _update_focus() -> void:
 		_interact_prompt.global_position = best.prompt_position()
 
 
-func _block_angle_bonus() -> float:
-	return discipline.block_angle_bonus if discipline else 0.0
+func _has_passive(id: StringName) -> bool:
+	return discipline != null and discipline.passive_id == id
+
+
+## Modificadores de dano recebido do próprio jogador (passivos).
+func _apply_damage_modifiers(info: DamageInfo) -> void:
+	if _firmeza_left > 0.0:
+		info.amount = ceili(info.amount * (1.0 - FIRMEZA_REDUCTION))
+
+
+## Provocar: inimigos vivos no raio passam a atacar este jogador.
+func _do_taunt(taunt: TauntData) -> void:
+	var count := 0
+	for node: Node in get_tree().get_nodes_in_group(BasicEnemy.GROUP):
+		var enemy := node as BasicEnemy
+		if enemy and not enemy.health.is_dead and enemy.global_position.distance_to(global_position) <= taunt.radius:
+			enemy.apply_taunt(self, taunt.taunt_time)
+			count += 1
+	FloatingText.spawn(self, "Provocou %d" % count if count > 0 else "Ninguém por perto", global_position + Vector3.UP * TEXT_HEIGHT, Color(1.0, 0.6, 0.3))
 
 
 func _can_block() -> bool:
 	return _input.defend_held and equipment.shield != null
 
 
-## Vida e mana máximas = base + crescimento por nível (+ bônus provisório da Disciplina).
+## Vida e mana máximas = base + crescimento por nível (igual para todas as classes).
 func _apply_growth() -> void:
-	var discipline_health: int = discipline.bonus_health if discipline else 0
-	var discipline_mana: int = discipline.bonus_mana if discipline else 0
-	health.set_max_health(_base_max_health + discipline_health + stats.bonus_max_health())
-	mana.set_max_mana(_base_max_mana + discipline_mana + stats.bonus_max_mana())
+	health.set_max_health(_base_max_health + stats.bonus_max_health())
+	mana.set_max_mana(_base_max_mana + stats.bonus_max_mana())
 
 
 func _on_leveled_up(new_level: int) -> void:

@@ -80,9 +80,10 @@ conhecidos. Detalhes técnicos de cada etapa ficam em `documentation/worklog/`.
 ### Fase 6 — Mundo e conteúdo — 🔄 em andamento
 - [x] Morte com "continuar" (volta ao início da área; botão "Não" a definir pelo proprietário)
 - [x] Mana; magias (Dardo arcano, Cura); NPC com diálogo; missões (derrotar / coletar)
-- [x] Disciplinas PROVISÓRIAS (Vanguarda/Guardião/Arcanista) — a substituir pelo sistema
-  de 6 classes × 3 disciplinas definido pelo proprietário
-- [ ] Classes/disciplinas definitivas, Gear Score, masmorras com sincronização
+- [x] ~~Disciplinas provisórias~~ substituídas pelas classes reais (Etapa A)
+- [x] Etapa A (reduzida): **Guardião/Bastião** (tanque) e **Devoto/Sacerdote** (cura) jogáveis;
+  tela de criação classe → disciplina; armas por classe; base igual para todos
+- [ ] Outras disciplinas e classes; Gear Score; masmorras com sincronização
 - [ ] Enigmas, chefes
 
 ### Migração para 3D em terceira pessoa — ✅ concluída (2026-11-07)

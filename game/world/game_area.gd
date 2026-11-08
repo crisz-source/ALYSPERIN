@@ -13,8 +13,9 @@ extends Node3D
 
 ## Segundos entre a morte e a tela "Você morreu!".
 @export var death_screen_delay: float = 1.2
-## Disciplinas oferecidas ao começar. Vazio = não pergunta (ex.: arena de teste).
-@export var discipline_options: Array[DisciplineData] = []
+## Classes oferecidas ao começar (depois, a disciplina). Vazio = não pergunta
+## (ex.: arena de teste).
+@export var class_options: Array[ClassData] = []
 
 @onready var player: Player = $Entities/Player
 @onready var entities: Node3D = $Entities
@@ -35,12 +36,12 @@ func _ready() -> void:
 
 
 func _ask_discipline() -> void:
-	if discipline_options.is_empty() or player.discipline != null or not has_node("DisciplineSelectScreen"):
+	if class_options.is_empty() or player.discipline != null or not has_node("DisciplineSelectScreen"):
 		return
 	var screen: DisciplineSelectScreen = $DisciplineSelectScreen
 	player.input_blocked = true
 	screen.chosen.connect(_on_discipline_chosen, CONNECT_ONE_SHOT)
-	screen.open(discipline_options)
+	screen.open(class_options)
 
 
 func _on_dialogue_requested(speaker: String, lines: Array[String], on_finished: Callable) -> void:
@@ -53,8 +54,8 @@ func _on_dialogue_requested(speaker: String, lines: Array[String], on_finished: 
 	)
 
 
-func _on_discipline_chosen(chosen: DisciplineData) -> void:
-	player.apply_discipline(chosen)
+func _on_discipline_chosen(chosen_class: ClassData, chosen: DisciplineData) -> void:
+	player.apply_class(chosen_class, chosen)
 	player.input_blocked = false
 
 

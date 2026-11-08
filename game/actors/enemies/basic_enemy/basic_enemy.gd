@@ -13,6 +13,8 @@ extends CharacterBody3D
 
 signal died
 
+const GROUP: StringName = &"enemies"
+
 enum State { IDLE, CHASE, WINDUP, LUNGE, RECOVER, HURT, STAGGER, DEAD }
 
 const GRAVITY: float = 20.0
@@ -89,6 +91,11 @@ var _last_attacker: Player = null
 ## Onde o inimigo começou (volta para cá quando o jogador continua após morrer).
 var _spawn_position: Vector3 = Vector3.ZERO
 var _body_material: StandardMaterial3D
+## Duração do atordoamento atual (bloqueio de investida ou Golpe de escudo).
+var _stagger_duration: float = 0.0
+## Provocado: segue este jogador até o tempo acabar, mesmo longe.
+var _taunted_by: Player = null
+var _taunt_left: float = 0.0
 var _telegraph_material: StandardMaterial3D
 
 @onready var health: HealthComponent = $HealthComponent
@@ -102,6 +109,8 @@ var _telegraph_material: StandardMaterial3D
 
 
 func _ready() -> void:
+	add_to_group(GROUP)
+	_stagger_duration = stagger_time
 	_body_material = (_body.material_override as StandardMaterial3D).duplicate()
 	_body.material_override = _body_material
 	_telegraph_material = (_telegraph.material_override as StandardMaterial3D).duplicate()
@@ -118,12 +127,16 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	_state_time += delta
+	_taunt_left = maxf(_taunt_left - delta, 0.0)
+	if _taunt_left > 0.0 and _is_valid_target(_taunted_by):
+		target = _taunted_by
 	var vertical: float = velocity.y
 	velocity.y = 0.0
 	match state:
 		State.IDLE:
 			velocity = velocity.move_toward(Vector3.ZERO, friction * delta)
-			target = _find_target(detect_radius)
+			if not (_taunt_left > 0.0 and _is_valid_target(_taunted_by)):
+				target = _find_target(detect_radius)
 			if target:
 				_change_state(State.CHASE)
 		State.CHASE:
@@ -148,7 +161,7 @@ func _physics_process(delta: float) -> void:
 				_change_state(State.CHASE)
 		State.STAGGER:
 			velocity = velocity.move_toward(Vector3.ZERO, friction * delta)
-			if _state_time >= stagger_time:
+			if _state_time >= _stagger_duration:
 				_change_state(State.CHASE)
 		State.DEAD:
 			velocity = velocity.move_toward(Vector3.ZERO, friction * delta)
@@ -190,7 +203,8 @@ func _apply_backstab(info: DamageInfo) -> void:
 
 
 func _process_chase(delta: float) -> void:
-	if not _is_valid_target(target) or global_position.distance_to(target.global_position) > lose_radius:
+	var taunted: bool = _taunt_left > 0.0 and _is_valid_target(_taunted_by)
+	if not taunted and (not _is_valid_target(target) or global_position.distance_to(target.global_position) > lose_radius):
 		target = _find_target(detect_radius)
 		if target == null:
 			_change_state(State.IDLE)
@@ -203,6 +217,29 @@ func _process_chase(delta: float) -> void:
 	velocity = velocity.move_toward(to_target.normalized() * move_speed, acceleration * delta)
 
 
+## Atordoa por `seconds` (não age; costas expostas). Golpe de escudo, bloqueio.
+func apply_stun(seconds: float) -> void:
+	if health.is_dead:
+		return
+	_stagger_duration = seconds
+	_change_state(State.STAGGER)
+
+
+## Provocado: passa a atacar `by` por `seconds`, mesmo longe ou fora de visão.
+func apply_taunt(by: Player, seconds: float) -> void:
+	if health.is_dead:
+		return
+	_taunted_by = by
+	_taunt_left = seconds
+	target = by
+	if state == State.IDLE:
+		_change_state(State.CHASE)
+
+
+func is_taunted_by(player: Player) -> bool:
+	return _taunt_left > 0.0 and _taunted_by == player
+
+
 ## Volta ao lugar de origem com vida cheia, sem alvo (jogador continuou após morrer).
 func reset_to_spawn() -> void:
 	if health.is_dead:
@@ -211,6 +248,7 @@ func reset_to_spawn() -> void:
 	velocity = Vector3.ZERO
 	target = null
 	_last_attacker = null
+	_taunt_left = 0.0
 	health.revive()
 	_change_state(State.IDLE)
 
@@ -306,6 +344,7 @@ func _on_lunge_blocked(_target: Hurtbox) -> void:
 	if state != State.LUNGE:
 		return
 	velocity = -_lunge_direction * blocked_recoil_speed
+	_stagger_duration = stagger_time
 	_change_state(State.STAGGER)
 
 

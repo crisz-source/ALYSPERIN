@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_utbsk")
+weapon_type = &"espada_leve"
 damage = 7
 timing_scale = 0.75
 reach_scale = 0.9

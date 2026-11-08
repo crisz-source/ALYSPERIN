@@ -1,16 +1,12 @@
 [gd_resource type="Resource" script_class="DisciplineData" format=3]
 
-[ext_resource type="Script" path="res://game/abilities/ability_data.gd" id="1_xvmyf"]
-[ext_resource type="Resource" path="res://game/abilities/data/spin_slash.tres" id="2_3go57"]
-[ext_resource type="Resource" path="res://game/abilities/data/heal.tres" id="3_cgwt7"]
-[ext_resource type="Script" path="res://game/disciplines/discipline_data.gd" id="4_uadll"]
+[ext_resource type="Script" path="res://game/abilities/ability_data.gd" id="1_kgh5l"]
+[ext_resource type="Script" path="res://game/disciplines/discipline_data.gd" id="2_1l73q"]
 
 [resource]
-script = ExtResource("4_uadll")
+script = ExtResource("2_1l73q")
 id = &"vanguard"
 display_name = "Vanguarda"
-description = "Combate corpo a corpo agressivo. +20 de vida, +10% de dano."
-icon_color = Color(0.9, 0.45, 0.3, 1)
-bonus_health = 20
-damage_bonus = 0.1
-abilities = Array[ExtResource("1_xvmyf")]([ExtResource("2_3go57"), ExtResource("3_cgwt7")])
+description = "Mobilidade, agressividade e investidas."
+icon_color = Color(0.9, 0.55, 0.3, 1)
+available = false

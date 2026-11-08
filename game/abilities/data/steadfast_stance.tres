@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="AbilityData" format=3]
+
+[ext_resource type="Script" path="res://game/abilities/ability_data.gd" id="1_mwkog"]
+
+[resource]
+script = ExtResource("1_mwkog")
+id = &"steadfast_stance"
+display_name = "Postura inabalável"
+description = "Enquanto defende, não é empurrado e bloqueia por todos os lados. (em desenvolvimento)"
+cooldown = 10.0
+unlock_level = 10
+icon_color = Color(0.45, 0.45, 0.5, 1)

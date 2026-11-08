@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_45lrm")
+weapon_type = &"machado"
 damage = 18
 timing_scale = 1.35
 reach_scale = 1.1

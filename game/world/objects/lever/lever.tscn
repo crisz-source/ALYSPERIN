@@ -23,33 +23,33 @@ size = Vector3(0.08, 0.7, 0.08)
 [sub_resource type="BoxShape3D" id="BoxShape3D_6wr85"]
 size = Vector3(1.6, 1.5, 1.6)
 
-[node name="Lever" type="StaticBody3D" unique_id=1711930955]
+[node name="Lever" type="StaticBody3D" unique_id=2094045436]
 collision_mask = 0
 script = ExtResource("1_aumwl")
 
-[node name="CollisionShape" type="CollisionShape3D" parent="." unique_id=400405069]
+[node name="CollisionShape" type="CollisionShape3D" parent="." unique_id=1747761095]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
 shape = SubResource("BoxShape3D_utw2r")
 
-[node name="BasePlaceholder" type="MeshInstance3D" parent="." unique_id=881571336]
+[node name="BasePlaceholder" type="MeshInstance3D" parent="." unique_id=1864317119]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
 material_override = SubResource("StandardMaterial3D_ngwuf")
 mesh = SubResource("BoxMesh_4jkqq")
 
-[node name="HandlePivot" type="Node3D" parent="." unique_id=1834972441]
+[node name="HandlePivot" type="Node3D" parent="." unique_id=1369831927]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
 
-[node name="HandlePlaceholder" type="MeshInstance3D" parent="HandlePivot" unique_id=140015597]
+[node name="HandlePlaceholder" type="MeshInstance3D" parent="HandlePivot" unique_id=1672560071]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0)
 material_override = SubResource("StandardMaterial3D_uavi3")
 mesh = SubResource("BoxMesh_7hh11")
 
-[node name="Interactable" type="Area3D" parent="." unique_id=536011963]
+[node name="Interactable" type="Area3D" parent="." unique_id=503481180]
 collision_layer = 32
 collision_mask = 0
 script = ExtResource("2_vkemy")
 prompt_offset = Vector3(0, 1.6, 0)
 
-[node name="CollisionShape" type="CollisionShape3D" parent="Interactable" unique_id=1645601645]
+[node name="CollisionShape" type="CollisionShape3D" parent="Interactable" unique_id=1057748226]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
 shape = SubResource("BoxShape3D_6wr85")

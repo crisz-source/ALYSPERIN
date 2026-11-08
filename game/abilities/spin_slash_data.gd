@@ -9,3 +9,7 @@ extends AbilityData
 @export var duration: float = 0.32
 @export var active_start: float = 0.06
 @export var active_end: float = 0.26
+
+
+func is_implemented() -> bool:
+	return true

@@ -14,6 +14,8 @@ signal blocked(info: DamageInfo)
 ## O golpe chegou durante uma invulnerabilidade e foi ignorado (ex.: esquiva no
 ## tempo certo). Quem quiser recompensar isso escuta este sinal.
 signal hit_ignored(info: DamageInfo)
+## O escudo de vida mudou (absorve dano antes da vida).
+signal shield_changed(points: int)
 
 @export var max_health: int = 100
 
@@ -30,6 +32,8 @@ var block_filter: Callable
 ## Opcional: func(info: DamageInfo) -> void que pode alterar info.amount antes
 ## do dano (ex.: golpe pelas costas). Quem sabe para onde está virado é o dono.
 var damage_modifier: Callable
+## Escudo de vida: absorve dano antes da vida (ex.: passivo Graça do Sacerdote).
+var shield_points: int = 0
 
 
 func _ready() -> void:
@@ -67,6 +71,13 @@ func apply_damage(info: DamageInfo) -> bool:
 		return false
 	if damage_modifier.is_valid():
 		damage_modifier.call(info)
+	if shield_points > 0:
+		var absorbed: int = mini(shield_points, info.amount)
+		shield_points -= absorbed
+		info.amount -= absorbed
+		shield_changed.emit(shield_points)
+		if info.amount <= 0:
+			return false
 	current_health = maxi(current_health - info.amount, 0)
 	damaged.emit(info)
 	health_changed.emit(current_health, max_health)
@@ -76,7 +87,14 @@ func apply_damage(info: DamageInfo) -> bool:
 	return true
 
 
-## Muda a vida máxima (ex.: ponto de Vigor). Aumento também enche a vida atual
+func add_shield(points: int) -> void:
+	if is_dead or points <= 0:
+		return
+	shield_points += points
+	shield_changed.emit(shield_points)
+
+
+## Muda a vida máxima (ex.: crescimento por nível). Aumento também enche a vida atual
 ## na mesma quantia; redução só corta o que passar do novo máximo.
 func set_max_health(new_max: int) -> void:
 	new_max = maxi(new_max, 1)

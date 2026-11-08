@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="AbilityData" format=3]
+
+[ext_resource type="Script" path="res://game/abilities/ability_data.gd" id="1_g1sck"]
+
+[resource]
+script = ExtResource("1_g1sck")
+id = &"blessing_of_protection"
+display_name = "Bênção de proteção"
+description = "Escudo que absorve dano num aliado. (em desenvolvimento)"
+cooldown = 10.0
+unlock_level = 10
+icon_color = Color(0.45, 0.45, 0.5, 1)

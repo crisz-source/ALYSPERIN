@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="DisciplineData" format=3]
+
+[ext_resource type="Script" path="res://game/abilities/ability_data.gd" id="1_s5rhr"]
+[ext_resource type="Script" path="res://game/disciplines/discipline_data.gd" id="2_jvqym"]
+
+[resource]
+script = ExtResource("2_jvqym")
+id = &"inquisitor"
+display_name = "Inquisidor"
+description = "Magia sagrada ofensiva contra criaturas profanas."
+icon_color = Color(0.95, 0.8, 0.4, 1)
+available = false

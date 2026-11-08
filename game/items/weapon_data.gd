@@ -3,6 +3,8 @@ extends ItemData
 ## Arma corpo a corpo. Os números multiplicam o golpe base do jogador
 ## (combo, tempos, alcance), então trocar de arma muda o jeito de lutar.
 
+## Tipo de arma (espada, maca, machado, cajado...): define quais classes usam.
+@export var weapon_type: StringName = &"espada"
 ## Dano do 1º golpe do combo (os outros usam os multiplicadores do Player).
 @export var damage: int = 10
 ## Multiplica os tempos do golpe (preparação, lâmina, recuperação): >1 = mais lento.

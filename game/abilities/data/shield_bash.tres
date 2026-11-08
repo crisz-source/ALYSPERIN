@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ShieldBashData" format=3]
+
+[ext_resource type="Script" path="res://game/abilities/shield_bash_data.gd" id="1_cmmxs"]
+
+[resource]
+script = ExtResource("1_cmmxs")
+id = &"shield_bash"
+display_name = "Golpe de escudo"
+description = "Empurra e atordoa o alvo à frente."
+cooldown = 6.0
+mana_cost = 5
+icon_color = Color(0.6, 0.7, 0.9, 1)

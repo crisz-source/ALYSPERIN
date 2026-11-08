@@ -17,3 +17,10 @@ extends Resource
 @export var mana_cost: int = 0
 ## Cor do quadrado na barra de habilidades (provisório, até haver ícones).
 @export var icon_color: Color = Color(0.8, 0.8, 0.8)
+
+
+## true = esta habilidade já tem funcionamento no jogo. As que ainda não têm
+## aparecem na barra, mas a tecla só avisa (sem gastar mana nem recarga).
+## Tipos de habilidade com funcionamento sobrescrevem e devolvem true.
+func is_implemented() -> bool:
+	return false

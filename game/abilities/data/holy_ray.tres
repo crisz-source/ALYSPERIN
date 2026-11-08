@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ProjectileSpellData" format=3]
+
+[ext_resource type="Script" path="res://game/abilities/projectile_spell_data.gd" id="1_sof3t"]
+
+[resource]
+script = ExtResource("1_sof3t")
+damage = 8
+speed = 220.0
+knockback = 60.0
+projectile_color = Color(1, 0.9, 0.5, 1)
+id = &"holy_ray"
+display_name = "Raio sagrado"
+description = "Projétil sagrado fraco (no co-op: cura os aliados que atravessa)."
+cooldown = 0.8
+mana_cost = 6
+icon_color = Color(1, 0.9, 0.5, 1)

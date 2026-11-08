@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="ClassData" format=3]
+
+[ext_resource type="Script" path="res://game/disciplines/discipline_data.gd" id="1_6r38r"]
+[ext_resource type="Resource" path="res://game/disciplines/data/priest.tres" id="2_igrcg"]
+[ext_resource type="Resource" path="res://game/disciplines/data/inquisitor.tres" id="3_wed2q"]
+[ext_resource type="Resource" path="res://game/disciplines/data/oracle.tres" id="4_fk6td"]
+[ext_resource type="Script" path="res://game/disciplines/class_data.gd" id="5_2ejkk"]
+[ext_resource type="Resource" path="res://game/items/data/pilgrim_mace.tres" id="6_xxnqc"]
+[ext_resource type="Script" path="res://game/items/item_stack.gd" id="7_57cdw"]
+
+[sub_resource type="Resource" id="Resource_3pyac"]
+script = ExtResource("7_57cdw")
+item = ExtResource("6_xxnqc")
+durability = 80
+
+[resource]
+script = ExtResource("5_2ejkk")
+id = &"devotee"
+display_name = "Devoto"
+role = "Cura"
+description = "Canaliza a fé para curar, proteger e punir. Não usa escudo."
+icon_color = Color(1, 0.9, 0.6, 1)
+allowed_weapon_types = Array[StringName]([&"maca", &"cetro"])
+starting_weapon = SubResource("Resource_3pyac")
+disciplines = Array[ExtResource("1_6r38r")]([ExtResource("2_igrcg"), ExtResource("3_wed2q"), ExtResource("4_fk6td")])
