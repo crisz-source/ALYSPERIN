@@ -191,6 +191,17 @@ var status: StatusEffects
 ## Ressurreição (solo): revive a si mesmo uma vez (recarrega ao continuar/entrar em masmorra).
 var self_revive_available: bool = true
 var _support_target: Node3D = null
+## Teto da masmorra (Dungeon Sync). 0 = sem teto. O personagem nunca é alterado:
+## as contas usam effective_level() e effective_gs_of().
+var sync_level_cap: int = 0
+var sync_gs_cap: int = 0
+## Elemento do óleo passado na arma e quanto tempo ainda dura.
+var weapon_element: StringName = &""
+var _weapon_element_left: float = 0.0
+## Nome mostrado de cada elemento.
+const ELEMENT_NAMES: Dictionary = {&"fire": "Fogo", &"ice": "Gelo", &"lightning": "Raio", &"earth": "Terra", &"light": "Luz", &"dark": "Trevas"}
+## GS em que o dano da arma não muda (itens iniciais).
+const GS_BASE: int = 100
 var _swing_material: StandardMaterial3D
 var _shield_material: StandardMaterial3D
 
@@ -273,6 +284,11 @@ func _physics_process(delta: float) -> void:
 	_dodge_cooldown_left = maxf(_dodge_cooldown_left - delta, 0.0)
 	_combo_window_left = maxf(_combo_window_left - delta, 0.0)
 	_firmeza_left = maxf(_firmeza_left - delta, 0.0)
+	if _weapon_element_left > 0.0:
+		_weapon_element_left -= delta
+		if _weapon_element_left <= 0.0:
+			weapon_element = &""
+			_say("O óleo da arma acabou.")
 	for i in _ability_cooldowns.size():
 		_ability_cooldowns[i] = maxf(_ability_cooldowns[i] - delta, 0.0)
 	_update_focus()
@@ -358,7 +374,60 @@ func current_attack_damage(step: int) -> int:
 	var base: float = float(weapon.damage) if weapon else float(unarmed_damage)
 	if weapon and equipment.weapon.is_broken():
 		base *= weapon.broken_damage_multiplier
+	if weapon:
+		base *= gs_damage_multiplier(effective_gs_of(weapon.gear_score))
 	return maxi(roundi(base * combo_damage_multiplier[step] * stats.damage_multiplier()), 1)
+
+
+# --- Gear Score e Dungeon Sync ----------------------------------------------
+
+## Multiplicador de dano da arma pelo GS: GS 100 = x1,0; cada +1000 = +1,0.
+static func gs_damage_multiplier(gs: int) -> float:
+	return 1.0 + float(gs - GS_BASE) / 1000.0
+
+
+## GS de um item depois do teto da masmorra (o item em si não muda).
+func effective_gs_of(gs: int) -> int:
+	return mini(gs, sync_gs_cap) if sync_gs_cap > 0 else gs
+
+
+## Espaços que contam no GS: arma, e escudo para quem usa escudo (Devoto: só arma).
+func _gs_slots() -> Array[int]:
+	var slots: Array[int] = []
+	var weapon: WeaponData = equipment.weapon_data()
+	slots.append(weapon.gear_score if weapon else 0)
+	var uses_shield: bool = player_class.uses_shield if player_class else equipment.shield != null
+	if uses_shield:
+		var shield: ShieldData = equipment.shield_data()
+		slots.append(shield.gear_score if shield else 0)
+	return slots
+
+
+## GS real do personagem (média dos espaços; vazio conta 0).
+func gear_score() -> int:
+	var slots: Array[int] = _gs_slots()
+	var total: int = 0
+	for gs: int in slots:
+		total += gs
+	return roundi(float(total) / slots.size())
+
+
+## GS com o teto da masmorra aplicado item a item.
+func effective_gear_score() -> int:
+	var slots: Array[int] = _gs_slots()
+	var total: int = 0
+	for gs: int in slots:
+		total += effective_gs_of(gs)
+	return roundi(float(total) / slots.size())
+
+
+## Nível usado nas contas (com o teto da masmorra, se houver).
+func effective_level() -> int:
+	return mini(stats.level, sync_level_cap) if sync_level_cap > 0 else stats.level
+
+
+func is_synced() -> bool:
+	return sync_level_cap > 0 or sync_gs_cap > 0
 
 
 ## Volta à vida no ponto indicado, com vida e mana cheias. Itens, equipamento e
@@ -501,6 +570,13 @@ func pick_up(stack: ItemStack) -> int:
 
 ## Gasta o item só se ele tiver efeito (vida/mana não cheias).
 func _consume(index: int, item: ConsumableData) -> String:
+	if item.weapon_element != &"":
+		if equipment.weapon == null:
+			return "Equipe uma arma para usar o óleo."
+		weapon_element = item.weapon_element
+		_weapon_element_left = item.element_duration
+		inventory.remove(index, 1)
+		return "Arma com %s por %d s." % [ELEMENT_NAMES.get(weapon_element, String(weapon_element)), int(item.element_duration)]
 	var heals: bool = item.heal_amount > 0 and health.current_health < health.max_health
 	var restores: bool = item.mana_amount > 0 and mana.current() < mana.max_mana
 	if not heals and not restores:
@@ -716,6 +792,7 @@ func _start_attack() -> void:
 	# Alcance só no chão: a altura da área de golpe não muda.
 	_attack_pivot.scale = Vector3(reach, 1.0, reach)
 	_sword_hitbox.damage = current_attack_damage(_combo_step)
+	_sword_hitbox.element = weapon_element
 	_sword_hitbox.knockback_force = combo_knockback[_combo_step] \
 		* (weapon.knockback_multiplier if weapon else unarmed_knockback_multiplier)
 	_swing_material.albedo_color = FINISHER_SWING_TINT if is_finisher else SWING_COLOR
@@ -782,6 +859,7 @@ func _try_start_ability() -> bool:
 	if spin:
 		_spin_hitbox.damage = maxi(roundi(current_attack_damage(0) * spin.damage_multiplier), 1)
 		_spin_hitbox.knockback_force = spin.knockback
+		_spin_hitbox.element = weapon_element
 	var bash := ability as ShieldBashData
 	if bash:
 		var aim: Vector3 = _aim_direction()

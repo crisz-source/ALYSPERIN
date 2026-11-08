@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="PackedScene" path="res://assets/weapons/crescent_staff/crescent_staff.glb" id="1_4smxh"]
+[ext_resource type="Script" path="res://game/items/weapon_data.gd" id="2_rjtwc"]
+
+[resource]
+script = ExtResource("2_rjtwc")
+weapon_type = &"cajado"
+gear_score = 320
+damage = 8
+timing_scale = 1.1
+reach_scale = 1.15
+durability = 100
+id = &"veteran_staff"
+display_name = "Cajado de veterano"
+description = "Cajado crescente com orbe desperto. GS 320."
+icon_color = Color(0.7, 0.55, 0.35, 1)
+model_scene = ExtResource("1_4smxh")
+model_scale = 0.65
+model_offset = Vector3(0, -0.8, 0)

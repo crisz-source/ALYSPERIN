@@ -113,6 +113,7 @@ func is_showing_message() -> bool:
 
 
 func _process(delta: float) -> void:
+	_update_level_label()
 	_update_ability_bar()
 	_update_crosshair()
 	_stats_clock -= delta
@@ -310,8 +311,20 @@ func _on_mana_changed(current: int, maximum: int) -> void:
 	_mana_fill.scale.x = float(current) / float(maxi(maximum, 1))
 
 
+## "Nv 20 · GS 320"; na masmorra mostra os valores sincronizados.
+func _update_level_label() -> void:
+	if _player == null:
+		return
+	var text: String = "Nv %d · GS %d" % [_player.stats.level, _player.gear_score()]
+	if _player.is_synced():
+		text += "  (sinc.: Nv %d · GS %d)" % [_player.effective_level(), _player.effective_gear_score()]
+	if _player.weapon_element != &"":
+		text += "  [%s]" % Player.ELEMENT_NAMES.get(_player.weapon_element, "")
+	_level_label.text = text
+
+
 func _on_xp_changed(xp: int, xp_to_next: int) -> void:
-	_level_label.text = "Nv %d" % _player.stats.level
+	_update_level_label()
 	_xp_fill.scale.x = 1.0 if _player.stats.is_max_level() else float(xp) / float(xp_to_next)
 
 

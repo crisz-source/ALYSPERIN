@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ShieldData" format=3]
+
+[ext_resource type="PackedScene" path="res://assets/weapons/sentinel_shield/sentinel_shield.glb" id="1_bvjus"]
+[ext_resource type="Script" path="res://game/items/shield_data.gd" id="2_8up2x"]
+
+[resource]
+script = ExtResource("2_8up2x")
+gear_score = 320
+block_half_angle = 80.0
+knockback_multiplier = 0.3
+durability = 90
+id = &"veteran_shield"
+display_name = "Escudo de veterano"
+description = "Escudo sentinela reforçado. GS 320."
+icon_color = Color(0.55, 0.65, 0.85, 1)
+model_scene = ExtResource("1_bvjus")
+model_scale = 0.7
+model_offset = Vector3(0, -0.45, 0)
+model_yaw_degrees = 180.0

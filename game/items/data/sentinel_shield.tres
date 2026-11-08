@@ -5,6 +5,7 @@
 
 [resource]
 script = ExtResource("2_ma1wi")
+gear_score = 120
 block_half_angle = 80.0
 knockback_multiplier = 0.3
 durability = 60

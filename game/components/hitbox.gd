@@ -18,6 +18,8 @@ signal hit_blocked(target: Hurtbox)
 @export var rehit_interval: float = 0.0
 ## Quem é considerado o autor do golpe (usado para direção do empurrão).
 @export var attacker: Node3D
+## Elemento dos golpes desta área (vazio = físico). Ex.: óleo de fogo na arma.
+var element: StringName = &""
 
 var is_active: bool = false
 var _hit_times: Dictionary = {}   # Hurtbox -> tempo (s) do último acerto
@@ -68,4 +70,6 @@ func _build_damage(target: Hurtbox) -> DamageInfo:
 	var origin: Vector3 = attacker.global_position if attacker else global_position
 	var direction: Vector3 = target.global_position - origin
 	direction.y = 0.0
-	return DamageInfo.new(damage, direction.normalized() * knockback_force, attacker)
+	var info := DamageInfo.new(damage, direction.normalized() * knockback_force, attacker)
+	info.element = element
+	return info

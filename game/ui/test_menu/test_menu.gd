@@ -5,6 +5,9 @@ extends CanvasLayer
 ## de nível e enche vida/mana. Não faz parte do jogo final.
 
 const CLASSES := "res://game/classes/data/"
+const ITEMS := "res://game/items/data/"
+## Nível mínimo das Ruínas Esquecidas.
+const DUNGEON_LEVEL: int = 20
 const ALLY_COUNT: int = 3
 const ALLY_WOUNDED_HEALTH: int = 40
 
@@ -27,17 +30,17 @@ func _ready() -> void:
 	_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_root)
 	var panel := ColorRect.new()
-	panel.position = Vector2(200, 60)
-	panel.size = Vector2(240, 220)
+	panel.position = Vector2(200, 30)
+	panel.size = Vector2(240, 290)
 	panel.color = Color(0.05, 0.05, 0.09, 0.95)
 	_root.add_child(panel)
 	var title := Label.new()
 	title.text = "MENU DE TESTES (P fecha)"
-	title.position = Vector2(212, 66)
+	title.position = Vector2(212, 36)
 	title.add_theme_font_size_override("font_size", 10)
 	_root.add_child(title)
 	_box = VBoxContainer.new()
-	_box.position = Vector2(212, 86)
+	_box.position = Vector2(212, 56)
 	_box.custom_minimum_size = Vector2(216, 0)
 	_box.add_theme_constant_override("separation", 4)
 	_root.add_child(_box)
@@ -47,6 +50,8 @@ func _ready() -> void:
 		["Criar %d aliados de teste (feridos)" % ALLY_COUNT, spawn_allies],
 		["Ferir os aliados de teste", wound_allies],
 		["Subir 1 nível", level_up],
+		["Ir para o nível %d (masmorra)" % DUNGEON_LEVEL, level_to_dungeon],
+		["Equipamento GS 320 + óleos de arma", give_veteran_gear],
 		["Encher vida e mana", refill],
 	]:
 		var b := Button.new()
@@ -101,6 +106,26 @@ func wound_allies() -> void:
 func level_up() -> void:
 	var stats: CharacterStats = _area.player.stats
 	stats.add_xp(stats.xp_to_next() - stats.xp)
+
+
+func level_to_dungeon() -> void:
+	var stats: CharacterStats = _area.player.stats
+	while stats.level < DUNGEON_LEVEL and not stats.is_max_level():
+		stats.add_xp(stats.xp_to_next() - stats.xp)
+
+
+## Equipa o equipamento de veterano da classe (GS 320) e põe 1 óleo de cada na bolsa.
+func give_veteran_gear() -> void:
+	var player: Player = _area.player
+	var is_devotee: bool = player.player_class != null and not player.player_class.uses_shield
+	player.equipment.equip(ItemStack.create(load(ITEMS + ("veteran_staff.tres" if is_devotee else "veteran_maul.tres"))))
+	if not is_devotee:
+		player.equipment.equip(ItemStack.create(load(ITEMS + "veteran_shield.tres")))
+	var left_out: int = 0
+	for oil: String in ["fire_oil", "ice_oil", "lightning_oil"]:
+		left_out += player.inventory.add(ItemStack.create(load(ITEMS + oil + ".tres")))
+	var note: String = " (bolsa cheia: faltou espaço para óleos)" if left_out > 0 else ""
+	player.message_requested.emit("Equipamento de veterano equipado: GS %d.%s" % [player.gear_score(), note])
 
 
 func refill() -> void:

@@ -5,6 +5,8 @@ extends ItemData
 
 ## Tipo de arma (espada, maca, machado, cajado...): define quais classes usam.
 @export var weapon_type: StringName = &"espada"
+## Gear Score (nível do item). Escala o dano da arma; entra na média do personagem.
+@export var gear_score: int = 100
 ## Dano do 1º golpe do combo (os outros usam os multiplicadores do Player).
 @export var damage: int = 10
 ## Multiplica os tempos do golpe (preparação, lâmina, recuperação): >1 = mais lento.

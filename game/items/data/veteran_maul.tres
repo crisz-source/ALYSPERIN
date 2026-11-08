@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="PackedScene" path="res://assets/weapons/ember_maul/ember_maul.glb" id="1_jgdno"]
+[ext_resource type="Script" path="res://game/items/weapon_data.gd" id="2_0t7v1"]
+
+[resource]
+script = ExtResource("2_0t7v1")
+weapon_type = &"maca"
+gear_score = 320
+damage = 14
+timing_scale = 1.2
+reach_scale = 1.05
+knockback_multiplier = 1.3
+durability = 100
+id = &"veteran_maul"
+display_name = "Malho de veterano"
+description = "Malho de brasa temperado em batalha. GS 320."
+icon_color = Color(0.95, 0.55, 0.2, 1)
+model_scene = ExtResource("1_jgdno")
+model_scale = 0.6
+model_offset = Vector3(0, -0.3, 0)
+model_yaw_degrees = 90.0
