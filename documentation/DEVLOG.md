@@ -97,6 +97,13 @@ conhecidos. Detalhes técnicos de cada etapa ficam em `documentation/worklog/`.
 - [x] 173 verificações automáticas passando
 - Ver `documentation/worklog/2026-11-07-migracao-3d.md`
 
+### Arte CC0 (KayKit) e texto nítido
+- [x] Cavaleiro (Guardião) e mago (Devoto) com animações reais; esqueletos animados como monstros
+- [x] Decoração (barris, caixotes, velas, ossos, lápides, caixões, pilares, lanternas) e pedra texturizada
+- [x] Clima: tons de filme, brilho, contraste; texto nítido (interface em resolução cheia, 3D pixelado)
+- [x] Partes do Khar'Vesh ao alcance da espada
+- Ver `documentation/worklog/2026-11-08-arte-kaykit.md` e `2026-11-08-alcance-chefe-e-texto-nitido.md`
+
 ### Gear Score, masmorra Ruínas Esquecidas e chefe Khar'Vesh
 - [x] GS nos itens e no personagem, escala de dano, óleos de arma (fogo/gelo/raio)
 - [x] Portal (nível 20, GS 300), masmorra com Dungeon Sync (nível 24, GS 300), saída

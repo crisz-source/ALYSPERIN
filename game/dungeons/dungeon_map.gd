@@ -48,8 +48,9 @@ func _ready() -> void:
 	var light := OmniLight3D.new()
 	light.position = Vector3(0, 6, -26)
 	light.omni_range = 60.0
-	light.light_energy = 0.8
+	light.light_energy = 0.35
 	add_child(light)
+	_decorate()
 
 
 ## Onde o jogador aparece ao entrar (e ao continuar depois de morrer).
@@ -119,9 +120,7 @@ func _block(size: Vector3, pos: Vector3, color: Color) -> void:
 	var bm := BoxMesh.new()
 	bm.size = size
 	mesh.mesh = bm
-	var mat := StandardMaterial3D.new()
-	mat.albedo_color = color
-	mesh.material_override = mat
+	mesh.material_override = _stone(color)
 	body.add_child(mesh)
 	add_child(body)
 
@@ -143,6 +142,37 @@ func _build_puddle(spot: Vector3) -> void:
 	mesh.position = spot + Vector3(0, 0.02, 0)
 	mesh.add_to_group(PUDDLE_GROUP)
 	add_child(mesh)
+
+
+## Material de pedra por cor (um por cor, reaproveitado entre blocos).
+var _stone_cache: Dictionary = {}
+
+
+func _stone(color: Color) -> StandardMaterial3D:
+	if not _stone_cache.has(color):
+		_stone_cache[color] = Decor.stone_material(color)
+	return _stone_cache[color]
+
+
+## Decoração KayKit (CC0): tochas nos corredores, ossos e escombros no salão,
+## pilares, caixões, lápides e árvore morta na arena do chefe.
+func _decorate() -> void:
+	var torch_spots: Array[Vector3] = [Vector3(-5.4, 0, 0), Vector3(5.4, 0, 0), Vector3(-1.6, 0, -12), Vector3(1.6, 0, -12),
+		Vector3(-7.4, 0, -26), Vector3(7.4, 0, -26), Vector3(-1.6, 0, -39), Vector3(1.6, 0, -39)]
+	for spot: Vector3 in torch_spots:
+		Decor.place(self, &"lantern", spot)
+	for spec: Array in [[&"skull_candle", Vector3(-2.5, 0, 4.5)], [&"skull_candle", Vector3(2.5, 0, 4.5)],
+			[&"bones", Vector3(-6, 0, -20)], [&"ribcage", Vector3(5.5, 0, -32)], [&"rubble", Vector3(6.5, 0, -19.5)],
+			[&"broken_gear", Vector3(-6.5, 0, -32.5)], [&"barrel", Vector3(-6.8, 0, -19)], [&"crates", Vector3(6.8, 0, -33)]]:
+		Decor.place(self, spec[0], spec[1])
+	# Arena do chefe: pilares nos cantos, caixões e lápides nas paredes, árvore morta.
+	for corner: Vector3 in [Vector3(-12.5, 0, -45.5), Vector3(12.5, 0, -45.5), Vector3(-12.5, 0, -70.5), Vector3(12.5, 0, -70.5)]:
+		Decor.place(self, &"pillar", corner)
+	for spec: Array in [[&"coffin", Vector3(-13, 0, -56), PI / 2.0], [&"coffin", Vector3(13, 0, -60), -PI / 2.0],
+			[&"grave", Vector3(-6, 0, -71), 0.0], [&"gravestone", Vector3(6, 0, -71), 0.0], [&"grave", Vector3(0, 0, -71.2), 0.0],
+			[&"dead_tree", Vector3(-12.5, 0, -63), 0.0], [&"shrine", Vector3(12.5, 0, -52), -PI / 2.0],
+			[&"bones", Vector3(-4, 0, -64)], [&"skull", Vector3(5, 0, -52)], [&"rubble_half", Vector3(8, 0, -66)]]:
+		Decor.place(self, spec[0], spec[1], spec[2] if spec.size() > 2 else 0.0)
 
 
 ## Faixa invisível no fim do corredor: ao passar, o chefe aparece.
