@@ -1,12 +1,17 @@
-[gd_resource type="Resource" script_class="AbilityData" format=3]
+[gd_resource type="Resource" script_class="SupportSpellData" format=3]
 
-[ext_resource type="Script" path="res://game/abilities/ability_data.gd" id="1_g1sck"]
+[ext_resource type="Script" path="res://game/abilities/support_spell_data.gd" id="1_g1sck"]
 
 [resource]
 script = ExtResource("1_g1sck")
+mechanic = 3
+duration = 0.0
+radius = 0.0
+amount = 40
 id = &"blessing_of_protection"
 display_name = "Bênção de proteção"
-description = "Escudo que absorve dano num aliado. (em desenvolvimento)"
-cooldown = 10.0
+description = "Escudo de 40 no aliado da mira (sem aliado: em você)."
+cooldown = 8.0
 unlock_level = 10
-icon_color = Color(0.45, 0.45, 0.5, 1)
+mana_cost = 12
+icon_color = Color(0.75, 0.85, 1, 1)

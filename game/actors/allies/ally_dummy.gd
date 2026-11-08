@@ -15,6 +15,7 @@ var health: HealthComponent
 var _material: StandardMaterial3D
 var _label: Label3D
 var _selected: bool = false
+var status: StatusEffects
 
 
 func _ready() -> void:
@@ -52,6 +53,7 @@ func _ready() -> void:
 	add_child(_label)
 	health.health_changed.connect(func(_c: int, _m: int) -> void: _refresh())
 	health.shield_changed.connect(func(_p: int) -> void: _refresh())
+	status = StatusEffects.attach(self, health, 2.35)
 	_refresh()
 
 
@@ -74,5 +76,5 @@ func _refresh() -> void:
 	if health == null:
 		return
 	var shield: String = "  +%d escudo" % health.shield_points if health.shield_points > 0 else ""
-	_label.text = "Aliado de teste  %d/%d%s" % [health.current_health, health.max_health, shield]
+	_label.text = ("Aliado de teste  CAÍDO" if health.is_dead else "Aliado de teste  %d/%d%s" % [health.current_health, health.max_health, shield])
 	_label.modulate = Color(0.6, 1.0, 0.6) if health.current_health >= health.max_health else Color(1.0, 0.85, 0.5)

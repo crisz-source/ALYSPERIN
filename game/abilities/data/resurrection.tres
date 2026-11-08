@@ -1,12 +1,17 @@
-[gd_resource type="Resource" script_class="AbilityData" format=3]
+[gd_resource type="Resource" script_class="SupportSpellData" format=3]
 
-[ext_resource type="Script" path="res://game/abilities/ability_data.gd" id="1_d3bt6"]
+[ext_resource type="Script" path="res://game/abilities/support_spell_data.gd" id="1_d3bt6"]
 
 [resource]
 script = ExtResource("1_d3bt6")
+mechanic = 5
+duration = 0.0
+radius = 6.0
+amount = 50
 id = &"resurrection"
 display_name = "Ressurreição"
-description = "Levanta um aliado caído (solo: revive a si uma vez por masmorra). (em desenvolvimento)"
-cooldown = 10.0
+description = "Levanta um aliado caído a até 6 m com metade da vida. Sozinho: você revive ao morrer, uma vez."
+cooldown = 60.0
 unlock_level = 35
-icon_color = Color(0.45, 0.45, 0.5, 1)
+mana_cost = 30
+icon_color = Color(0.75, 0.85, 1, 1)

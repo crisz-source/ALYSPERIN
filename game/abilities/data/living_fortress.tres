@@ -1,12 +1,18 @@
-[gd_resource type="Resource" script_class="AbilityData" format=3]
+[gd_resource type="Resource" script_class="SupportSpellData" format=3]
 
-[ext_resource type="Script" path="res://game/abilities/ability_data.gd" id="1_t6cuo"]
+[ext_resource type="Script" path="res://game/abilities/support_spell_data.gd" id="1_t6cuo"]
 
 [resource]
 script = ExtResource("1_t6cuo")
+mechanic = 2
+effect_id = &"protect"
+strength = 0.5
+duration = 8.0
+radius = 3.5
 id = &"living_fortress"
 display_name = "Fortaleza viva"
-description = "Cúpula que bloqueia projéteis inimigos por 8 s. (em desenvolvimento)"
-cooldown = 10.0
+description = "Cúpula de 8 s: quem está dentro recebe 50% menos dano; projéteis inimigos somem."
+cooldown = 60.0
 unlock_level = 50
-icon_color = Color(0.45, 0.45, 0.5, 1)
+mana_cost = 25
+icon_color = Color(0.75, 0.85, 1, 1)

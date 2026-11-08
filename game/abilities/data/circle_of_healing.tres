@@ -1,12 +1,16 @@
-[gd_resource type="Resource" script_class="AbilityData" format=3]
+[gd_resource type="Resource" script_class="SupportSpellData" format=3]
 
-[ext_resource type="Script" path="res://game/abilities/ability_data.gd" id="1_7jba1"]
+[ext_resource type="Script" path="res://game/abilities/support_spell_data.gd" id="1_7jba1"]
 
 [resource]
 script = ExtResource("1_7jba1")
+mechanic = 4
+radius = 4.0
+amount = 8
 id = &"circle_of_healing"
 display_name = "Círculo de cura"
-description = "Área que cura aliados dentro por 6 s. (em desenvolvimento)"
-cooldown = 10.0
+description = "Círculo no chão (raio 4 m) que cura 8 por segundo por 6 s."
+cooldown = 18.0
 unlock_level = 20
-icon_color = Color(0.45, 0.45, 0.5, 1)
+mana_cost = 20
+icon_color = Color(0.75, 0.85, 1, 1)

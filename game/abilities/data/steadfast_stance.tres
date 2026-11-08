@@ -1,12 +1,15 @@
-[gd_resource type="Resource" script_class="AbilityData" format=3]
+[gd_resource type="Resource" script_class="SupportSpellData" format=3]
 
-[ext_resource type="Script" path="res://game/abilities/ability_data.gd" id="1_mwkog"]
+[ext_resource type="Script" path="res://game/abilities/support_spell_data.gd" id="1_mwkog"]
 
 [resource]
 script = ExtResource("1_mwkog")
+effect_id = &"stance"
+radius = 0.0
 id = &"steadfast_stance"
 display_name = "Postura inabalável"
-description = "Enquanto defende, não é empurrado e bloqueia por todos os lados. (em desenvolvimento)"
-cooldown = 10.0
+description = "Por 6 s, defendendo: bloqueia por todos os lados e não é empurrado."
+cooldown = 15.0
 unlock_level = 10
-icon_color = Color(0.45, 0.45, 0.5, 1)
+mana_cost = 10
+icon_color = Color(0.75, 0.85, 1, 1)

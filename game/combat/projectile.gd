@@ -8,6 +8,8 @@ extends Hitbox
 ## pelo mundo sem precisar procurar o nó da área.
 
 const SCENE_PATH := "res://game/combat/projectile.tscn"
+## Projéteis disparados por inimigos (a Fortaleza viva os apaga).
+const ENEMY_GROUP: StringName = &"enemy_projectiles"
 ## Conversão da escala da versão 2D (pixels) para metros.
 const PIXELS_PER_METER: float = 16.0
 
@@ -26,6 +28,8 @@ static func fire(shooter: Node3D, from: Vector3, p_direction: Vector3, data: Pro
 	p.damage = data.damage
 	p.knockback_force = data.knockback / PIXELS_PER_METER
 	p.attacker = shooter
+	if not shooter is Player:
+		p.add_to_group(ENEMY_GROUP)
 	p.top_level = true
 	shooter.add_child(p)
 	p.global_position = from

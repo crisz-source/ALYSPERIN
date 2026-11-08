@@ -34,6 +34,9 @@ var block_filter: Callable
 var damage_modifier: Callable
 ## Escudo de vida: absorve dano antes da vida (ex.: passivo Graça do Devoto).
 var shield_points: int = 0
+## Efeitos de status do dono (Protegido reduz o dano; Inabalável segura em 1 de vida).
+## Preenchido por StatusEffects.attach.
+var status: StatusEffects
 
 
 func _ready() -> void:
@@ -71,6 +74,8 @@ func apply_damage(info: DamageInfo) -> bool:
 		return false
 	if damage_modifier.is_valid():
 		damage_modifier.call(info)
+	if status and status.has(StatusEffects.PROTECT):
+		info.amount = maxi(ceili(info.amount * (1.0 - status.strength_of(StatusEffects.PROTECT))), 1)
 	if shield_points > 0:
 		var absorbed: int = mini(shield_points, info.amount)
 		shield_points -= absorbed
@@ -78,7 +83,8 @@ func apply_damage(info: DamageInfo) -> bool:
 		shield_changed.emit(shield_points)
 		if info.amount <= 0:
 			return false
-	current_health = maxi(current_health - info.amount, 0)
+	var floor_health: int = 1 if status and status.has(StatusEffects.UNDYING) else 0
+	current_health = maxi(current_health - info.amount, mini(floor_health, current_health))
 	damaged.emit(info)
 	health_changed.emit(current_health, max_health)
 	if current_health == 0:

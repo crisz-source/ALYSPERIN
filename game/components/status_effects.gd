@@ -19,6 +19,12 @@ const POISON := &"poison"
 const STUN := &"stun"
 const FEAR := &"fear"
 const TAUNT := &"taunt"
+## Positivos (habilidades de proteção):
+const STANCE := &"stance"      ## defendendo: bloqueia por todos os lados, sem empurrão
+const PROTECT := &"protect"    ## recebe menos dano (strength = fração reduzida)
+const UNDYING := &"undying"    ## não cai abaixo de 1 de vida
+## Efeitos que o Milagre remove.
+const NEGATIVE: Array[StringName] = [&"slow", &"freeze", &"burn", &"poison", &"stun", &"fear"]
 
 ## Nome mostrado e cor de cada efeito.
 const INFO: Dictionary = {
@@ -29,6 +35,9 @@ const INFO: Dictionary = {
 	&"stun": ["Atordoado", Color(1.0, 0.9, 0.4)],
 	&"fear": ["Medo", Color(0.75, 0.5, 1.0)],
 	&"taunt": ["Provocado", Color(1.0, 0.45, 0.3)],
+	&"stance": ["Postura", Color(0.7, 0.85, 1.0)],
+	&"protect": ["Protegido", Color(0.6, 0.8, 1.0)],
+	&"undying": ["Inabalável", Color(1.0, 0.85, 0.4)],
 }
 ## Dano contínuo: um tique a cada TICK_INTERVAL segundos.
 const TICK_INTERVAL: float = 0.5
@@ -55,6 +64,8 @@ static func attach(owner_node: Node3D, owner_health: HealthComponent, height: fl
 	fx.name = "StatusEffects"
 	fx.health = owner_health
 	fx.text_height = height
+	if owner_health:
+		owner_health.status = fx
 	owner_node.add_child(fx)
 	return fx
 
@@ -100,6 +111,12 @@ func remove(id: StringName) -> void:
 		effect_ended.emit(id)
 
 
+## Remove os efeitos negativos (Milagre).
+func clear_negative() -> void:
+	for id: StringName in NEGATIVE:
+		remove(id)
+
+
 func clear_all() -> void:
 	for id: StringName in _effects.keys():
 		remove(id)
@@ -117,6 +134,11 @@ func active_ids() -> Array[StringName]:
 	var ids: Array[StringName] = []
 	ids.assign(_effects.keys())
 	return ids
+
+
+## Força de um efeito ativo (0 se não houver).
+func strength_of(id: StringName) -> float:
+	return float(_effects[id].strength) if _effects.has(id) else 0.0
 
 
 ## Multiplica a velocidade de movimento (congelado = parado).

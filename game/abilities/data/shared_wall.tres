@@ -1,12 +1,16 @@
-[gd_resource type="Resource" script_class="AbilityData" format=3]
+[gd_resource type="Resource" script_class="SupportSpellData" format=3]
 
-[ext_resource type="Script" path="res://game/abilities/ability_data.gd" id="1_2jg0p"]
+[ext_resource type="Script" path="res://game/abilities/support_spell_data.gd" id="1_2jg0p"]
 
 [resource]
 script = ExtResource("1_2jg0p")
+mechanic = 1
+effect_id = &"protect"
+strength = 0.3
 id = &"shared_wall"
 display_name = "Muralha compartilhada"
-description = "Aliados próximos recebem 30% menos dano por 6 s. (em desenvolvimento)"
-cooldown = 10.0
+description = "Você e aliados a até 8 m recebem 30% menos dano por 6 s."
+cooldown = 20.0
 unlock_level = 20
-icon_color = Color(0.45, 0.45, 0.5, 1)
+mana_cost = 15
+icon_color = Color(0.75, 0.85, 1, 1)

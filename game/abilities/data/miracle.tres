@@ -1,12 +1,16 @@
-[gd_resource type="Resource" script_class="AbilityData" format=3]
+[gd_resource type="Resource" script_class="SupportSpellData" format=3]
 
-[ext_resource type="Script" path="res://game/abilities/ability_data.gd" id="1_5psxl"]
+[ext_resource type="Script" path="res://game/abilities/support_spell_data.gd" id="1_5psxl"]
 
 [resource]
 script = ExtResource("1_5psxl")
+mechanic = 6
+duration = 0.0
+radius = 15.0
 id = &"miracle"
 display_name = "Milagre"
-description = "Cura total do grupo e remove efeitos negativos. (em desenvolvimento)"
-cooldown = 10.0
+description = "Cura total do grupo (15 m) e remove efeitos negativos."
+cooldown = 90.0
 unlock_level = 50
-icon_color = Color(0.45, 0.45, 0.5, 1)
+mana_cost = 40
+icon_color = Color(0.75, 0.85, 1, 1)

@@ -176,7 +176,7 @@ func _pose_ability(pose: Pose, t: float) -> void:
 	elif ability is ProjectileSpellData:
 		pose.right_rot = Vector3(-PI / 2.0, 0.0, 0.0)  # aponta para a frente
 		pose.right_pos = RIGHT_REST_POS + Vector3(-0.1, 0.2, -0.2)
-	elif ability is HealSpellData:
+	elif ability is HealSpellData or ability is SupportSpellData:
 		pose.right_pos = RIGHT_RAISED_POS
 		pose.right_rot = Vector3(-0.15, 0.0, 0.0)  # cajado erguido
 	if pose.spin != 0.0:

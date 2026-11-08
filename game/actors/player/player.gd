@@ -188,6 +188,9 @@ var _class_model: Node3D
 var _heal_selected: bool = false
 ## Efeitos de status ativos (lentidão, veneno...). Criado no _ready.
 var status: StatusEffects
+## Ressurreição (solo): revive a si mesmo uma vez (recarrega ao continuar/entrar em masmorra).
+var self_revive_available: bool = true
+var _support_target: Node3D = null
 var _swing_material: StandardMaterial3D
 var _shield_material: StandardMaterial3D
 
@@ -367,6 +370,8 @@ func respawn(at: Vector3) -> void:
 	mana.restore_full()
 	health.grant_invulnerability(respawn_invulnerability)
 	input_blocked = false
+	self_revive_available = true
+	status.clear_all()
 	_change_state(State.MOVE)
 
 
@@ -619,6 +624,14 @@ func _process_ability(delta: float) -> void:
 		if _state_time >= bash.duration:
 			_change_state(State.MOVE)
 		return
+	var support := _active_ability as SupportSpellData
+	if support:
+		if not _ability_fired and _state_time >= support.cast_time:
+			_ability_fired = true
+			_cast_support(support)
+		if _state_time >= support.cast_time + 0.1:
+			_change_state(State.MOVE)
+		return
 	if _active_ability is TauntData:
 		if _state_time >= 0.2:
 			_change_state(State.MOVE)
@@ -752,6 +765,12 @@ func _try_start_ability() -> bool:
 		return false
 	if _ability_cooldowns[slot] > 0.0:
 		return false
+	var support := ability as SupportSpellData
+	if support and support.mechanic == SupportSpellData.Mechanic.REVIVE:
+		_support_target = _fallen_ally(support.radius)
+		if _support_target == null:
+			_say("Nenhum aliado caído por perto.")
+			return false
 	if not mana.spend(ability.mana_cost):
 		FloatingText.spawn(self, "Sem mana", global_position + Vector3.UP * TEXT_HEIGHT, NO_MANA_COLOR)
 		return false
@@ -1058,8 +1077,10 @@ func _is_hit_blocked(info: DamageInfo) -> bool:
 	else:
 		from_direction = -flat(info.knockback).normalized()
 	var shield: ShieldData = equipment.shield_data()
+	# Postura inabalável: bloqueia por todos os lados.
+	var half_angle: float = 180.0 if status.has(StatusEffects.STANCE) else shield.block_half_angle
 	var in_front: bool = from_direction == Vector3.ZERO \
-		or _block_direction.angle_to(from_direction) <= deg_to_rad(shield.block_half_angle)
+		or _block_direction.angle_to(from_direction) <= deg_to_rad(half_angle)
 	if not in_front:
 		return false
 	# Escudo quebrado ainda segura parte do golpe: o dano passa reduzido.
@@ -1070,7 +1091,7 @@ func _is_hit_blocked(info: DamageInfo) -> bool:
 
 
 func _on_blocked(info: DamageInfo) -> void:
-	velocity = info.knockback * equipment.shield_data().knockback_multiplier
+	velocity = Vector3.ZERO if status.has(StatusEffects.STANCE) else info.knockback * equipment.shield_data().knockback_multiplier
 	if equipment.shield.wear(1):
 		FloatingText.spawn(self, "Escudo quebrou!", global_position + Vector3.UP * TEXT_HEIGHT, BROKEN_COLOR)
 	# Passivo Muralha: bloquear dá Firmeza (menos dano por alguns segundos).
@@ -1139,10 +1160,92 @@ func _on_damaged(info: DamageInfo) -> void:
 
 
 func _on_died() -> void:
+	if _can_self_revive():
+		self_revive_available = false
+		health.revive()
+		health.current_health = maxi(health.max_health / 2, 1)
+		health.health_changed.emit(health.current_health, health.max_health)
+		health.grant_invulnerability(1.5)
+		FloatingText.spawn(self, "Ressurreição!", global_position + Vector3.UP * (TEXT_HEIGHT + 0.4), Color(1.0, 0.95, 0.6))
+		_change_state(State.MOVE)
+		return
 	_flash_time = 0.0
 	_camera.shake(5.0, 0.25)
 	_change_state(State.DEAD)
 	died.emit()
+
+
+# --- Habilidades de suporte -------------------------------------------------
+
+## Você e os aliados vivos a até `radius` m de `center` (aliados de teste e outros jogadores).
+func group_members(radius: float, center: Vector3) -> Array[Node3D]:
+	var members: Array[Node3D] = []
+	for group: StringName in [GROUP, AllyDummy.GROUP]:
+		for node: Node in get_tree().get_nodes_in_group(group):
+			var n := node as Node3D
+			var hp: HealthComponent = n.get("health") if n else null
+			if hp and not hp.is_dead and not members.has(n) and n.global_position.distance_to(center) <= radius:
+				members.append(n)
+	return members
+
+
+func _fallen_ally(radius: float) -> Node3D:
+	var best: Node3D = null
+	for node: Node in get_tree().get_nodes_in_group(AllyDummy.GROUP) + get_tree().get_nodes_in_group(GROUP):
+		var n := node as Node3D
+		var hp: HealthComponent = n.get("health") if n and n != self else null
+		if hp and hp.is_dead and n.global_position.distance_to(global_position) <= radius \
+				and (best == null or n.global_position.distance_to(global_position) < best.global_position.distance_to(global_position)):
+			best = n
+	return best
+
+
+func _can_self_revive() -> bool:
+	if not self_revive_available:
+		return false
+	for a: AbilityData in abilities:
+		var s := a as SupportSpellData
+		if s and s.mechanic == SupportSpellData.Mechanic.REVIVE and stats.level >= s.unlock_level:
+			return true
+	return false
+
+
+func _cast_support(s: SupportSpellData) -> void:
+	var text_at: Vector3 = global_position + Vector3.UP * (TEXT_HEIGHT + 0.4)
+	match s.mechanic:
+		SupportSpellData.Mechanic.SELF_EFFECT:
+			status.apply(s.effect_id, s.duration, s.strength, self)
+		SupportSpellData.Mechanic.GROUP_EFFECT:
+			for m: Node3D in group_members(s.radius, global_position):
+				var fx: StatusEffects = m.get("status")
+				if fx:
+					fx.apply(s.effect_id, s.duration, s.strength, self)
+		SupportSpellData.Mechanic.DOME:
+			SupportZone.spawn(self, SupportZone.Kind.DOME, s.radius, s.duration, 0, s.strength)
+		SupportSpellData.Mechanic.ALLY_SHIELD:
+			var target: Node3D = ally_in_crosshair()
+			if target == null:
+				target = self
+			(target.get("health") as HealthComponent).add_shield(s.amount)
+			FloatingText.spawn(self, "Escudo +%d" % s.amount, target.global_position + Vector3.UP * (TEXT_HEIGHT + 0.3), Color(1.0, 0.95, 0.6))
+		SupportSpellData.Mechanic.HEAL_ZONE:
+			SupportZone.spawn(self, SupportZone.Kind.HEAL, s.radius, s.duration, s.amount)
+		SupportSpellData.Mechanic.REVIVE:
+			if is_instance_valid(_support_target):
+				var hp: HealthComponent = _support_target.get("health")
+				hp.revive()
+				hp.current_health = maxi(hp.max_health * s.amount / 100, 1)
+				hp.health_changed.emit(hp.current_health, hp.max_health)
+				FloatingText.spawn(self, "Levantou!", _support_target.global_position + Vector3.UP * (TEXT_HEIGHT + 0.3), Color(1.0, 0.95, 0.6))
+			_support_target = null
+		SupportSpellData.Mechanic.GROUP_HEAL:
+			for m: Node3D in group_members(s.radius, global_position):
+				var hp: HealthComponent = m.get("health")
+				hp.heal(hp.max_health)
+				var fx: StatusEffects = m.get("status")
+				if fx:
+					fx.clear_negative()
+			FloatingText.spawn(self, "Milagre!", text_at, Color(1.0, 0.95, 0.6))
 
 
 # --- Auxiliares ------------------------------------------------------------
