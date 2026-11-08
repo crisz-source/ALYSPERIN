@@ -186,6 +186,8 @@ var _tint_material: StandardMaterial3D
 var _body: Node3D
 var _class_model: Node3D
 var _heal_selected: bool = false
+## Efeitos de status ativos (lentidão, veneno...). Criado no _ready.
+var status: StatusEffects
 var _swing_material: StandardMaterial3D
 var _shield_material: StandardMaterial3D
 
@@ -253,6 +255,7 @@ func _ready() -> void:
 	hotbar_items.resize(PlayerInput.ABILITY_SLOTS)
 	_spin_hitbox.hit_landed.connect(_on_ability_hit)
 	_spin_visual.visible = false
+	status = StatusEffects.attach(self, health, TEXT_HEIGHT + 0.25)
 	_set_facing(facing)
 
 
@@ -273,6 +276,35 @@ func _physics_process(delta: float) -> void:
 	# A lógica trabalha só no chão; a altura é tratada pela gravidade no fim.
 	var vertical: float = velocity.y
 	velocity.y = 0.0
+	if state == State.DEAD or not _process_status_control(delta):
+		_process_state(delta)
+	velocity.y = vertical - GRAVITY * delta if not is_on_floor() else minf(vertical, 0.0)
+	move_and_slide()
+	_update_visuals(delta)
+
+
+## Congelado/atordoado: não age. Com medo: foge de quem assustou, sem agir.
+## Devolve true quando o efeito tomou o controle neste quadro.
+func _process_status_control(delta: float) -> bool:
+	var scared_of: Node3D = status.fear_source()
+	if not status.is_disabled() and scared_of == null:
+		return false
+	cancel_heal_targeting()
+	if state != State.MOVE:
+		_change_state(State.MOVE)
+	_input.clear()
+	if status.is_disabled():
+		velocity = velocity.move_toward(Vector3.ZERO, friction * delta)
+		return true
+	var away: Vector3 = flat(global_position - scared_of.global_position)
+	if away.length() < 0.01:
+		away = -facing
+	_apply_movement(away.normalized(), max_speed * 0.8, delta)
+	_set_facing(away)
+	return true
+
+
+func _process_state(delta: float) -> void:
 	match state:
 		State.MOVE:
 			_process_move(delta)
@@ -288,9 +320,6 @@ func _physics_process(delta: float) -> void:
 			_process_ability(delta)
 		State.DEAD:
 			velocity = velocity.move_toward(Vector3.ZERO, friction * delta)
-	velocity.y = vertical - GRAVITY * delta if not is_on_floor() else minf(vertical, 0.0)
-	move_and_slide()
-	_update_visuals(delta)
 
 
 # --- Leitura para a animação (PlayerAnimator) -------------------------------
@@ -1093,6 +1122,10 @@ func _on_sword_hit(target: Hurtbox) -> void:
 
 
 func _on_damaged(info: DamageInfo) -> void:
+	if info.over_time:
+		# Queimadura/veneno: só o número, sem interromper nem empurrar.
+		FloatingText.spawn(self, str(info.amount), global_position + Vector3.UP * (TEXT_HEIGHT + 0.3), Color(0.85, 0.6, 0.3), 8)
+		return
 	cancel_heal_targeting()
 	if health.is_dead:
 		return
@@ -1200,6 +1233,7 @@ func _update_block_direction() -> void:
 
 
 func _apply_movement(direction: Vector3, speed: float, delta: float) -> void:
+	speed *= status.speed_multiplier()
 	if direction != Vector3.ZERO:
 		velocity = velocity.move_toward(direction * speed, acceleration * delta)
 	else:
@@ -1227,7 +1261,7 @@ func _update_visuals(delta: float) -> void:
 	elif _heal_selected:
 		_tint_material.albedo_color = TINT_HEAL_SELECTED
 	else:
-		_tint_material.albedo_color = TINT_NONE
+		_tint_material.albedo_color = status.tint()
 	if health.is_invulnerable() and state != State.DODGE:
 		# Pisca enquanto invulnerável após dano (alterna a cada 1/15 s).
 		_blink_clock += delta

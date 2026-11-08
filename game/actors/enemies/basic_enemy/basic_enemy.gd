@@ -97,6 +97,8 @@ var _stagger_duration: float = 0.0
 var _taunted_by: Player = null
 var _taunt_left: float = 0.0
 var _telegraph_material: StandardMaterial3D
+## Efeitos de status ativos. Criado no _ready.
+var status: StatusEffects
 
 @onready var health: HealthComponent = $HealthComponent
 @onready var _hitbox: Hitbox = $LungeHitbox
@@ -123,6 +125,8 @@ func _ready() -> void:
 	_spawn_position = global_position
 	health.damage_modifier = _apply_backstab
 	_build_telegraph()
+	status = StatusEffects.attach(self, health, TEXT_HEIGHT + 0.35)
+	status.effect_started.connect(_on_status_started)
 
 
 func _physics_process(delta: float) -> void:
@@ -132,6 +136,23 @@ func _physics_process(delta: float) -> void:
 		target = _taunted_by
 	var vertical: float = velocity.y
 	velocity.y = 0.0
+	var scared_of: Node3D = status.fear_source()
+	if scared_of and state != State.DEAD and state != State.STAGGER:
+		# Medo: foge de quem assustou e não ataca.
+		if state != State.CHASE:
+			_change_state(State.CHASE)
+		var away: Vector3 = _flat(global_position - scared_of.global_position).normalized()
+		velocity = velocity.move_toward(away * move_speed * status.speed_multiplier(), acceleration * delta)
+		facing = away if away != Vector3.ZERO else facing
+	else:
+		_process_state(delta)
+	_update_facing()
+	velocity.y = vertical - GRAVITY * delta if not is_on_floor() else minf(vertical, 0.0)
+	move_and_slide()
+	_update_visuals(delta)
+
+
+func _process_state(delta: float) -> void:
 	match state:
 		State.IDLE:
 			velocity = velocity.move_toward(Vector3.ZERO, friction * delta)
@@ -148,7 +169,7 @@ func _physics_process(delta: float) -> void:
 			if _state_time >= windup_time:
 				_start_lunge()
 		State.LUNGE:
-			velocity = _lunge_direction * lunge_speed
+			velocity = _lunge_direction * lunge_speed * status.speed_multiplier()
 			if _state_time >= lunge_time:
 				_change_state(State.RECOVER)
 		State.RECOVER:
@@ -169,10 +190,6 @@ func _physics_process(delta: float) -> void:
 			_model.scale = Vector3(1.0, 1.0 - 0.9 * t, 1.0)
 			if _state_time >= death_fade_time:
 				queue_free()
-	_update_facing()
-	velocity.y = vertical - GRAVITY * delta if not is_on_floor() else minf(vertical, 0.0)
-	move_and_slide()
-	_update_visuals(delta)
 
 
 ## Vira para o alvo enquanto persegue/prepara; na investida, para a direção dela.
@@ -214,7 +231,7 @@ func _process_chase(delta: float) -> void:
 		_change_state(State.WINDUP)
 		_aim_at_target()
 		return
-	velocity = velocity.move_toward(to_target.normalized() * move_speed, acceleration * delta)
+	velocity = velocity.move_toward(to_target.normalized() * move_speed * status.speed_multiplier(), acceleration * delta)
 
 
 ## Atordoa por `seconds` (não age; costas expostas). Golpe de escudo, bloqueio.
@@ -223,6 +240,7 @@ func apply_stun(seconds: float) -> void:
 		return
 	_stagger_duration = seconds
 	_change_state(State.STAGGER)
+	status.apply(StatusEffects.STUN, seconds)
 
 
 ## Provocado: passa a atacar `by` por `seconds`, mesmo longe ou fora de visão.
@@ -231,6 +249,7 @@ func apply_taunt(by: Player, seconds: float) -> void:
 		return
 	_taunted_by = by
 	_taunt_left = seconds
+	status.apply(StatusEffects.TAUNT, seconds, 0.0, by)
 	target = by
 	if state == State.IDLE:
 		_change_state(State.CHASE)
@@ -330,6 +349,9 @@ func _is_valid_target(candidate: Player) -> bool:
 func _on_damaged(info: DamageInfo) -> void:
 	if health.is_dead:
 		return
+	if info.over_time:
+		_show_damage_number(info)
+		return
 	velocity = info.knockback
 	_flash_time = 0.08
 	_show_damage_number(info)
@@ -392,15 +414,23 @@ func _update_visuals(delta: float) -> void:
 		_body_material.albedo_color = Color.WHITE
 		_body.scale = Vector3.ONE
 	elif state == State.STAGGER:
-		_body_material.albedo_color = STAGGER_COLOR
+		_body_material.albedo_color = STAGGER_COLOR.lerp(Color(0.55, 0.85, 1.0), 0.7) if status.has(StatusEffects.FREEZE) else STAGGER_COLOR
 		_body.scale = Vector3.ONE
 	elif state == State.WINDUP:
 		_body_material.albedo_color = WINDUP_COLOR
 		var pulse: float = 1.0 + 0.15 * sin(_state_time * 30.0)
 		_body.scale = Vector3(pulse, pulse, pulse)
 	else:
-		_body_material.albedo_color = BODY_COLOR
+		var fx: Color = status.tint()
+		_body_material.albedo_color = BODY_COLOR.lerp(Color(fx.r, fx.g, fx.b), fx.a)
 		_body.scale = Vector3.ONE
+
+
+## Congelar para o inimigo como um atordoamento (costas expostas), com cor azul.
+func _on_status_started(id: StringName) -> void:
+	if id == StatusEffects.FREEZE and not health.is_dead:
+		_stagger_duration = status.remaining(StatusEffects.FREEZE)
+		_change_state(State.STAGGER)
 
 
 static func _flat(v: Vector3) -> Vector3:

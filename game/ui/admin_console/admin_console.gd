@@ -7,9 +7,21 @@ extends CanvasLayer
 ##   /add players N  -> N aliados de teste (feridos) perto do jogador
 ##   /add mob N      -> N monstros em volta do jogador
 ##   /boss           -> chama o chefe (quando existir)
+##   /efeito NOME    -> efeito de status nos monstros próximos (com "eu": em você)
 ##   /help           -> lista os comandos
 
-const HELP_TEXT := "Comandos: /add players N | /add mob N | /boss | /help"
+const HELP_TEXT := "Comandos: /add players N | /add mob N | /boss | /efeito NOME [eu] | /help"
+## /efeito: nome em português -> [id, duração (s), força].
+const EFFECTS: Dictionary = {
+	"lento": [&"slow", 6.0, 0.5],
+	"congelar": [&"freeze", 3.0, 0.0],
+	"queimar": [&"burn", 6.0, 6.0],
+	"veneno": [&"poison", 8.0, 4.0],
+	"atordoar": [&"stun", 2.0, 0.0],
+	"medo": [&"fear", 3.0, 0.0],
+}
+## Alcance do /efeito nos monstros (m).
+const EFFECT_RADIUS: float = 15.0
 
 var is_open: bool = false
 var _area: GameArea
@@ -76,6 +88,8 @@ func execute(command: String) -> String:
 		reply = HELP_TEXT
 	elif parts[0] == "/boss":
 		reply = "Nenhum chefe implementado ainda. (Quando Khar'Vesh existir, /boss o chamará.)"
+	elif parts[0] == "/efeito":
+		reply = _apply_effect(parts)
 	elif parts[0] == "/add" and parts.size() >= 2 and (parts[1] == "players" or parts[1] == "player" or parts[1] == "mob" or parts[1] == "mobs"):
 		var count: int = parts[2].to_int() if parts.size() >= 3 and parts[2].is_valid_int() else 1
 		if count <= 0:
@@ -93,6 +107,38 @@ func execute(command: String) -> String:
 	if not reply.is_empty():
 		_area.player.message_requested.emit(reply)
 	return reply
+
+
+## /efeito NOME [eu]: aplica nos monstros próximos (ou em você, com "eu").
+func _apply_effect(parts: PackedStringArray) -> String:
+	var names: String = ", ".join(PackedStringArray(EFFECTS.keys()))
+	if parts.size() < 2 or not EFFECTS.has(parts[1]):
+		return "Use /efeito NOME [eu]. Nomes: %s" % names
+	var spec: Array = EFFECTS[parts[1]]
+	var player: Player = _area.player
+	if parts.size() >= 3 and parts[2] == "eu":
+		# Medo em si mesmo precisa de alguém de quem fugir: o monstro mais próximo.
+		var source: Node3D = _nearest_enemy(player.global_position) if spec[0] == &"fear" else null
+		if spec[0] == &"fear" and source == null:
+			return "Medo precisa de um monstro por perto (de quem fugir)."
+		player.status.apply(spec[0], spec[1], spec[2], source)
+		return "Efeito %s em você por %d s." % [parts[1], int(spec[1])]
+	var count: int = 0
+	for node: Node in _area.get_tree().get_nodes_in_group(BasicEnemy.GROUP):
+		var enemy := node as BasicEnemy
+		if enemy and not enemy.health.is_dead and enemy.global_position.distance_to(player.global_position) <= EFFECT_RADIUS:
+			enemy.status.apply(spec[0], spec[1], spec[2], player)
+			count += 1
+	return "Efeito %s em %d monstro(s) a até %d m." % [parts[1], count, int(EFFECT_RADIUS)]
+
+
+func _nearest_enemy(from: Vector3) -> Node3D:
+	var best: Node3D = null
+	for node: Node in _area.get_tree().get_nodes_in_group(BasicEnemy.GROUP):
+		var enemy := node as BasicEnemy
+		if enemy and not enemy.health.is_dead and (best == null or enemy.global_position.distance_to(from) < best.global_position.distance_to(from)):
+			best = enemy
+	return best
 
 
 func _on_submitted(text: String) -> void:

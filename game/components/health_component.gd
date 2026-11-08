@@ -62,10 +62,10 @@ func set_invulnerable(value: bool) -> void:
 func apply_damage(info: DamageInfo) -> bool:
 	if is_dead or info.amount <= 0:
 		return false
-	if is_invulnerable():
+	if is_invulnerable() and not info.over_time:
 		hit_ignored.emit(info)
 		return false
-	if block_filter.is_valid() and block_filter.call(info):
+	if not info.over_time and block_filter.is_valid() and block_filter.call(info):
 		info.blocked = true
 		blocked.emit(info)
 		return false

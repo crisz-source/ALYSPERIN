@@ -16,6 +16,12 @@ var source: Node = null
 var blocked: bool = false
 ## Marcado quando o golpe acertou pelas costas (dano maior).
 var backstab: bool = false
+## Dano contínuo (queimadura, veneno): não é bloqueado, ignora invulnerabilidade,
+## não empurra e não interrompe quem apanha.
+var over_time: bool = false
+## Elemento do golpe (&"fire", &"ice", &"lightning", &"earth", &"light", &"dark")
+## ou vazio = físico neutro. Chefes usam para fraquezas/resistências.
+var element: StringName = &""
 
 
 func _init(p_amount: int = 0, p_knockback: Vector3 = Vector3.ZERO, p_source: Node = null) -> void:
