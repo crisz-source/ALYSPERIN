@@ -48,3 +48,15 @@ o mouse gera); vários jogadores de verdade (co-op).
 - [ ] Decidir: a Luz curativa deve poder curar o próprio Sacerdote? (ex.: tecla de novo sem ninguém selecionado cura a si)
 - [ ] Grupo de verdade (quadro com a vida dos membros) — com o co-op
 - [ ] /boss quando o primeiro chefe existir
+
+## Ajuste: selecionar passando a mira; tela cheia 1920x1080
+- Pedido: "eu quero apenas passar a mira nos aliados" e "que o jogo rode a 1920x1080".
+  Perguntado (duas leituras possíveis); proprietário escolheu: **passar a mira seleciona**
+  (fica verde, sem clicar) e **Espaço cura**; **tela cheia 1920x1080 mantendo o visual pixel**.
+- Cura: aliado sob a mira é marcado automaticamente; passar de novo não desmarca; clique
+  não ataca no modo de cura. Mensagem: "Passe a mira nos aliados para selecionar".
+- Tela: `window_width/height_override` 1920x1080, modo tela cheia; desenho interno segue
+  640x360 (escala inteira 3x). Medido na janela real: janela (1920,1080), tela cheia,
+  viewport (640,360), escala 3,0.
+- Testes: `test3d_heal.gd` 28/28 (seleção por mira, não desmarca, clique não ataca); demais
+  10 suítes passando.

@@ -36,6 +36,7 @@ conhecidos. Detalhes técnicos de cada etapa ficam em `documentation/worklog/`.
 | 2026-11-07 | Etapa A reduzida a 2 classes por enquanto: Guardião (tanque, Bastião) e Devoto (cura, Sacerdote) |
 | 2026-11-07 | Luz curativa com seleção de aliados (mira de cura, vários alvos, Espaço confirma, 15 de mana por aliado); animação de nível 4 s |
 | 2026-11-07 | Ferramentas de teste: menu (P) e console de administrador (Enter: /add players N, /add mob N, /boss, /help) |
+| 2026-11-07 | Luz curativa: passar a mira seleciona (sem clicar), Espaço cura. Jogo em tela cheia 1920x1080 (visual pixel: 640x360 x3) |
 | 2026-11-07 | Chefes aprovados; Fúria aos 70%, 50% e 20% de vida; óleos de arma aprovados |
 | 2026-11-07 | ~~Morrer recomeça a área do zero~~ → substituído: morrer mostra "Você morreu!" / "Deseja continuar?"; Sim volta ao último ponto de descanso mantendo itens e experiência |
 

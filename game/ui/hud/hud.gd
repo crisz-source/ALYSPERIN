@@ -235,7 +235,7 @@ func _update_crosshair() -> void:
 	_heal_hint.visible = healing and _crosshair.visible
 	if _heal_hint.visible:
 		var count: int = _player.heal_selection().size()
-		_heal_hint.text = "Clique em um aliado para selecionar  (botão direito cancela)" if count == 0 \
+		_heal_hint.text = "Passe a mira nos aliados para selecionar  (botão direito cancela)" if count == 0 \
 			else "Aperte Espaço para curar  (%d selecionado%s)" % [count, "" if count == 1 else "s"]
 
 

@@ -802,8 +802,9 @@ func _start_heal_targeting(ability: HealSpellData, slot: int) -> void:
 	_heal_slot = slot
 
 
-## Durante a seleção: clique marca/desmarca o aliado na mira, Espaço cura os
-## marcados, botão direito cancela. Devolve true se usou o comando do quadro.
+## Durante a seleção: passar a mira por um aliado já o marca (fica esverdeado;
+## sem clicar), Espaço cura os marcados, botão direito cancela. Clique não ataca
+## nesse modo. Devolve true se usou o comando do quadro.
 func _process_heal_targeting() -> bool:
 	if input_blocked:
 		cancel_heal_targeting()
@@ -811,11 +812,11 @@ func _process_heal_targeting() -> bool:
 	if _input.defend_held:
 		cancel_heal_targeting()
 		return true
+	var ally: Node3D = ally_in_crosshair()
+	if ally and not _heal_selection.has(ally):
+		_toggle_heal_selection(ally)
 	if _input.has_attack():
 		_input.consume_attack()
-		var ally: Node3D = ally_in_crosshair()
-		if ally:
-			_toggle_heal_selection(ally)
 		return true
 	if _input.has_dodge():
 		_input.consume_dodge()

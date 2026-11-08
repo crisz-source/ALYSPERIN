@@ -1,7 +1,7 @@
 class_name HealSpellData
 extends AbilityData
 ## Magia de cura. Com `requires_target`, abre o modo de seleção: o jogador
-## clica em um ou mais aliados (ficam esverdeados) e confirma com Espaço.
+## passa a mira em um ou mais aliados (ficam esverdeados) e confirma com Espaço.
 ## Sem isso, cura quem conjurou.
 
 @export var heal_amount: int = 30
