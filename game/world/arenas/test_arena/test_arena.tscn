@@ -1,145 +1,285 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://game/world/arenas/test_arena/test_arena.gd" id="1_rgs4t"]
-[ext_resource type="PackedScene" path="res://game/actors/enemies/basic_enemy/basic_enemy.tscn" id="2_w5yd4"]
-[ext_resource type="Script" path="res://game/world/arenas/test_arena/ground_placeholder.gd" id="3_runn2"]
-[ext_resource type="PackedScene" path="res://game/actors/player/player.tscn" id="4_ljlan"]
-[ext_resource type="PackedScene" path="res://game/ui/hud/hud.tscn" id="5_xit53"]
-[ext_resource type="PackedScene" path="res://game/ui/inventory/inventory_screen.tscn" id="6_cktml"]
-[ext_resource type="PackedScene" path="res://game/ui/death_screen/death_screen.tscn" id="7_te1sv"]
-[ext_resource type="PackedScene" path="res://game/ui/dialogue/dialogue_box.tscn" id="8_t0jte"]
+[ext_resource type="Script" path="res://game/world/arenas/test_arena/test_arena.gd" id="1_274wh"]
+[ext_resource type="PackedScene" path="res://game/actors/enemies/basic_enemy/basic_enemy.tscn" id="2_rgs4t"]
+[ext_resource type="PackedScene" path="res://game/actors/player/player.tscn" id="3_w5yd4"]
+[ext_resource type="PackedScene" path="res://game/ui/hud/hud.tscn" id="4_runn2"]
+[ext_resource type="PackedScene" path="res://game/ui/inventory/inventory_screen.tscn" id="5_ljlan"]
+[ext_resource type="PackedScene" path="res://game/ui/death_screen/death_screen.tscn" id="6_xit53"]
+[ext_resource type="PackedScene" path="res://game/ui/dialogue/dialogue_box.tscn" id="7_cktml"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_dl5pp"]
-size = Vector2(1024, 16)
+[sub_resource type="Environment" id="Environment_te1sv"]
+background_mode = 1
+background_color = Color(0.04, 0.035, 0.05, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.35, 0.33, 0.42, 1)
+ambient_light_energy = 0.6
+fog_enabled = true
+fog_light_color = Color(0.08, 0.07, 0.1, 1)
+fog_density = 0.03
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_81t7n"]
-size = Vector2(1024, 16)
+[sub_resource type="BoxShape3D" id="BoxShape3D_t0jte"]
+size = Vector3(64, 1, 36)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_fh8n2"]
-size = Vector2(16, 576)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dl5pp"]
+albedo_color = Color(0.22, 0.21, 0.24, 1)
+roughness = 0.9
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_coo2h"]
-size = Vector2(16, 576)
+[sub_resource type="BoxMesh" id="BoxMesh_81t7n"]
+size = Vector3(64, 1, 36)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_b8noy"]
-size = Vector2(32, 16)
+[sub_resource type="BoxShape3D" id="BoxShape3D_fh8n2"]
+size = Vector3(64, 3, 1)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_8y6xv"]
-size = Vector2(32, 16)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_coo2h"]
+albedo_color = Color(0.42, 0.36, 0.3, 1)
+roughness = 0.9
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_gn34f"]
-size = Vector2(32, 16)
+[sub_resource type="BoxMesh" id="BoxMesh_b8noy"]
+size = Vector3(64, 3, 1)
 
-[node name="TestArena" type="Node2D" unique_id=1037404751]
-script = ExtResource("1_rgs4t")
-enemy_scene = ExtResource("2_w5yd4")
+[sub_resource type="BoxShape3D" id="BoxShape3D_8y6xv"]
+size = Vector3(64, 3, 1)
 
-[node name="GroundPlaceholder" type="Node2D" parent="." unique_id=1977317611]
-script = ExtResource("3_runn2")
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gn34f"]
+albedo_color = Color(0.42, 0.36, 0.3, 1)
+roughness = 0.9
 
-[node name="Walls" type="StaticBody2D" parent="." unique_id=1538987944]
+[sub_resource type="BoxMesh" id="BoxMesh_siwcr"]
+size = Vector3(64, 3, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_bd05w"]
+size = Vector3(1, 3, 36)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jdxi1"]
+albedo_color = Color(0.42, 0.36, 0.3, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_gs3e3"]
+size = Vector3(1, 3, 36)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_cwm8m"]
+size = Vector3(1, 3, 36)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gjgif"]
+albedo_color = Color(0.42, 0.36, 0.3, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_07bpl"]
+size = Vector3(1, 3, 36)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_l0aoe"]
+size = Vector3(2, 3, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_y2w8t"]
+albedo_color = Color(0.5, 0.45, 0.4, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_3574f"]
+size = Vector3(2, 3, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gukns"]
+albedo_color = Color(1, 0.55, 0.2, 1)
+roughness = 0.9
+emission_enabled = true
+emission = Color(1, 0.55, 0.2, 1)
+emission_energy_multiplier = 3.0
+
+[sub_resource type="BoxMesh" id="BoxMesh_ehnev"]
+size = Vector3(0.15, 0.3, 0.15)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ks7xy"]
+size = Vector3(2, 3, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2fedx"]
+albedo_color = Color(0.5, 0.45, 0.4, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_2u8xy"]
+size = Vector3(2, 3, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_m58f6"]
+albedo_color = Color(1, 0.55, 0.2, 1)
+roughness = 0.9
+emission_enabled = true
+emission = Color(1, 0.55, 0.2, 1)
+emission_energy_multiplier = 3.0
+
+[sub_resource type="BoxMesh" id="BoxMesh_jmcuw"]
+size = Vector3(0.15, 0.3, 0.15)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_68lce"]
+size = Vector3(2, 3, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ldmyt"]
+albedo_color = Color(0.5, 0.45, 0.4, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_nu8xe"]
+size = Vector3(2, 3, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_p4u0q"]
+albedo_color = Color(1, 0.55, 0.2, 1)
+roughness = 0.9
+emission_enabled = true
+emission = Color(1, 0.55, 0.2, 1)
+emission_energy_multiplier = 3.0
+
+[sub_resource type="BoxMesh" id="BoxMesh_tnl37"]
+size = Vector3(0.15, 0.3, 0.15)
+
+[node name="TestArena" type="Node3D" unique_id=1073215751]
+script = ExtResource("1_274wh")
+enemy_scene = ExtResource("2_rgs4t")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1978396475]
+environment = SubResource("Environment_te1sv")
+
+[node name="MoonLight" type="DirectionalLight3D" parent="." unique_id=1538919530]
+transform = Transform3D(0.8660254, 0.40957603, -0.28678823, 0, 0.57357645, 0.81915206, 0.5, -0.7094065, 0.49673176, 0, 0, 0)
+light_color = Color(0.6, 0.65, 0.85, 1)
+light_energy = 0.5
+shadow_enabled = true
+
+[node name="Level" type="Node3D" parent="." unique_id=1570729813]
+
+[node name="Floor" type="StaticBody3D" parent="Level" unique_id=991675019]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32, -0.5, 18)
 collision_mask = 0
 
-[node name="TopShape" type="CollisionShape2D" parent="Walls" unique_id=1729968795]
-position = Vector2(512, 8)
-shape = SubResource("RectangleShape2D_dl5pp")
+[node name="CollisionShape" type="CollisionShape3D" parent="Level/Floor" unique_id=388240738]
+shape = SubResource("BoxShape3D_t0jte")
 
-[node name="TopPlaceholder" type="ColorRect" parent="Walls" unique_id=1621147925]
-offset_right = 1024.0
-offset_bottom = 16.0
-color = Color(0.42, 0.36, 0.3, 1)
+[node name="Visual" type="MeshInstance3D" parent="Level/Floor" unique_id=2035074908]
+material_override = SubResource("StandardMaterial3D_dl5pp")
+mesh = SubResource("BoxMesh_81t7n")
 
-[node name="BottomShape" type="CollisionShape2D" parent="Walls" unique_id=328663858]
-position = Vector2(512, 568)
-shape = SubResource("RectangleShape2D_81t7n")
-
-[node name="BottomPlaceholder" type="ColorRect" parent="Walls" unique_id=620906216]
-offset_top = 560.0
-offset_right = 1024.0
-offset_bottom = 576.0
-color = Color(0.42, 0.36, 0.3, 1)
-
-[node name="LeftShape" type="CollisionShape2D" parent="Walls" unique_id=835505538]
-position = Vector2(8, 288)
-shape = SubResource("RectangleShape2D_fh8n2")
-
-[node name="LeftPlaceholder" type="ColorRect" parent="Walls" unique_id=366897183]
-offset_right = 16.0
-offset_bottom = 576.0
-color = Color(0.42, 0.36, 0.3, 1)
-
-[node name="RightShape" type="CollisionShape2D" parent="Walls" unique_id=852283729]
-position = Vector2(1016, 288)
-shape = SubResource("RectangleShape2D_coo2h")
-
-[node name="RightPlaceholder" type="ColorRect" parent="Walls" unique_id=1664195771]
-offset_left = 1008.0
-offset_right = 1024.0
-offset_bottom = 576.0
-color = Color(0.42, 0.36, 0.3, 1)
-
-[node name="Entities" type="Node2D" parent="." unique_id=702074270]
-y_sort_enabled = true
-
-[node name="PillarPlaceholder1" type="StaticBody2D" parent="Entities" unique_id=1718741521]
-position = Vector2(352, 200)
+[node name="WallNorth" type="StaticBody3D" parent="Level" unique_id=325316277]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32, 1.5, 0.5)
 collision_mask = 0
 
-[node name="CollisionShape" type="CollisionShape2D" parent="Entities/PillarPlaceholder1" unique_id=322526182]
-position = Vector2(0, -8)
-shape = SubResource("RectangleShape2D_b8noy")
+[node name="CollisionShape" type="CollisionShape3D" parent="Level/WallNorth" unique_id=1016781328]
+shape = SubResource("BoxShape3D_fh8n2")
 
-[node name="Visual" type="ColorRect" parent="Entities/PillarPlaceholder1" unique_id=1113118357]
-offset_left = -16.0
-offset_top = -48.0
-offset_right = 16.0
-color = Color(0.5, 0.45, 0.4, 1)
+[node name="Visual" type="MeshInstance3D" parent="Level/WallNorth" unique_id=1113607412]
+material_override = SubResource("StandardMaterial3D_coo2h")
+mesh = SubResource("BoxMesh_b8noy")
 
-[node name="PillarPlaceholder2" type="StaticBody2D" parent="Entities" unique_id=207955127]
-position = Vector2(672, 200)
+[node name="WallSouth" type="StaticBody3D" parent="Level" unique_id=1137479728]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32, 1.5, 35.5)
 collision_mask = 0
 
-[node name="CollisionShape" type="CollisionShape2D" parent="Entities/PillarPlaceholder2" unique_id=2141091935]
-position = Vector2(0, -8)
-shape = SubResource("RectangleShape2D_8y6xv")
+[node name="CollisionShape" type="CollisionShape3D" parent="Level/WallSouth" unique_id=510695838]
+shape = SubResource("BoxShape3D_8y6xv")
 
-[node name="Visual" type="ColorRect" parent="Entities/PillarPlaceholder2" unique_id=379536061]
-offset_left = -16.0
-offset_top = -48.0
-offset_right = 16.0
-color = Color(0.5, 0.45, 0.4, 1)
+[node name="Visual" type="MeshInstance3D" parent="Level/WallSouth" unique_id=1238157714]
+material_override = SubResource("StandardMaterial3D_gn34f")
+mesh = SubResource("BoxMesh_siwcr")
 
-[node name="PillarPlaceholder3" type="StaticBody2D" parent="Entities" unique_id=353981885]
-position = Vector2(512, 420)
+[node name="WallWest" type="StaticBody3D" parent="Level" unique_id=730309325]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 1.5, 18)
 collision_mask = 0
 
-[node name="CollisionShape" type="CollisionShape2D" parent="Entities/PillarPlaceholder3" unique_id=238456881]
-position = Vector2(0, -8)
-shape = SubResource("RectangleShape2D_gn34f")
+[node name="CollisionShape" type="CollisionShape3D" parent="Level/WallWest" unique_id=1236257261]
+shape = SubResource("BoxShape3D_bd05w")
 
-[node name="Visual" type="ColorRect" parent="Entities/PillarPlaceholder3" unique_id=155599542]
-offset_left = -16.0
-offset_top = -48.0
-offset_right = 16.0
-color = Color(0.5, 0.45, 0.4, 1)
+[node name="Visual" type="MeshInstance3D" parent="Level/WallWest" unique_id=773072801]
+material_override = SubResource("StandardMaterial3D_jdxi1")
+mesh = SubResource("BoxMesh_gs3e3")
 
-[node name="Player" parent="Entities" unique_id=2119048327 instance=ExtResource("4_ljlan")]
-position = Vector2(512, 288)
+[node name="WallEast" type="StaticBody3D" parent="Level" unique_id=670860521]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 63.5, 1.5, 18)
+collision_mask = 0
 
-[node name="BasicEnemy1" parent="Entities" unique_id=749671949 groups=["arena_enemies"] instance=ExtResource("2_w5yd4")]
-position = Vector2(200, 120)
+[node name="CollisionShape" type="CollisionShape3D" parent="Level/WallEast" unique_id=481427564]
+shape = SubResource("BoxShape3D_cwm8m")
 
-[node name="BasicEnemy2" parent="Entities" unique_id=395273414 groups=["arena_enemies"] instance=ExtResource("2_w5yd4")]
-position = Vector2(820, 140)
+[node name="Visual" type="MeshInstance3D" parent="Level/WallEast" unique_id=2075291985]
+material_override = SubResource("StandardMaterial3D_gjgif")
+mesh = SubResource("BoxMesh_07bpl")
 
-[node name="BasicEnemy3" parent="Entities" unique_id=1663688296 groups=["arena_enemies"] instance=ExtResource("2_w5yd4")]
-position = Vector2(800, 470)
+[node name="Pillar1" type="StaticBody3D" parent="Level" unique_id=1518000315]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 1.5, 12)
+collision_mask = 0
 
-[node name="Hud" parent="." unique_id=1524649923 instance=ExtResource("5_xit53")]
-help_text = "WASD mover | Clique atacar | Botão dir. defender | Espaço esquivar | F interagir | I inventário | 1-9, F1-F12 habilidades  (arena provisória)"
+[node name="CollisionShape" type="CollisionShape3D" parent="Level/Pillar1" unique_id=1436450886]
+shape = SubResource("BoxShape3D_l0aoe")
 
-[node name="InventoryScreen" parent="." unique_id=229125347 instance=ExtResource("6_cktml")]
+[node name="Visual" type="MeshInstance3D" parent="Level/Pillar1" unique_id=1580131873]
+material_override = SubResource("StandardMaterial3D_y2w8t")
+mesh = SubResource("BoxMesh_3574f")
 
-[node name="DeathScreen" parent="." unique_id=975902598 instance=ExtResource("7_te1sv")]
+[node name="Torch1" type="OmniLight3D" parent="Level" unique_id=58917753]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 2.2, 12.65)
+light_color = Color(1, 0.6, 0.25, 1)
+light_energy = 1.6
+omni_range = 7.0
 
-[node name="DialogueBox" parent="." unique_id=904077797 instance=ExtResource("8_t0jte")]
+[node name="Flame" type="MeshInstance3D" parent="Level/Torch1" unique_id=520572027]
+material_override = SubResource("StandardMaterial3D_gukns")
+mesh = SubResource("BoxMesh_ehnev")
+
+[node name="Pillar2" type="StaticBody3D" parent="Level" unique_id=1017817515]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42, 1.5, 12)
+collision_mask = 0
+
+[node name="CollisionShape" type="CollisionShape3D" parent="Level/Pillar2" unique_id=1510532015]
+shape = SubResource("BoxShape3D_ks7xy")
+
+[node name="Visual" type="MeshInstance3D" parent="Level/Pillar2" unique_id=521673572]
+material_override = SubResource("StandardMaterial3D_2fedx")
+mesh = SubResource("BoxMesh_2u8xy")
+
+[node name="Torch2" type="OmniLight3D" parent="Level" unique_id=123989547]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42, 2.2, 12.65)
+light_color = Color(1, 0.6, 0.25, 1)
+light_energy = 1.6
+omni_range = 7.0
+
+[node name="Flame" type="MeshInstance3D" parent="Level/Torch2" unique_id=1832632438]
+material_override = SubResource("StandardMaterial3D_m58f6")
+mesh = SubResource("BoxMesh_jmcuw")
+
+[node name="Pillar3" type="StaticBody3D" parent="Level" unique_id=1579817359]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32, 1.5, 25.75)
+collision_mask = 0
+
+[node name="CollisionShape" type="CollisionShape3D" parent="Level/Pillar3" unique_id=11444386]
+shape = SubResource("BoxShape3D_68lce")
+
+[node name="Visual" type="MeshInstance3D" parent="Level/Pillar3" unique_id=304411993]
+material_override = SubResource("StandardMaterial3D_ldmyt")
+mesh = SubResource("BoxMesh_nu8xe")
+
+[node name="Torch3" type="OmniLight3D" parent="Level" unique_id=258203065]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32, 2.2, 26.4)
+light_color = Color(1, 0.6, 0.25, 1)
+light_energy = 1.6
+omni_range = 7.0
+
+[node name="Flame" type="MeshInstance3D" parent="Level/Torch3" unique_id=2005294227]
+material_override = SubResource("StandardMaterial3D_p4u0q")
+mesh = SubResource("BoxMesh_tnl37")
+
+[node name="Entities" type="Node3D" parent="." unique_id=1798283448]
+
+[node name="Player" parent="Entities" unique_id=859502370 instance=ExtResource("3_w5yd4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32, 0, 18)
+
+[node name="BasicEnemy1" parent="Entities" unique_id=2052354605 groups=["arena_enemies"] instance=ExtResource("2_rgs4t")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.5, 0, 7.5)
+
+[node name="BasicEnemy2" parent="Entities" unique_id=1556809130 groups=["arena_enemies"] instance=ExtResource("2_rgs4t")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 51.25, 0, 8.75)
+
+[node name="BasicEnemy3" parent="Entities" unique_id=1270683665 groups=["arena_enemies"] instance=ExtResource("2_rgs4t")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 50, 0, 29.4)
+
+[node name="Hud" parent="." unique_id=1524649923 instance=ExtResource("4_runn2")]
+help_text = "WASD andar | Mouse câmera | Clique atacar | Dir. defender | Espaço esquivar | F usar | I inventário | Esc solta o mouse"
+
+[node name="InventoryScreen" parent="." unique_id=229125347 instance=ExtResource("5_ljlan")]
+
+[node name="DeathScreen" parent="." unique_id=975902598 instance=ExtResource("6_xit53")]
+
+[node name="DialogueBox" parent="." unique_id=904077797 instance=ExtResource("7_cktml")]

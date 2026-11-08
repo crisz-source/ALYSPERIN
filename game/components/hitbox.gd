@@ -1,6 +1,6 @@
 class_name Hitbox
-extends Area2D
-## Área que CAUSA dano: lâmina da espada, investida de inimigo, armadilha.
+extends Area3D
+## Área que CAUSA dano: lâmina da espada, investida de inimigo, projétil.
 ##
 ## Só machuca enquanto ativa. Cada ativação atinge cada alvo no máximo uma vez,
 ## a não ser que rehit_interval > 0 (dano contínuo, ex.: chão de espinhos).
@@ -12,12 +12,12 @@ signal hit_landed(target: Hurtbox)
 signal hit_blocked(target: Hurtbox)
 
 @export var damage: int = 10
-## Força do empurrão aplicado no alvo, em pixels por segundo.
-@export var knockback_force: float = 160.0
+## Força do empurrão aplicado no alvo, em metros por segundo (no chão).
+@export var knockback_force: float = 10.0
 ## 0 = acerta cada alvo uma vez por ativação. > 0 = pode repetir após N segundos.
 @export var rehit_interval: float = 0.0
 ## Quem é considerado o autor do golpe (usado para direção do empurrão).
-@export var attacker: Node2D
+@export var attacker: Node3D
 
 var is_active: bool = false
 var _hit_times: Dictionary = {}   # Hurtbox -> tempo (s) do último acerto
@@ -45,7 +45,7 @@ func _physics_process(delta: float) -> void:
 	# Varre o que está sobreposto a cada quadro em vez de depender só do sinal
 	# area_entered: assim um alvo que já estava encostado na hora da ativação
 	# também é atingido.
-	for area: Area2D in get_overlapping_areas():
+	for area: Area3D in get_overlapping_areas():
 		var hurtbox := area as Hurtbox
 		if hurtbox == null or not _can_hit(hurtbox):
 			continue
@@ -63,7 +63,9 @@ func _can_hit(hurtbox: Hurtbox) -> bool:
 	return rehit_interval > 0.0 and _clock - float(_hit_times[hurtbox]) >= rehit_interval
 
 
+## O empurrão é sempre no chão (sem componente vertical).
 func _build_damage(target: Hurtbox) -> DamageInfo:
-	var origin: Vector2 = attacker.global_position if attacker else global_position
-	var direction: Vector2 = origin.direction_to(target.global_position)
-	return DamageInfo.new(damage, direction * knockback_force, attacker)
+	var origin: Vector3 = attacker.global_position if attacker else global_position
+	var direction: Vector3 = target.global_position - origin
+	direction.y = 0.0
+	return DamageInfo.new(damage, direction.normalized() * knockback_force, attacker)

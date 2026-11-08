@@ -28,8 +28,11 @@ const ABILITY_KEY_LABELS: Array[String] = [
 
 ## Direção desejada de movimento. Comprimento entre 0 e 1 (diagonal já normalizada).
 var move_direction: Vector2 = Vector2.ZERO
-## Ponto do mundo para onde o jogador está mirando (cursor do mouse).
-var aim_position: Vector2 = Vector2.ZERO
+## Direção da mira no chão (para onde a câmera olha). Lida da câmera em poll();
+## no co-op, a entrada de rede preenche este mesmo campo.
+var aim_direction: Vector3 = Vector3.FORWARD
+## Câmera que define a mira (definida pelo Player).
+var camera_rig: PlayerCamera
 ## Defesa: vale enquanto o botão estiver segurado (sem buffer).
 var defend_held: bool = false
 
@@ -52,8 +55,8 @@ static func _zeroed(count: int) -> Array[float]:
 ## física, para nunca ler um valor atrasado em um quadro.
 func poll(delta: float) -> void:
 	move_direction = Input.get_vector("move_left", "move_right", "move_up", "move_down")
-	var viewport: Viewport = get_viewport()
-	aim_position = viewport.get_canvas_transform().affine_inverse() * viewport.get_mouse_position()
+	if camera_rig:
+		aim_direction = camera_rig.flat_forward()
 	defend_held = Input.is_action_pressed("defend")
 	_attack_buffer = BUFFER_TIME if Input.is_action_just_pressed("attack") else maxf(_attack_buffer - delta, 0.0)
 	_dodge_buffer = BUFFER_TIME if Input.is_action_just_pressed("dodge") else maxf(_dodge_buffer - delta, 0.0)

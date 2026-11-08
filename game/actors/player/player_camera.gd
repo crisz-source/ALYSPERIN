@@ -1,16 +1,51 @@
 class_name PlayerCamera
-extends Camera2D
-## Câmera que segue o jogador, com tremida curta para dar peso aos impactos.
+extends Node3D
+## Câmera em terceira pessoa: este nó gira na horizontal (yaw), o filho Pitch
+## na vertical, e um braço com colisão (SpringArm3D) afasta a câmera sem
+## atravessar paredes.
 ##
-## A tremida mexe só no offset (deslocamento visual), nunca na posição: a câmera
-## continua centrada no personagem e a lógica do jogo não é afetada.
+## O mouse gira a câmera. O mouse fica "preso" durante o jogo e é solto
+## automaticamente quando o jogador não pode agir (inventário, diálogo, morte).
+## Esc solta manualmente; clicar prende de novo.
+## A tremida mexe só no deslocamento da lente, nunca na posição.
 
+@export var mouse_sensitivity: float = 0.004
+@export var min_pitch_degrees: float = -65.0
+@export var max_pitch_degrees: float = 15.0
+## Converte a força de tremida da versão 2D (pixels) para metros.
+@export var shake_scale: float = 0.025
+
+## Quem a câmera segue; usado para saber se o jogador pode agir.
+var player: Player
+var _manual_release: bool = false
 var _shake_strength: float = 0.0
 var _shake_time_left: float = 0.0
 var _shake_duration: float = 0.0
 
+@onready var _pitch: Node3D = $Pitch
+@onready var camera: Camera3D = $Pitch/SpringArm/Camera
 
-## strength em pixels; o tremor diminui até zero ao longo de duration segundos.
+
+## Para frente da câmera, no chão (sem inclinação): direção dos golpes.
+func flat_forward() -> Vector3:
+	var f: Vector3 = -global_basis.z
+	f.y = 0.0
+	return f.normalized() if f.length() > 0.001 else Vector3.FORWARD
+
+
+func flat_right() -> Vector3:
+	var r: Vector3 = global_basis.x
+	r.y = 0.0
+	return r.normalized() if r.length() > 0.001 else Vector3.RIGHT
+
+
+## Gira a câmera para olhar numa direção (ex.: ao nascer, ou em testes).
+func face(direction: Vector3) -> void:
+	if direction.length() > 0.001:
+		rotation.y = atan2(-direction.x, -direction.z)
+
+
+## strength na escala antiga (pixels); o tremor diminui até zero em duration segundos.
 func shake(strength: float, duration: float) -> void:
 	if strength < _current_strength():
 		return
@@ -19,41 +54,42 @@ func shake(strength: float, duration: float) -> void:
 	_shake_time_left = duration
 
 
-## Prende a câmera dentro do retângulo do mapa (em pixels do mundo), para
-## nunca mostrar o vazio fora da área.
-func set_world_bounds(bounds: Rect2) -> void:
-	limit_left = int(bounds.position.x)
-	limit_top = int(bounds.position.y)
-	limit_right = int(bounds.end.x)
-	limit_bottom = int(bounds.end.y)
-	# Sem isto, ao nascer perto da borda a câmera "desliza" do centro até o limite.
-	reset_smoothing()
+func reset_smoothing() -> void:
+	pass  # mantido pela interface antiga; a câmera 3D não suaviza a posição
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if not _can_control():
+		return
+	var motion := event as InputEventMouseMotion
+	if motion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+		rotate_y(-motion.relative.x * mouse_sensitivity)
+		_pitch.rotation.x = clampf(_pitch.rotation.x - motion.relative.y * mouse_sensitivity,
+			deg_to_rad(min_pitch_degrees), deg_to_rad(max_pitch_degrees))
+	elif event.is_action_pressed("pause"):
+		_manual_release = not _manual_release
+	elif event is InputEventMouseButton and (event as InputEventMouseButton).pressed and _manual_release:
+		_manual_release = false
+		get_viewport().set_input_as_handled()
 
 
 func _process(delta: float) -> void:
+	var wants_capture: bool = _can_control() and not _manual_release
+	var mode: Input.MouseMode = Input.MOUSE_MODE_CAPTURED if wants_capture else Input.MOUSE_MODE_VISIBLE
+	if Input.mouse_mode != mode and DisplayServer.get_name() != "headless":
+		Input.mouse_mode = mode
 	if _shake_time_left <= 0.0:
-		offset = Vector2.ZERO
+		camera.h_offset = 0.0
+		camera.v_offset = 0.0
 		return
 	_shake_time_left = maxf(_shake_time_left - delta, 0.0)
-	var amount: float = _current_strength()
-	# Arredonda para pixels inteiros: tremida fracionária borra a pixel art.
-	var wanted := Vector2(randf_range(-amount, amount), randf_range(-amount, amount)).round()
-	offset = _clamp_offset_to_limits(wanted)
+	var amount: float = _current_strength() * shake_scale
+	camera.h_offset = randf_range(-amount, amount)
+	camera.v_offset = randf_range(-amount, amount)
 
 
-## A Godot aplica os limites só à posição, não ao offset: perto da borda a
-## tremida mostraria alguns pixels de vazio. Aqui o offset é limitado para a
-## vista continuar dentro do mapa.
-func _clamp_offset_to_limits(wanted: Vector2) -> Vector2:
-	var base_center: Vector2 = get_screen_center_position() - offset
-	var half_view: Vector2 = get_viewport_rect().size / (2.0 * zoom)
-	var low: Vector2 = Vector2(limit_left, limit_top) + half_view - base_center
-	var high: Vector2 = Vector2(limit_right, limit_bottom) - half_view - base_center
-	# ceil/floor mantêm o pixel inteiro sem passar do limite; min/max com 0
-	# garantem que "sem tremida" sempre é permitido.
-	return Vector2(
-		clampf(wanted.x, minf(ceilf(low.x), 0.0), maxf(floorf(high.x), 0.0)),
-		clampf(wanted.y, minf(ceilf(low.y), 0.0), maxf(floorf(high.y), 0.0)))
+func _can_control() -> bool:
+	return player != null and not player.input_blocked and not player.health.is_dead
 
 
 func _current_strength() -> float:

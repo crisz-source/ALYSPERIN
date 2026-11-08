@@ -8,8 +8,8 @@ extends RefCounted
 ## que o host vai validar e replicar.
 
 var amount: int = 0
-## Direção e força do empurrão, em pixels por segundo.
-var knockback: Vector2 = Vector2.ZERO
+## Direção e força do empurrão no chão (plano X/Z), em metros por segundo.
+var knockback: Vector3 = Vector3.ZERO
 ## Nó que causou o dano (pode ser liberado antes do pacote ser lido: checar com is_instance_valid).
 var source: Node = null
 ## Marcado pelo HealthComponent quando quem apanha bloqueou o golpe (sem dano).
@@ -18,7 +18,7 @@ var blocked: bool = false
 var backstab: bool = false
 
 
-func _init(p_amount: int = 0, p_knockback: Vector2 = Vector2.ZERO, p_source: Node = null) -> void:
+func _init(p_amount: int = 0, p_knockback: Vector3 = Vector3.ZERO, p_source: Node = null) -> void:
 	amount = p_amount
 	knockback = p_knockback
 	source = p_source

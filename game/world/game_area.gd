@@ -1,11 +1,11 @@
 class_name GameArea
-extends Node2D
+extends Node3D
 ## Base de toda área jogável (arena, mapas, dungeons): liga HUD, inventário e
 ## tela de morte ao jogador, põe no chão o que ele descarta e cuida do
 ## "continuar" depois da morte.
 ##
 ## Estrutura esperada na cena: Entities/Player, Hud, InventoryScreen, DeathScreen.
-## Áreas filhas sobrescrevem map_bounds() e, se precisarem de _ready, chamam super().
+## Áreas filhas que precisarem de _ready chamam super().
 ##
 ## Continuar = o jogador volta ao início da área com vida e mana cheias e
 ## MANTÉM itens, equipamento e experiência. Inimigos vivos voltam ao lugar de
@@ -17,7 +17,7 @@ extends Node2D
 @export var discipline_options: Array[DisciplineData] = []
 
 @onready var player: Player = $Entities/Player
-@onready var entities: Node2D = $Entities
+@onready var entities: Node3D = $Entities
 @onready var hud: Hud = $Hud
 @onready var inventory_screen: InventoryScreen = $InventoryScreen
 @onready var death_screen: DeathScreen = $DeathScreen
@@ -26,9 +26,8 @@ extends Node2D
 func _ready() -> void:
 	hud.bind_player(player)
 	inventory_screen.bind_player(player)
-	player.set_camera_bounds(map_bounds())
 	player.died.connect(_on_player_died)
-	player.item_dropped.connect(func(stack: ItemStack, at: Vector2) -> void: ItemPickup.spawn(entities, stack, at))
+	player.item_dropped.connect(func(stack: ItemStack, at: Vector3) -> void: ItemPickup.spawn(entities, stack, at))
 	death_screen.continue_requested.connect(continue_after_death)
 	death_screen.decline_requested.connect(_on_decline)
 	player.dialogue_requested.connect(_on_dialogue_requested)
@@ -57,11 +56,6 @@ func _on_dialogue_requested(speaker: String, lines: Array[String], on_finished: 
 func _on_discipline_chosen(chosen: DisciplineData) -> void:
 	player.apply_discipline(chosen)
 	player.input_blocked = false
-
-
-## Retângulo do mapa em pixels (limites da câmera). Áreas filhas sobrescrevem.
-func map_bounds() -> Rect2:
-	return Rect2(-100000, -100000, 200000, 200000)
 
 
 func continue_after_death() -> void:

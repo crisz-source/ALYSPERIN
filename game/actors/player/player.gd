@@ -1,12 +1,14 @@
 class_name Player
-extends CharacterBody2D
-## Personagem controlável: movimento, combo, defesa, esquiva, dano, morte,
-## itens (inventário/equipamento) e progressão (nível e atributos).
+extends CharacterBody3D
+## Personagem controlável (3D, terceira pessoa): movimento, combo, defesa,
+## esquiva, dano, morte, itens (inventário/equipamento), progressão, habilidades.
 ##
 ## Organizado como uma máquina de estados simples: em cada momento o personagem
 ## está em exatamente um estado (andando, atacando, defendendo...), e cada
-## estado decide o que é permitido. Isso evita combinações impossíveis como
-## "atacando e esquivando ao mesmo tempo".
+## estado decide o que é permitido.
+##
+## Toda a lógica de combate acontece no chão (plano X/Z); a altura (Y) só é
+## usada pela gravidade. Escala: 1 metro = 1 tile da versão 2D (16 px).
 
 signal died
 ## Um golpe passou por dentro da invencibilidade da esquiva.
@@ -14,7 +16,7 @@ signal dodge_succeeded
 ## Um objeto pediu para mostrar um texto (placa, porta trancada...). O HUD escuta.
 signal message_requested(text: String)
 ## O jogador descartou um item: a área decide onde ele aparece no chão.
-signal item_dropped(stack: ItemStack, at_position: Vector2)
+signal item_dropped(stack: ItemStack, at_position: Vector3)
 ## Disciplina escolhida/trocada: habilidades e bônus mudaram (HUD refaz a barra).
 signal discipline_changed(discipline: DisciplineData)
 ## Itens colocados na barra de habilidades mudaram.
@@ -26,10 +28,12 @@ enum State { MOVE, ATTACK, BLOCK, DODGE, HURT, ABILITY, DEAD }
 
 const GROUP: StringName = &"players"
 const COMBO_LENGTH: int = 3
+const GRAVITY: float = 20.0
 const PLACEHOLDER_COLOR := Color(0.36, 0.62, 0.92)
 const DEAD_COLOR := Color(0.35, 0.35, 0.4)
 const SHIELD_COLOR := Color(0.75, 0.85, 1.0, 0.85)
-const FINISHER_SWING_TINT := Color(1.0, 0.75, 0.45)
+const SWING_COLOR := Color(1.0, 1.0, 0.85, 0.6)
+const FINISHER_SWING_TINT := Color(1.0, 0.75, 0.45, 0.7)
 const DODGE_SUCCESS_TEXT := "Esquiva perfeita!"
 const DODGE_SUCCESS_COLOR := Color(0.55, 0.95, 1.0)
 const LEVEL_UP_COLOR := Color(1.0, 0.85, 0.35)
@@ -38,14 +42,16 @@ const MSG_HEALTH_FULL := "A vida já está cheia."
 const MSG_MANA_FULL := "A mana já está cheia."
 const MSG_INVENTORY_FULL := "Inventário cheio."
 const NO_MANA_COLOR := Color(0.5, 0.7, 1.0)
+## Altura (acima dos pés) onde aparecem textos flutuantes.
+const TEXT_HEIGHT: float = 2.1
 
 @export_group("Movimento")
-## Velocidade máxima, em pixels por segundo (16 px = 1 tile).
-@export var max_speed: float = 90.0
+## Velocidade máxima (m/s).
+@export var max_speed: float = 5.6
 ## Quanto a velocidade cresce por segundo ao começar a andar.
-@export var acceleration: float = 900.0
+@export var acceleration: float = 56.0
 ## Quanto a velocidade cai por segundo ao soltar as teclas.
-@export var friction: float = 1100.0
+@export var friction: float = 69.0
 
 @export_group("Ataque")
 ## Preparação antes da lâmina causar dano (s).
@@ -60,10 +66,10 @@ const NO_MANA_COLOR := Color(0.5, 0.7, 1.0)
 @export_group("Combo")
 ## Multiplicador do dano da arma em cada golpe do combo (1º, 2º, 3º = finalizador).
 @export var combo_damage_multiplier: Array[float] = [1.0, 1.0, 2.0]
-## Empurrão de cada golpe no inimigo (px/s), antes do multiplicador da arma.
-@export var combo_knockback: Array[float] = [140.0, 140.0, 260.0]
-## Passo à frente que o personagem dá em cada golpe (px/s).
-@export var combo_step_impulse: Array[float] = [40.0, 40.0, 110.0]
+## Empurrão de cada golpe no inimigo (m/s), antes do multiplicador da arma.
+@export var combo_knockback: Array[float] = [8.75, 8.75, 16.25]
+## Passo à frente que o personagem dá em cada golpe (m/s).
+@export var combo_step_impulse: Array[float] = [2.5, 2.5, 6.9]
 ## Tempo depois de um golpe em que clicar de novo continua o combo (s).
 @export var combo_window: float = 0.25
 ## O finalizador demora mais para sair e para se recuperar: é o preço do dano maior.
@@ -84,7 +90,7 @@ const NO_MANA_COLOR := Color(0.5, 0.7, 1.0)
 @export_range(0.0, 1.0) var block_move_multiplier: float = 0.4
 
 @export_group("Esquiva")
-@export var dodge_speed: float = 230.0
+@export var dodge_speed: float = 14.4
 @export var dodge_duration: float = 0.24
 ## Parte inicial da esquiva em que o personagem não toma dano (s).
 @export var dodge_invulnerability: float = 0.18
@@ -107,12 +113,12 @@ const NO_MANA_COLOR := Color(0.5, 0.7, 1.0)
 @export var hitstop_hurt: float = 0.07
 @export var hitstop_block: float = 0.04
 
-## Direção para onde o personagem está virado: sempre uma das 4 cardeais.
-var facing: Vector2 = Vector2.DOWN
+## Direção (no chão) para onde o personagem está virado.
+var facing: Vector3 = Vector3.FORWARD
 var state: State = State.MOVE
 
 var _state_time: float = 0.0
-var _dodge_direction: Vector2 = Vector2.ZERO
+var _dodge_direction: Vector3 = Vector3.ZERO
 var _dodge_cooldown_left: float = 0.0
 var _flash_time: float = 0.0
 var _shield_flash_time: float = 0.0
@@ -123,20 +129,21 @@ var _combo_window_left: float = 0.0
 var _attack_windup_now: float = 0.0
 var _attack_active_now: float = 0.0
 var _attack_recovery_now: float = 0.0
-## Vida máxima sem bônus de Vigor (o valor configurado no HealthComponent).
+## Vida máxima sem crescimento de nível (o valor configurado no HealthComponent).
 var _base_max_health: int = 0
-var _block_direction: Vector2 = Vector2.DOWN
+var _block_direction: Vector3 = Vector3.FORWARD
 ## Consumíveis arrastados para a barra (mesma posição das habilidades; null = vazio).
 ## Guarda o TIPO de item: a tecla usa a primeira pilha dele na bolsa.
 var hotbar_items: Array[ItemData] = []
 ## Uma mensagem por esquiva, mesmo que dois inimigos acertem a mesma esquiva.
 var _dodge_success_this_dodge: bool = false
-## Objeto usável mais próximo (o que recebe o "[E]"), ou null.
+## Objeto usável mais próximo (o que recebe o "[F]"), ou null.
 var focused_interactable: Interactable = null
-## true enquanto uma tela (inventário) estiver aberta: o personagem ignora comandos.
+## true enquanto uma tela (inventário, diálogo...) estiver aberta: ignora comandos
+## e a câmera solta o mouse.
 var input_blocked: bool = false
 ## Onde o jogador volta ao continuar depois da morte (início da área).
-var respawn_point: Vector2 = Vector2.ZERO
+var respawn_point: Vector3 = Vector3.ZERO
 ## Invulnerabilidade ao voltar, para não morrer de novo no mesmo instante (s).
 var respawn_invulnerability: float = 1.5
 ## Segundos restantes de recarga por habilidade (mesma posição da lista).
@@ -149,6 +156,9 @@ var discipline: DisciplineData = null
 var _base_max_mana: int = 0
 ## Desgaste fracionário do escudo (Guardião gasta metade: 1 ponto a cada 2 bloqueios).
 var _shield_wear_accumulator: float = 0.0
+var _body_material: StandardMaterial3D
+var _swing_material: StandardMaterial3D
+var _shield_material: StandardMaterial3D
 
 @onready var health: HealthComponent = $HealthComponent
 @onready var inventory: Inventory = $Inventory
@@ -157,17 +167,17 @@ var _shield_wear_accumulator: float = 0.0
 @onready var mana: ManaComponent = $ManaComponent
 @onready var quest_log: QuestLog = $QuestLog
 @onready var _input: PlayerInput = $PlayerInput
-@onready var _facing_indicator: Node2D = $FacingIndicator
-@onready var _body: Polygon2D = $BodyPlaceholder
-@onready var _attack_pivot: Node2D = $AttackPivot
+@onready var _model: Node3D = $Model
+@onready var _body: MeshInstance3D = $Model/BodyPlaceholder
+@onready var _attack_pivot: Node3D = $AttackPivot
 @onready var _sword_hitbox: Hitbox = $AttackPivot/SwordHitbox
-@onready var _swing_visual: CanvasItem = $AttackPivot/SwingPlaceholder
-@onready var _shield_visual: Polygon2D = $AttackPivot/ShieldPlaceholder
-@onready var _camera: PlayerCamera = $Camera
-@onready var _interaction_detector: Area2D = $InteractionDetector
-@onready var _interact_prompt: Label = $InteractPrompt
+@onready var _swing_visual: MeshInstance3D = $AttackPivot/SwingPlaceholder
+@onready var _shield_visual: MeshInstance3D = $AttackPivot/ShieldPlaceholder
+@onready var _camera: PlayerCamera = $CameraRig
+@onready var _interaction_detector: Area3D = $InteractionDetector
+@onready var _interact_prompt: Label3D = $InteractPrompt
 @onready var _spin_hitbox: Hitbox = $SpinHitbox
-@onready var _spin_visual: Polygon2D = $SpinPlaceholder
+@onready var _spin_visual: MeshInstance3D = $SpinPlaceholder
 
 
 func _ready() -> void:
@@ -175,9 +185,17 @@ func _ready() -> void:
 		and combo_step_impulse.size() == COMBO_LENGTH,
 		"Player: listas do combo precisam ter %d valores cada" % COMBO_LENGTH)
 	add_to_group(GROUP)
-	_facing_indicator.rotation = facing.angle()
+	# Materiais próprios desta instância (piscar não pode afetar outro personagem).
+	_body_material = (_body.material_override as StandardMaterial3D).duplicate()
+	_body.material_override = _body_material
+	_swing_material = (_swing_visual.material_override as StandardMaterial3D).duplicate()
+	_swing_visual.material_override = _swing_material
+	_shield_material = (_shield_visual.material_override as StandardMaterial3D).duplicate()
+	_shield_visual.material_override = _shield_material
 	_swing_visual.visible = false
 	_shield_visual.visible = false
+	_camera.player = self
+	_input.camera_rig = _camera
 	health.block_filter = _is_hit_blocked
 	health.damaged.connect(_on_damaged)
 	health.blocked.connect(_on_blocked)
@@ -197,6 +215,7 @@ func _ready() -> void:
 	hotbar_items.resize(PlayerInput.ABILITY_SLOTS)
 	_spin_hitbox.hit_landed.connect(_on_ability_hit)
 	_spin_visual.visible = false
+	_set_facing(facing)
 
 
 func _physics_process(delta: float) -> void:
@@ -209,6 +228,9 @@ func _physics_process(delta: float) -> void:
 	for i in _ability_cooldowns.size():
 		_ability_cooldowns[i] = maxf(_ability_cooldowns[i] - delta, 0.0)
 	_update_focus()
+	# A lógica trabalha só no chão; a altura é tratada pela gravidade no fim.
+	var vertical: float = velocity.y
+	velocity.y = 0.0
 	match state:
 		State.MOVE:
 			_process_move(delta)
@@ -223,17 +245,18 @@ func _physics_process(delta: float) -> void:
 		State.ABILITY:
 			_process_ability(delta)
 		State.DEAD:
-			velocity = velocity.move_toward(Vector2.ZERO, friction * delta)
+			velocity = velocity.move_toward(Vector3.ZERO, friction * delta)
+	velocity.y = vertical - GRAVITY * delta if not is_on_floor() else minf(vertical, 0.0)
 	move_and_slide()
 	_update_visuals(delta)
 
 
-## A área avisa o tamanho do mapa; o jogador repassa para a própria câmera.
-func set_camera_bounds(bounds: Rect2) -> void:
-	_camera.set_world_bounds(bounds)
+## A câmera que o jogador usa (HUD/testes podem precisar dela).
+func camera_rig() -> PlayerCamera:
+	return _camera
 
 
-## Dano do golpe `step` do combo com a arma atual, Força e estado da arma.
+## Dano do golpe `step` do combo com a arma atual, nível e estado da arma.
 func current_attack_damage(step: int) -> int:
 	var weapon: WeaponData = equipment.weapon_data()
 	var base: float = float(weapon.damage) if weapon else float(unarmed_damage)
@@ -243,17 +266,16 @@ func current_attack_damage(step: int) -> int:
 	return maxi(roundi(base * combo_damage_multiplier[step] * stats.damage_multiplier() * discipline_bonus), 1)
 
 
-## Volta à vida no ponto indicado, com vida cheia. Itens, equipamento e
+## Volta à vida no ponto indicado, com vida e mana cheias. Itens, equipamento e
 ## experiência são mantidos (nada é recarregado).
-func respawn(at: Vector2) -> void:
+func respawn(at: Vector3) -> void:
 	global_position = at
-	velocity = Vector2.ZERO
+	velocity = Vector3.ZERO
 	health.revive()
 	mana.restore_full()
 	health.grant_invulnerability(respawn_invulnerability)
 	input_blocked = false
 	_change_state(State.MOVE)
-	_camera.reset_smoothing()
 
 
 ## Aplica a Disciplina: bônus de vida/mana e troca das habilidades.
@@ -297,7 +319,7 @@ func turn_in_quest(quest: QuestData) -> void:
 		var left: int = inventory.add(piece)
 		if left > 0:
 			piece.count = left
-			item_dropped.emit(piece, global_position + facing * 14.0)
+			item_dropped.emit(piece, global_position + facing * 0.9)
 	_say("Missão concluída: %s" % quest.title)
 
 
@@ -351,7 +373,7 @@ func discard_inventory_slot(index: int) -> void:
 	if stack == null:
 		return
 	inventory.set_slot(index, null)
-	item_dropped.emit(stack, global_position + facing * 14.0)
+	item_dropped.emit(stack, global_position + facing * 0.9)
 
 
 ## Pega um item do mundo. Devolve quantos NÃO couberam.
@@ -408,9 +430,10 @@ func _process_move(delta: float) -> void:
 	if _input.has_attack():
 		_start_attack()
 		return
-	_apply_movement(_input.move_direction, max_speed, delta)
-	if _input.move_direction != Vector2.ZERO:
-		_set_facing(to_cardinal(_input.move_direction))
+	var move: Vector3 = _world_move()
+	_apply_movement(move, max_speed, delta)
+	if move != Vector3.ZERO:
+		_set_facing(move)
 
 
 func _process_attack(delta: float) -> void:
@@ -432,7 +455,7 @@ func _process_attack(delta: float) -> void:
 		if _can_block():
 			_start_block()
 			return
-	_apply_movement(_input.move_direction, max_speed * attack_move_multiplier, delta)
+	_apply_movement(_world_move(), max_speed * attack_move_multiplier, delta)
 	if _state_time >= attack_end:
 		var was_finisher: bool = _combo_step == COMBO_LENGTH - 1
 		_change_state(State.MOVE)
@@ -451,11 +474,11 @@ func _process_block(delta: float) -> void:
 		_change_state(State.MOVE)
 		return
 	_update_block_direction()
-	_apply_movement(_input.move_direction, max_speed * block_move_multiplier, delta)
+	_apply_movement(_world_move(), max_speed * block_move_multiplier, delta)
 
 
 func _process_ability(delta: float) -> void:
-	velocity = velocity.move_toward(Vector2.ZERO, friction * delta)
+	velocity = velocity.move_toward(Vector3.ZERO, friction * delta)
 	var spin := _active_ability as SpinSlashData
 	if spin:
 		var active: bool = _state_time >= spin.active_start and _state_time < spin.active_end
@@ -464,7 +487,7 @@ func _process_ability(delta: float) -> void:
 		elif not active and _spin_hitbox.is_active:
 			_spin_hitbox.deactivate()
 		_spin_visual.visible = active
-		_spin_visual.rotation = _state_time * TAU * 3.0
+		_spin_visual.rotation.y = _state_time * TAU * 3.0
 		if _state_time >= spin.duration:
 			_change_state(State.MOVE)
 		return
@@ -472,9 +495,9 @@ func _process_ability(delta: float) -> void:
 	if bolt:
 		if not _ability_fired and _state_time >= bolt.cast_time:
 			_ability_fired = true
-			var aim: Vector2 = _aim_direction()
-			_set_facing(to_cardinal(aim))
-			Projectile.fire(self, _attack_pivot.global_position + aim * 8.0, aim, bolt)
+			var aim: Vector3 = _aim_direction()
+			_set_facing(aim)
+			Projectile.fire(self, _attack_pivot.global_position + aim * 0.5, aim, bolt)
 		if _state_time >= bolt.cast_time + 0.08:
 			_change_state(State.MOVE)
 		return
@@ -483,7 +506,7 @@ func _process_ability(delta: float) -> void:
 		if not _ability_fired and _state_time >= heal_spell.cast_time:
 			_ability_fired = true
 			health.heal(heal_spell.heal_amount)
-			FloatingText.spawn(self, "+%d" % heal_spell.heal_amount, global_position + Vector2(0, -30), Color(0.5, 1.0, 0.5))
+			FloatingText.spawn(self, "+%d" % heal_spell.heal_amount, global_position + Vector3.UP * TEXT_HEIGHT, Color(0.5, 1.0, 0.5))
 			_change_state(State.MOVE)
 		return
 	_change_state(State.MOVE)
@@ -499,7 +522,7 @@ func _process_dodge() -> void:
 
 
 func _process_hurt(delta: float) -> void:
-	velocity = velocity.move_toward(Vector2.ZERO, friction * delta)
+	velocity = velocity.move_toward(Vector3.ZERO, friction * delta)
 	if _state_time >= hurt_duration:
 		_change_state(State.MOVE)
 
@@ -511,7 +534,7 @@ func _change_state(new_state: State) -> void:
 	if state == State.ATTACK:
 		_sword_hitbox.deactivate()
 		_swing_visual.visible = false
-		_attack_pivot.scale = Vector2.ONE
+		_attack_pivot.scale = Vector3.ONE
 	elif state == State.BLOCK:
 		_shield_visual.visible = false
 	elif state == State.DODGE:
@@ -531,18 +554,19 @@ func _start_attack() -> void:
 	_combo_window_left = 0.0
 	var is_finisher: bool = _combo_step == COMBO_LENGTH - 1
 
-	var aim: Vector2 = _aim_direction()
-	_attack_pivot.rotation = aim.angle()
-	_attack_pivot.scale = Vector2.ONE * (finisher_reach_scale if is_finisher else 1.0)
-	_set_facing(to_cardinal(aim))
+	var aim: Vector3 = _aim_direction()
+	_attack_pivot.rotation.y = yaw_of(aim)
+	_set_facing(aim)
 
 	var weapon: WeaponData = equipment.weapon_data()
 	var timing: float = weapon.timing_scale if weapon else 1.0
-	_attack_pivot.scale *= weapon.reach_scale if weapon else unarmed_reach_scale
+	var reach: float = (finisher_reach_scale if is_finisher else 1.0) * (weapon.reach_scale if weapon else unarmed_reach_scale)
+	# Alcance só no chão: a altura da área de golpe não muda.
+	_attack_pivot.scale = Vector3(reach, 1.0, reach)
 	_sword_hitbox.damage = current_attack_damage(_combo_step)
 	_sword_hitbox.knockback_force = combo_knockback[_combo_step] \
 		* (weapon.knockback_multiplier if weapon else unarmed_knockback_multiplier)
-	_swing_visual.modulate = FINISHER_SWING_TINT if is_finisher else Color.WHITE
+	_swing_material.albedo_color = FINISHER_SWING_TINT if is_finisher else SWING_COLOR
 	_attack_windup_now = (attack_windup + (finisher_extra_windup if is_finisher else 0.0)) * timing
 	_attack_active_now = attack_active * timing
 	_attack_recovery_now = (attack_recovery + (finisher_extra_recovery if is_finisher else 0.0)) * timing
@@ -576,7 +600,7 @@ func _try_start_ability() -> bool:
 	if _ability_cooldowns[slot] > 0.0:
 		return false
 	if not mana.spend(ability.mana_cost):
-		FloatingText.spawn(self, "Sem mana", global_position + Vector2(0, -30), NO_MANA_COLOR)
+		FloatingText.spawn(self, "Sem mana", global_position + Vector3.UP * TEXT_HEIGHT, NO_MANA_COLOR)
 		return false
 	_ability_cooldowns[slot] = ability.cooldown
 	_change_state(State.ABILITY)
@@ -632,8 +656,9 @@ func _try_start_dodge() -> bool:
 	if not _input.has_dodge() or _dodge_cooldown_left > 0.0:
 		return false
 	_input.consume_dodge()
-	_dodge_direction = _input.move_direction.normalized() if _input.move_direction != Vector2.ZERO else facing
-	_set_facing(to_cardinal(_dodge_direction))
+	var move: Vector3 = _world_move()
+	_dodge_direction = move.normalized() if move != Vector3.ZERO else facing
+	_set_facing(_dodge_direction)
 	_dodge_cooldown_left = dodge_cooldown
 	_dodge_success_this_dodge = false
 	_change_state(State.DODGE)
@@ -654,14 +679,14 @@ func _interact_with(target: Interactable) -> void:
 func _is_hit_blocked(info: DamageInfo) -> bool:
 	if state != State.BLOCK:
 		return false
-	var from_direction: Vector2
-	if is_instance_valid(info.source) and info.source is Node2D:
-		from_direction = global_position.direction_to((info.source as Node2D).global_position)
+	var from_direction: Vector3
+	if is_instance_valid(info.source) and info.source is Node3D:
+		from_direction = flat((info.source as Node3D).global_position - global_position).normalized()
 	else:
-		from_direction = -info.knockback.normalized()
+		from_direction = -flat(info.knockback).normalized()
 	var shield: ShieldData = equipment.shield_data()
-	var in_front: bool = from_direction == Vector2.ZERO \
-		or absf(_block_direction.angle_to(from_direction)) <= deg_to_rad(shield.block_half_angle + _block_angle_bonus())
+	var in_front: bool = from_direction == Vector3.ZERO \
+		or _block_direction.angle_to(from_direction) <= deg_to_rad(shield.block_half_angle + _block_angle_bonus())
 	if not in_front:
 		return false
 	# Escudo quebrado ainda segura parte do golpe: o dano passa reduzido.
@@ -677,7 +702,7 @@ func _on_blocked(info: DamageInfo) -> void:
 	while _shield_wear_accumulator >= 1.0:
 		_shield_wear_accumulator -= 1.0
 		if equipment.shield.wear(1):
-			FloatingText.spawn(self, "Escudo quebrou!", global_position + Vector2(0, -30), BROKEN_COLOR)
+			FloatingText.spawn(self, "Escudo quebrou!", global_position + Vector3.UP * TEXT_HEIGHT, BROKEN_COLOR)
 	equipment.notify_wear()
 	_shield_flash_time = 0.08
 	_camera.shake(1.5, 0.08)
@@ -690,13 +715,13 @@ func _on_hit_ignored(_info: DamageInfo) -> void:
 	if state != State.DODGE or _dodge_success_this_dodge:
 		return
 	_dodge_success_this_dodge = true
-	FloatingText.spawn(self, DODGE_SUCCESS_TEXT, global_position + Vector2(0, -30), DODGE_SUCCESS_COLOR)
+	FloatingText.spawn(self, DODGE_SUCCESS_TEXT, global_position + Vector3.UP * TEXT_HEIGHT, DODGE_SUCCESS_COLOR)
 	dodge_succeeded.emit()
 
 
 func _on_ability_hit(_target: Hurtbox) -> void:
 	if equipment.weapon and equipment.weapon.wear(1):
-		FloatingText.spawn(self, "Arma quebrou!", global_position + Vector2(0, -30), BROKEN_COLOR)
+		FloatingText.spawn(self, "Arma quebrou!", global_position + Vector3.UP * TEXT_HEIGHT, BROKEN_COLOR)
 	equipment.notify_wear()
 	Hitstop.request(hitstop_hit)
 
@@ -704,7 +729,7 @@ func _on_ability_hit(_target: Hurtbox) -> void:
 func _on_sword_hit(_target: Hurtbox) -> void:
 	if equipment.weapon:
 		if equipment.weapon.wear(1):
-			FloatingText.spawn(self, "Arma quebrou!", global_position + Vector2(0, -30), BROKEN_COLOR)
+			FloatingText.spawn(self, "Arma quebrou!", global_position + Vector3.UP * TEXT_HEIGHT, BROKEN_COLOR)
 		equipment.notify_wear()
 	var is_finisher: bool = _combo_step == COMBO_LENGTH - 1
 	Hitstop.request(hitstop_finisher if is_finisher else hitstop_hit)
@@ -718,7 +743,7 @@ func _on_damaged(info: DamageInfo) -> void:
 	health.grant_invulnerability(post_hit_invulnerability)
 	velocity = info.knockback
 	_flash_time = 0.08
-	FloatingText.spawn(self, str(info.amount), global_position + Vector2(0, -34), Color(1.0, 0.35, 0.3), 10)
+	FloatingText.spawn(self, str(info.amount), global_position + Vector3.UP * (TEXT_HEIGHT + 0.3), Color(1.0, 0.35, 0.3), 10)
 	_camera.shake(3.0, 0.15)
 	Hitstop.request(hitstop_hurt)
 	_change_state(State.HURT)
@@ -738,7 +763,7 @@ func _update_focus() -> void:
 	var best: Interactable = null
 	var best_distance: float = INF
 	if state != State.DEAD:
-		for area: Area2D in _interaction_detector.get_overlapping_areas():
+		for area: Area3D in _interaction_detector.get_overlapping_areas():
 			var candidate := area as Interactable
 			if candidate == null or not candidate.enabled:
 				continue
@@ -750,7 +775,7 @@ func _update_focus() -> void:
 	_interact_prompt.visible = best != null
 	if best:
 		_interact_prompt.text = "[F] " + best.prompt_text
-		_interact_prompt.global_position = (best.prompt_position() - _interact_prompt.get_combined_minimum_size() / 2.0).round()
+		_interact_prompt.global_position = best.prompt_position()
 
 
 func _block_angle_bonus() -> float:
@@ -771,59 +796,70 @@ func _apply_growth() -> void:
 
 func _on_leveled_up(new_level: int) -> void:
 	_apply_growth()
-	FloatingText.spawn(self, "Nível %d!" % new_level, global_position + Vector2(0, -40), LEVEL_UP_COLOR)
+	FloatingText.spawn(self, "Nível %d!" % new_level, global_position + Vector3.UP * (TEXT_HEIGHT + 0.5), LEVEL_UP_COLOR)
 
 
-func _aim_direction() -> Vector2:
-	var aim: Vector2 = _attack_pivot.global_position.direction_to(_input.aim_position)
-	return aim if aim != Vector2.ZERO else facing
+## Movimento pedido (teclas) convertido para o mundo, relativo à câmera:
+## "para cima" = para onde a câmera olha.
+func _world_move() -> Vector3:
+	var input: Vector2 = _input.move_direction
+	if input == Vector2.ZERO:
+		return Vector3.ZERO
+	var world: Vector3 = _camera.flat_right() * input.x - _camera.flat_forward() * input.y
+	return world.limit_length(1.0)
+
+
+func _aim_direction() -> Vector3:
+	var aim: Vector3 = flat(_input.aim_direction)
+	return aim.normalized() if aim.length() > 0.001 else facing
 
 
 func _update_block_direction() -> void:
 	_block_direction = _aim_direction()
-	_attack_pivot.rotation = _block_direction.angle()
-	_set_facing(to_cardinal(_block_direction))
+	_attack_pivot.rotation.y = yaw_of(_block_direction)
+	_set_facing(_block_direction)
 
 
-func _apply_movement(direction: Vector2, speed: float, delta: float) -> void:
-	if direction != Vector2.ZERO:
+func _apply_movement(direction: Vector3, speed: float, delta: float) -> void:
+	if direction != Vector3.ZERO:
 		velocity = velocity.move_toward(direction * speed, acceleration * delta)
 	else:
-		velocity = velocity.move_toward(Vector2.ZERO, friction * delta)
+		velocity = velocity.move_toward(Vector3.ZERO, friction * delta)
 
 
-func _set_facing(new_facing: Vector2) -> void:
-	if new_facing == facing:
+func _set_facing(new_facing: Vector3) -> void:
+	var f: Vector3 = flat(new_facing)
+	if f.length() < 0.001:
 		return
-	facing = new_facing
-	_facing_indicator.rotation = facing.angle()
+	facing = f.normalized()
+	_model.rotation.y = yaw_of(facing)
 
 
 ## Apresentação provisória: só lê o estado, nunca muda regras de jogo.
 func _update_visuals(delta: float) -> void:
 	_flash_time = maxf(_flash_time - delta, 0.0)
 	_shield_flash_time = maxf(_shield_flash_time - delta, 0.0)
-	_shield_visual.color = Color.WHITE if _shield_flash_time > 0.0 else SHIELD_COLOR
+	_shield_material.albedo_color = Color.WHITE if _shield_flash_time > 0.0 else SHIELD_COLOR
+	_model.scale = Vector3(1.0, 0.6 if state == State.DODGE else 1.0, 1.0)
 	if state == State.DEAD:
-		_body.color = DEAD_COLOR
-		_body.modulate.a = 1.0
+		_body_material.albedo_color = DEAD_COLOR
+		_body.visible = true
 		return
-	_body.color = Color.WHITE if _flash_time > 0.0 else PLACEHOLDER_COLOR
-	if state == State.DODGE:
-		_body.modulate.a = 0.45
-	elif health.is_invulnerable():
+	_body_material.albedo_color = Color.WHITE if _flash_time > 0.0 else PLACEHOLDER_COLOR
+	if health.is_invulnerable() and state != State.DODGE:
 		# Pisca enquanto invulnerável após dano (alterna a cada 1/15 s).
 		_blink_clock += delta
-		_body.modulate.a = 0.35 if int(_blink_clock * 15.0) % 2 == 0 else 1.0
+		_body.visible = int(_blink_clock * 15.0) % 2 == 1
 	else:
 		_blink_clock = 0.0
-		_body.modulate.a = 1.0
-	_body.scale.y = 0.7 if state == State.DODGE else 1.0
+		_body.visible = true
 
 
-## Converte qualquer direção na cardeal mais próxima. Em diagonal exata
-## (teclado), o lado horizontal vence, porque o sprite de perfil lê melhor.
-static func to_cardinal(direction: Vector2) -> Vector2:
-	if absf(direction.x) >= absf(direction.y):
-		return Vector2.RIGHT if direction.x > 0.0 else Vector2.LEFT
-	return Vector2.DOWN if direction.y > 0.0 else Vector2.UP
+## Vetor só no chão (sem altura).
+static func flat(v: Vector3) -> Vector3:
+	return Vector3(v.x, 0.0, v.z)
+
+
+## Rotação em Y para um nó que "olha" para -Z apontar na direção dada.
+static func yaw_of(direction: Vector3) -> float:
+	return atan2(-direction.x, -direction.z)

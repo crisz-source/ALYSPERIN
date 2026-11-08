@@ -3,25 +3,47 @@
 [ext_resource type="Script" path="res://game/world/objects/item_pickup/item_pickup.gd" id="1_7hde6"]
 [ext_resource type="Script" path="res://game/components/interactable.gd" id="2_phmmq"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_21wac"]
-size = Vector2(16, 16)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_21wac"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(0, 0, 0, 0.4)
 
-[node name="ItemPickup" type="Node2D" unique_id=1994859907]
+[sub_resource type="CylinderMesh" id="CylinderMesh_m3t30"]
+top_radius = 0.25
+bottom_radius = 0.25
+height = 0.01
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nuvyq"]
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+roughness = 0.9
+emission_enabled = true
+emission = Color(0.8, 0.8, 0.8, 1)
+emission_energy_multiplier = 1.2
+
+[sub_resource type="BoxMesh" id="BoxMesh_5m1kk"]
+size = Vector3(0.25, 0.25, 0.25)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_3y5nw"]
+
+[node name="ItemPickup" type="Node3D" unique_id=83765952]
 script = ExtResource("1_7hde6")
 
-[node name="Shadow" type="Polygon2D" parent="." unique_id=938034307]
-color = Color(0, 0, 0, 0.35)
-polygon = PackedVector2Array(-4, -1, 4, -1, 4, 1, -4, 1)
+[node name="Shadow" type="MeshInstance3D" parent="." unique_id=1712766294]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, 0)
+material_override = SubResource("StandardMaterial3D_21wac")
+mesh = SubResource("CylinderMesh_m3t30")
 
-[node name="IconPlaceholder" type="Polygon2D" parent="." unique_id=1197728837]
-color = Color(0.8, 0.8, 0.8, 1)
-polygon = PackedVector2Array(0, -4, 4, 0, 0, 4, -4, 0)
+[node name="IconPlaceholder" type="MeshInstance3D" parent="." unique_id=575662623]
+transform = Transform3D(0.70710677, -0.70710677, 0, 0.49999997, 0.49999997, -0.70710677, 0.49999997, 0.49999997, 0.70710677, 0, 0.45, 0)
+material_override = SubResource("StandardMaterial3D_nuvyq")
+mesh = SubResource("BoxMesh_5m1kk")
 
-[node name="Interactable" type="Area2D" parent="." unique_id=1702883020]
+[node name="Interactable" type="Area3D" parent="." unique_id=67605340]
 collision_layer = 32
 collision_mask = 0
 script = ExtResource("2_phmmq")
+prompt_offset = Vector3(0, 1.2, 0)
 
-[node name="CollisionShape" type="CollisionShape2D" parent="Interactable" unique_id=516231117]
-position = Vector2(0, -4)
-shape = SubResource("RectangleShape2D_21wac")
+[node name="CollisionShape" type="CollisionShape3D" parent="Interactable" unique_id=1335084466]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+shape = SubResource("BoxShape3D_3y5nw")

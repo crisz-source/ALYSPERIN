@@ -1,6 +1,6 @@
 class_name BasicEnemy
-extends CharacterBody2D
-## Inimigo básico de teste (PROVISÓRIO: sem arte, sem identidade definida).
+extends CharacterBody3D
+## Inimigo básico de teste (PROVISÓRIO: sem arte, sem identidade definida). 3D.
 ##
 ## Comportamento: fica parado até ver um jogador; persegue; ao chegar perto,
 ## avisa o ataque (fica laranja e pulsa) e dá uma investida em linha reta.
@@ -9,45 +9,49 @@ extends CharacterBody2D
 ## resposta justa: durante a preparação aparece no chão o caminho exato da
 ## investida; a mira acompanha o jogador e trava no fim da preparação.
 ## Investida bloqueada pelo escudo deixa o inimigo atordoado.
+## Toda a lógica acontece no chão (X/Z); a altura só é usada pela gravidade.
 
 signal died
 
 enum State { IDLE, CHASE, WINDUP, LUNGE, RECOVER, HURT, STAGGER, DEAD }
 
+const GRAVITY: float = 20.0
 const BODY_COLOR := Color(0.78, 0.25, 0.25)
 const WINDUP_COLOR := Color(1.0, 0.6, 0.15)
 const STAGGER_COLOR := Color(0.55, 0.5, 0.7)
-const TELEGRAPH_TRACKING_COLOR := Color(1.0, 0.2, 0.15, 0.22)
-const TELEGRAPH_LOCKED_COLOR := Color(1.0, 0.2, 0.15, 0.5)
-## Metade do tamanho da LungeHitbox (14x14): a faixa cobre tudo que a investida toca.
-const LUNGE_HALF_WIDTH: float = 7.0
+const TELEGRAPH_TRACKING_COLOR := Color(1.0, 0.2, 0.15, 0.25)
+const TELEGRAPH_LOCKED_COLOR := Color(1.0, 0.2, 0.15, 0.55)
+## Metade da largura da LungeHitbox: a faixa cobre tudo que a investida toca.
+const LUNGE_HALF_WIDTH: float = 0.45
 ## Camada "world" (paredes): é o que bloqueia a visão.
 const SIGHT_BLOCKING_MASK: int = 1
 ## A visão sai da altura do tronco, não dos pés.
-const EYE_OFFSET := Vector2(0, -8)
+const EYE_HEIGHT: float = 0.6
+## Altura onde aparecem os números de dano.
+const TEXT_HEIGHT: float = 1.6
 
 @export_group("Percepção")
-## Distância em que o inimigo nota um jogador (px).
-@export var detect_radius: float = 130.0
-## Distância em que desiste da perseguição (px).
-@export var lose_radius: float = 220.0
+## Distância em que o inimigo nota um jogador (m).
+@export var detect_radius: float = 8.1
+## Distância em que desiste da perseguição (m).
+@export var lose_radius: float = 13.75
 ## Só nota um jogador se não houver parede entre os dois.
 @export var requires_line_of_sight: bool = true
 
 @export_group("Movimento")
-@export var move_speed: float = 45.0
-@export var acceleration: float = 400.0
-@export var friction: float = 700.0
+@export var move_speed: float = 2.8
+@export var acceleration: float = 25.0
+@export var friction: float = 44.0
 
 @export_group("Ataque")
-## Distância a partir da qual começa a investida (px).
-@export var attack_range: float = 40.0
+## Distância a partir da qual começa a investida (m).
+@export var attack_range: float = 2.5
 ## Duração do aviso antes da investida (s).
 @export var windup_time: float = 0.45
 ## Parte final do aviso em que a direção já está travada (s). Antes disso a
 ## mira acompanha o jogador.
 @export var aim_lock_time: float = 0.2
-@export var lunge_speed: float = 190.0
+@export var lunge_speed: float = 11.9
 @export var lunge_time: float = 0.22
 ## Tempo parado e vulnerável depois da investida (s).
 @export var recover_time: float = 0.6
@@ -56,8 +60,8 @@ const EYE_OFFSET := Vector2(0, -8)
 @export var hurt_time: float = 0.25
 ## Tempo atordoado depois de ter a investida bloqueada: janela de contra-ataque (s).
 @export var stagger_time: float = 0.7
-## Velocidade do recuo ao bater no escudo (px/s).
-@export var blocked_recoil_speed: float = 150.0
+## Velocidade do recuo ao bater no escudo (m/s).
+@export var blocked_recoil_speed: float = 9.4
 
 @export_group("Ponto fraco")
 ## Golpes vindos de trás causam mais dano (vale para monstros e chefes).
@@ -75,28 +79,33 @@ const EYE_OFFSET := Vector2(0, -8)
 var state: State = State.IDLE
 var target: Player = null
 ## Para onde o inimigo está virado (a seta mostra). Define o que é "costas".
-var facing: Vector2 = Vector2.DOWN
+var facing: Vector3 = Vector3.BACK
 
 var _state_time: float = 0.0
-var _lunge_direction: Vector2 = Vector2.ZERO
+var _lunge_direction: Vector3 = Vector3.ZERO
 var _flash_time: float = 0.0
 ## Último jogador que causou dano: recebe a experiência na morte.
 var _last_attacker: Player = null
 ## Onde o inimigo começou (volta para cá quando o jogador continua após morrer).
-var _spawn_position: Vector2 = Vector2.ZERO
+var _spawn_position: Vector3 = Vector3.ZERO
+var _body_material: StandardMaterial3D
+var _telegraph_material: StandardMaterial3D
 
 @onready var health: HealthComponent = $HealthComponent
 @onready var _hitbox: Hitbox = $LungeHitbox
 @onready var _hurtbox: Hurtbox = $Hurtbox
-@onready var _body_shape: CollisionShape2D = $CollisionShape
-@onready var _body: Polygon2D = $BodyPlaceholder
-@onready var _health_bar: Node2D = $HealthBar
-@onready var _health_bar_fill: ColorRect = $HealthBar/Fill
-@onready var _telegraph: Polygon2D = $LungeTelegraph
-@onready var _facing_indicator: Polygon2D = $FacingIndicator
+@onready var _body_shape: CollisionShape3D = $CollisionShape
+@onready var _model: Node3D = $Model
+@onready var _body: MeshInstance3D = $Model/BodyPlaceholder
+@onready var _health_bar: HealthBar3D = $HealthBar
+@onready var _telegraph: MeshInstance3D = $LungeTelegraph
 
 
 func _ready() -> void:
+	_body_material = (_body.material_override as StandardMaterial3D).duplicate()
+	_body.material_override = _body_material
+	_telegraph_material = (_telegraph.material_override as StandardMaterial3D).duplicate()
+	_telegraph.material_override = _telegraph_material
 	health.damaged.connect(_on_damaged)
 	health.died.connect(_on_died)
 	health.health_changed.connect(_on_health_changed)
@@ -109,16 +118,18 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	_state_time += delta
+	var vertical: float = velocity.y
+	velocity.y = 0.0
 	match state:
 		State.IDLE:
-			velocity = velocity.move_toward(Vector2.ZERO, friction * delta)
+			velocity = velocity.move_toward(Vector3.ZERO, friction * delta)
 			target = _find_target(detect_radius)
 			if target:
 				_change_state(State.CHASE)
 		State.CHASE:
 			_process_chase(delta)
 		State.WINDUP:
-			velocity = velocity.move_toward(Vector2.ZERO, friction * delta)
+			velocity = velocity.move_toward(Vector3.ZERO, friction * delta)
 			if not is_aim_locked():
 				_aim_at_target()
 			if _state_time >= windup_time:
@@ -128,23 +139,25 @@ func _physics_process(delta: float) -> void:
 			if _state_time >= lunge_time:
 				_change_state(State.RECOVER)
 		State.RECOVER:
-			velocity = velocity.move_toward(Vector2.ZERO, friction * delta)
+			velocity = velocity.move_toward(Vector3.ZERO, friction * delta)
 			if _state_time >= recover_time:
 				_change_state(State.CHASE)
 		State.HURT:
-			velocity = velocity.move_toward(Vector2.ZERO, friction * delta)
+			velocity = velocity.move_toward(Vector3.ZERO, friction * delta)
 			if _state_time >= hurt_time:
 				_change_state(State.CHASE)
 		State.STAGGER:
-			velocity = velocity.move_toward(Vector2.ZERO, friction * delta)
+			velocity = velocity.move_toward(Vector3.ZERO, friction * delta)
 			if _state_time >= stagger_time:
 				_change_state(State.CHASE)
 		State.DEAD:
-			velocity = velocity.move_toward(Vector2.ZERO, friction * delta)
-			modulate.a = 1.0 - clampf(_state_time / death_fade_time, 0.0, 1.0)
+			velocity = velocity.move_toward(Vector3.ZERO, friction * delta)
+			var t: float = clampf(_state_time / death_fade_time, 0.0, 1.0)
+			_model.scale = Vector3(1.0, 1.0 - 0.9 * t, 1.0)
 			if _state_time >= death_fade_time:
 				queue_free()
 	_update_facing()
+	velocity.y = vertical - GRAVITY * delta if not is_on_floor() else minf(vertical, 0.0)
 	move_and_slide()
 	_update_visuals(delta)
 
@@ -152,26 +165,26 @@ func _physics_process(delta: float) -> void:
 ## Vira para o alvo enquanto persegue/prepara; na investida, para a direção dela.
 ## Atordoado ou ferido, mantém a direção (as costas ficam expostas).
 func _update_facing() -> void:
-	var wanted := Vector2.ZERO
+	var wanted := Vector3.ZERO
 	match state:
 		State.CHASE, State.WINDUP:
 			if _is_valid_target(target):
-				wanted = global_position.direction_to(target.global_position)
+				wanted = _flat(target.global_position - global_position)
 		State.LUNGE:
 			wanted = _lunge_direction
-	if wanted != Vector2.ZERO:
-		facing = wanted
-	_facing_indicator.rotation = facing.angle()
+	if wanted.length() > 0.001:
+		facing = wanted.normalized()
+	_model.rotation.y = Player.yaw_of(facing)
 
 
 ## Golpe de trás causa mais dano. "Trás" = mais de backstab_angle graus da frente.
 func _apply_backstab(info: DamageInfo) -> void:
-	if not is_instance_valid(info.source) or not (info.source is Node2D):
+	if not is_instance_valid(info.source) or not (info.source is Node3D):
 		return
-	var to_attacker: Vector2 = global_position.direction_to((info.source as Node2D).global_position)
-	if to_attacker == Vector2.ZERO:
+	var to_attacker: Vector3 = _flat((info.source as Node3D).global_position - global_position)
+	if to_attacker.length() < 0.001:
 		return
-	if absf(rad_to_deg(facing.angle_to(to_attacker))) >= backstab_angle:
+	if rad_to_deg(facing.angle_to(to_attacker.normalized())) >= backstab_angle:
 		info.amount = roundi(info.amount * backstab_multiplier)
 		info.backstab = true
 
@@ -182,7 +195,7 @@ func _process_chase(delta: float) -> void:
 		if target == null:
 			_change_state(State.IDLE)
 			return
-	var to_target: Vector2 = target.global_position - global_position
+	var to_target: Vector3 = _flat(target.global_position - global_position)
 	if to_target.length() <= attack_range:
 		_change_state(State.WINDUP)
 		_aim_at_target()
@@ -195,7 +208,7 @@ func reset_to_spawn() -> void:
 	if health.is_dead:
 		return
 	global_position = _spawn_position
-	velocity = Vector2.ZERO
+	velocity = Vector3.ZERO
 	target = null
 	_last_attacker = null
 	health.revive()
@@ -209,15 +222,15 @@ func is_aim_locked() -> bool:
 
 func _aim_at_target() -> void:
 	if _is_valid_target(target):
-		var aim: Vector2 = global_position.direction_to(target.global_position)
-		if aim != Vector2.ZERO:
-			_lunge_direction = aim
+		var aim: Vector3 = _flat(target.global_position - global_position)
+		if aim.length() > 0.001:
+			_lunge_direction = aim.normalized()
 
 
 ## A investida sai exatamente na direção que o aviso mostrou (travada), não
 ## para onde o jogador está agora: é isso que torna a esquiva possível.
 func _start_lunge() -> void:
-	if _lunge_direction == Vector2.ZERO:
+	if _lunge_direction == Vector3.ZERO:
 		_change_state(State.RECOVER)
 		return
 	_change_state(State.LUNGE)
@@ -225,12 +238,15 @@ func _start_lunge() -> void:
 
 
 ## Faixa do tamanho do caminho da investida, calculada dos próprios valores de
-## velocidade e duração (mudar no Inspetor já ajusta o aviso).
+## velocidade e duração (mudar no Inspetor já ajusta o aviso). A malha é um
+## plano no chão; aqui só se define o tamanho.
 func _build_telegraph() -> void:
 	var length: float = lunge_speed * lunge_time + LUNGE_HALF_WIDTH
-	var w: float = LUNGE_HALF_WIDTH
-	_telegraph.polygon = PackedVector2Array([
-		Vector2(-w, -w), Vector2(length, -w), Vector2(length, w), Vector2(-w, w)])
+	var plane := PlaneMesh.new()
+	plane.size = Vector2(LUNGE_HALF_WIDTH * 2.0, length)
+	# Começa nos pés e vai para a frente (-Z do nó).
+	plane.center_offset = Vector3(0, 0, -length / 2.0 + LUNGE_HALF_WIDTH)
+	_telegraph.mesh = plane
 	_telegraph.visible = false
 
 
@@ -239,7 +255,7 @@ func _change_state(new_state: State) -> void:
 		_hitbox.deactivate()
 	# A direção só vale do aviso até o fim da investida.
 	if new_state != State.WINDUP and new_state != State.LUNGE:
-		_lunge_direction = Vector2.ZERO
+		_lunge_direction = Vector3.ZERO
 	state = new_state
 	_state_time = 0.0
 
@@ -263,9 +279,10 @@ func _find_target(radius: float) -> Player:
 func _can_see(candidate: Player) -> bool:
 	if not requires_line_of_sight:
 		return true
-	var query := PhysicsRayQueryParameters2D.create(
-		global_position + EYE_OFFSET, candidate.global_position + EYE_OFFSET, SIGHT_BLOCKING_MASK)
-	return get_world_2d().direct_space_state.intersect_ray(query).is_empty()
+	var eye := Vector3.UP * EYE_HEIGHT
+	var query := PhysicsRayQueryParameters3D.create(
+		global_position + eye, candidate.global_position + eye, SIGHT_BLOCKING_MASK)
+	return get_world_3d().direct_space_state.intersect_ray(query).is_empty()
 
 
 func _is_valid_target(candidate: Player) -> bool:
@@ -295,7 +312,7 @@ func _on_lunge_blocked(_target: Hurtbox) -> void:
 func _on_died() -> void:
 	_flash_time = 0.08
 	_hurtbox.set_deferred("monitorable", false)
-	# Corpo desvanecendo não pode bloquear outros inimigos nem jogadores.
+	# Corpo desaparecendo não pode bloquear outros inimigos nem jogadores.
 	_body_shape.set_deferred("disabled", true)
 	_change_state(State.DEAD)
 	# No co-op a divisão da experiência será decidida pelo host (Fase 7).
@@ -304,42 +321,48 @@ func _on_died() -> void:
 	died.emit()
 
 
-## Número do dano: maior e mais amarelado quanto maior o dano. Criado como
-## filho de quem bateu (se ainda existir), para não sumir junto com o inimigo
-## que morreu nesse golpe.
+## Número do dano: maior e mais amarelado quanto maior o dano; laranja nas
+## costas. Criado como filho de quem bateu (se ainda existir), para não sumir
+## junto com o inimigo que morreu nesse golpe.
 func _show_damage_number(info: DamageInfo) -> void:
 	var owner_node: Node = info.source if is_instance_valid(info.source) else self
 	var size: int = clampi(8 + info.amount / 4, 8, 18) + (2 if info.backstab else 0)
 	var color: Color = Color.WHITE.lerp(Color(1.0, 0.85, 0.3), clampf(info.amount / 40.0, 0.0, 1.0))
 	if info.backstab:
 		color = Color(1.0, 0.55, 0.2)  # laranja: acerto pelas costas
-	var jitter := Vector2(randf_range(-6.0, 6.0), 0.0)
-	FloatingText.spawn(owner_node, str(info.amount), global_position + Vector2(0, -24) + jitter, color, size)
+	var jitter := Vector3(randf_range(-0.35, 0.35), 0.0, randf_range(-0.35, 0.35))
+	FloatingText.spawn(owner_node, str(info.amount), global_position + Vector3.UP * TEXT_HEIGHT + jitter, color, size)
 
 
 ## A barra de vida fica sempre visível enquanto o inimigo está vivo.
 func _on_health_changed(current: int, maximum: int) -> void:
 	_health_bar.visible = current > 0
-	_health_bar_fill.scale.x = float(current) / float(maximum)
+	_health_bar.set_ratio(float(current) / float(maximum))
 
 
 ## Apresentação provisória: só lê o estado, nunca muda regras de jogo.
 func _update_visuals(delta: float) -> void:
 	_flash_time = maxf(_flash_time - delta, 0.0)
-	_telegraph.visible = state == State.WINDUP and _lunge_direction != Vector2.ZERO
+	_telegraph.visible = state == State.WINDUP and _lunge_direction != Vector3.ZERO
 	if _telegraph.visible:
-		_telegraph.rotation = _lunge_direction.angle()
-		_telegraph.color = TELEGRAPH_LOCKED_COLOR if is_aim_locked() else TELEGRAPH_TRACKING_COLOR
+		_telegraph.global_rotation = Vector3(0, Player.yaw_of(_lunge_direction), 0)
+		_telegraph_material.albedo_color = TELEGRAPH_LOCKED_COLOR if is_aim_locked() else TELEGRAPH_TRACKING_COLOR
+	if state == State.DEAD:
+		return
 	if _flash_time > 0.0:
-		_body.color = Color.WHITE
-		_body.scale = Vector2.ONE
+		_body_material.albedo_color = Color.WHITE
+		_body.scale = Vector3.ONE
 	elif state == State.STAGGER:
-		_body.color = STAGGER_COLOR
-		_body.scale = Vector2.ONE
+		_body_material.albedo_color = STAGGER_COLOR
+		_body.scale = Vector3.ONE
 	elif state == State.WINDUP:
-		_body.color = WINDUP_COLOR
+		_body_material.albedo_color = WINDUP_COLOR
 		var pulse: float = 1.0 + 0.15 * sin(_state_time * 30.0)
-		_body.scale = Vector2(pulse, pulse)
+		_body.scale = Vector3(pulse, pulse, pulse)
 	else:
-		_body.color = BODY_COLOR
-		_body.scale = Vector2.ONE
+		_body_material.albedo_color = BODY_COLOR
+		_body.scale = Vector3.ONE
+
+
+static func _flat(v: Vector3) -> Vector3:
+	return Vector3(v.x, 0.0, v.z)

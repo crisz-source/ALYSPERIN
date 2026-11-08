@@ -1,5 +1,5 @@
 class_name Interactable
-extends Area2D
+extends Area3D
 ## Área que torna um objeto "usável" com a tecla de interagir (F).
 ##
 ## O objeto dono (porta, alavanca, placa, baú no futuro) registra em `handler`
@@ -11,8 +11,8 @@ signal interacted(by: Player)
 
 ## Verbo mostrado no aviso acima do objeto: "[F] <prompt_text>".
 @export var prompt_text: String = "Usar"
-## Onde o aviso aparece, relativo ao objeto (px).
-@export var prompt_offset: Vector2 = Vector2(0, -24)
+## Onde o aviso aparece, relativo ao objeto (metros; y = altura).
+@export var prompt_offset: Vector3 = Vector3(0, 2.0, 0)
 ## Desligado = o jogador não vê aviso nem consegue usar.
 @export var enabled: bool = true
 
@@ -25,7 +25,7 @@ func _ready() -> void:
 	monitorable = true
 
 
-func prompt_position() -> Vector2:
+func prompt_position() -> Vector3:
 	return global_position + prompt_offset
 
 

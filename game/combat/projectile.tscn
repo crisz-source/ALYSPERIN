@@ -2,17 +2,28 @@
 
 [ext_resource type="Script" path="res://game/combat/projectile.gd" id="1_u8f4w"]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_3m7ta"]
-radius = 3.0
+[sub_resource type="SphereShape3D" id="SphereShape3D_3m7ta"]
+radius = 0.2
 
-[node name="Projectile" type="Area2D" unique_id=2073669298]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ukxgw"]
+albedo_color = Color(0.6, 0.5, 1, 1)
+roughness = 0.9
+emission_enabled = true
+emission = Color(0.6, 0.5, 1, 1)
+emission_energy_multiplier = 3.0
+
+[sub_resource type="SphereMesh" id="SphereMesh_ww64p"]
+radius = 0.15
+height = 0.3
+
+[node name="Projectile" type="Area3D" unique_id=945585484]
 collision_layer = 8
 collision_mask = 5
 script = ExtResource("1_u8f4w")
 
-[node name="CollisionShape" type="CollisionShape2D" parent="." unique_id=1116459740]
-shape = SubResource("CircleShape2D_3m7ta")
+[node name="CollisionShape" type="CollisionShape3D" parent="." unique_id=504867577]
+shape = SubResource("SphereShape3D_3m7ta")
 
-[node name="Visual" type="Polygon2D" parent="." unique_id=1554643868]
-color = Color(0.6, 0.5, 1, 1)
-polygon = PackedVector2Array(5, 0, 0, -3, -4, 0, 0, 3)
+[node name="Visual" type="MeshInstance3D" parent="." unique_id=1136608269]
+material_override = SubResource("StandardMaterial3D_ukxgw")
+mesh = SubResource("SphereMesh_ww64p")

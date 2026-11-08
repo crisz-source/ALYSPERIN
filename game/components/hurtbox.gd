@@ -1,5 +1,5 @@
 class_name Hurtbox
-extends Area2D
+extends Area3D
 ## Área que pode SER atingida. Fica no corpo de quem apanha e repassa o golpe
 ## para o HealthComponent configurado no Inspetor.
 ##

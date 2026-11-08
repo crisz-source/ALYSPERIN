@@ -1,26 +1,27 @@
 class_name FloatingText
-extends Label
-## Texto curto que aparece no mundo, sobe e some (ex.: "Esquiva perfeita!").
+extends Label3D
+## Texto curto que aparece no mundo 3D, sobe e some (ex.: "Esquiva perfeita!",
+## números de dano). Sempre virado para a câmera e visível através de paredes.
 ##
 ## Só apresentação: quem cria decide quando; o texto não afeta o jogo.
 ## Usa top_level para ficar parado no mundo mesmo se quem criou continuar andando.
 
-## Pixels por segundo que o texto sobe.
-@export var rise_speed: float = 18.0
+## Metros por segundo que o texto sobe.
+@export var rise_speed: float = 1.1
 ## Segundos até sumir.
 @export var lifetime: float = 0.9
-@export var font_size: int = 10
 
 var _age: float = 0.0
-var _anchor: Vector2 = Vector2.ZERO
+var _anchor: Vector3 = Vector3.ZERO
+var _base_alpha: float = 1.0
 
 
-## Cria o texto centralizado em world_position, como filho de `owner_node`
-## (some junto com ele se a cena for trocada).
-static func spawn(owner_node: Node, message: String, world_position: Vector2, color: Color = Color.WHITE, size: int = 10) -> FloatingText:
+## Cria o texto em world_position, como filho de `owner_node` (some junto com
+## ele se a cena for trocada). `size` segue a escala da versão 2D (10 = normal).
+static func spawn(owner_node: Node, message: String, world_position: Vector3, color: Color = Color.WHITE, size: int = 10) -> FloatingText:
 	var label := FloatingText.new()
 	label.text = message
-	label.font_size = size
+	label.font_size = size * 4
 	label.modulate = color
 	label._anchor = world_position
 	owner_node.add_child(label)
@@ -29,12 +30,15 @@ static func spawn(owner_node: Node, message: String, world_position: Vector2, co
 
 func _ready() -> void:
 	top_level = true
-	z_index = 10
-	horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	add_theme_font_size_override("font_size", font_size)
-	add_theme_constant_override("outline_size", 3)
-	add_theme_color_override("font_outline_color", Color(0.05, 0.05, 0.08))
-	_place()
+	billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	no_depth_test = true
+	fixed_size = true
+	pixel_size = 0.0008
+	outline_size = 10
+	outline_modulate = Color(0.05, 0.05, 0.08)
+	render_priority = 10
+	_base_alpha = modulate.a
+	global_position = _anchor
 
 
 func _process(delta: float) -> void:
@@ -42,13 +46,8 @@ func _process(delta: float) -> void:
 	if _age >= lifetime:
 		queue_free()
 		return
-	_place()
+	global_position = _anchor + Vector3.UP * rise_speed * _age
 	# Some na segunda metade da vida.
 	var fade_start: float = lifetime * 0.5
-	modulate.a = 1.0 - clampf((_age - fade_start) / (lifetime - fade_start), 0.0, 1.0)
-
-
-func _place() -> void:
-	# Centraliza pelo tamanho do texto e arredonda para não borrar a pixel art.
-	var size_now: Vector2 = get_combined_minimum_size()
-	global_position = (_anchor + Vector2(0, -rise_speed * _age) - size_now / 2.0).round()
+	modulate.a = _base_alpha * (1.0 - clampf((_age - fade_start) / (lifetime - fade_start), 0.0, 1.0))
+	outline_modulate.a = modulate.a
