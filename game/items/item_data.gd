@@ -18,6 +18,16 @@ enum Kind { MATERIAL, CONSUMABLE, WEAPON, SHIELD, KEY }
 ## Quantos cabem numa mesma vaga do inventário.
 @export_range(1, 99) var max_stack: int = 1
 
+@export_group("Modelo 3D")
+## Modelo segurado na mão (arma/escudo). Vazio = sem modelo (boneco provisório).
+## O modelo deve estar em pé, com a base em y = 0.
+@export var model_scene: PackedScene
+@export var model_scale: float = 1.0
+## Posição da base do modelo em relação à mão (m).
+@export var model_offset: Vector3 = Vector3.ZERO
+## Giro do modelo em volta do eixo vertical (graus).
+@export var model_yaw_degrees: float = 0.0
+
 
 func kind() -> Kind:
 	return Kind.MATERIAL

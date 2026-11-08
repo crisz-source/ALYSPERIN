@@ -97,13 +97,16 @@ conhecidos. Detalhes técnicos de cada etapa ficam em `documentation/worklog/`.
 - [x] 173 verificações automáticas passando
 - Ver `documentation/worklog/2026-11-07-migracao-3d.md`
 
-### Primeiro modelo de arte — Guardião (modelo de teste do proprietário)
-- [x] `assets/characters/guardian/guardian.glb` (1,70 m, espada e escudo, animações bow/idle/wave)
-- [x] Original guardado sem alteração em `assets/characters/guardian/source/model.glb` (pasta ignorada pelo Godot)
+### Armas 3D (CC0) — `assets/weapons/`
+- [x] Malho de brasa (maça) e Escudo sentinela: equipamento inicial do Guardião
+- [x] Cajado crescente: arma do Devoto (mesmo item `apprentice_staff`, novo nome e modelo)
+- [x] Modelos de 3dassets.dev, licença CC0 (domínio público), registrada em `LICENSE.txt` de cada pasta
+- [x] `ItemData.model_scene/model_scale/model_offset/model_yaw_degrees`: arma/escudo aparecem na mão
+  ao equipar; arma sem modelo volta à espada provisória
 - [x] `tools/dequantize_glb.py`: converte .glb com `KHR_mesh_quantization` (Godot 4.7 não lê)
-- [x] `ClassData.model_scene`: cada classe pode ter seu modelo; Devoto segue com o boneco provisório
-- [x] Piscar de dano, cinza de morte e verde da cura agora funcionam em qualquer modelo (camada de cor)
-- Ver `documentation/worklog/2026-11-07-modelo-guardiao.md`
+- [x] `ClassData.model_scene`: cada classe pode ter modelo de corpo (nenhuma tem por enquanto)
+- [x] Modelo de teste do gladiador removido a pedido do proprietário (fica no histórico do git, commit 2a3dccb)
+- Ver `documentation/worklog/2026-11-07-modelo-guardiao.md` e `2026-11-07-armas-3d.md`
 
 ### Protótipo 3D (só visualização) — `prototypes/preview_3d/`
 - [x] Cena separada, sem afetar o jogo 2D: terceira pessoa, câmera no mouse, andar, atacar,
@@ -120,8 +123,7 @@ conhecidos. Detalhes técnicos de cada etapa ficam em `documentation/worklog/`.
 ## Itens provisórios no projeto
 - `test_arena.tscn`: chão quadriculado desenhado por código, paredes e pilares em
   `ColorRect`, texto de ajuda — no lugar de tilemap/arte reais.
-- `guardian.glb`: modelo de TESTE gerado pelo proprietário (origem/licença a confirmar); só
-  tem animações bow/idle/wave — andar, atacar e defender ainda sem animação.
+- Armas 3D seguradas paradas na mão (sem animação de golpe); corpo do personagem continua cápsula.
 - `player.tscn`: corpo azul (`BodyPlaceholder`), seta amarela (`FacingIndicator`) e
   arco claro do golpe (`SwingPlaceholder`) no lugar de sprites/efeitos.
 - `basic_enemy.tscn`: inimigo inteiro é provisório (quadrado vermelho, sem nome nem

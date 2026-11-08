@@ -1,14 +1,18 @@
 [gd_resource type="Resource" script_class="WeaponData" format=3]
 
-[ext_resource type="Script" path="res://game/items/weapon_data.gd" id="1_wj8wf"]
+[ext_resource type="PackedScene" path="res://assets/weapons/crescent_staff/crescent_staff.glb" id="1_ij857"]
+[ext_resource type="Script" path="res://game/items/weapon_data.gd" id="2_2nica"]
 
 [resource]
-script = ExtResource("1_wj8wf")
+script = ExtResource("2_2nica")
 weapon_type = &"cajado"
 damage = 8
 timing_scale = 1.1
 reach_scale = 1.15
 id = &"apprentice_staff"
-display_name = "Cajado de aprendiz"
-description = "Cajado simples de madeira, usado para canalizar a fé."
+display_name = "Cajado crescente"
+description = "Cajado com lua crescente e um orbe de éter, usado para canalizar a fé."
 icon_color = Color(0.7, 0.55, 0.35, 1)
+model_scene = ExtResource("1_ij857")
+model_scale = 0.65
+model_offset = Vector3(0, -0.8, 0)

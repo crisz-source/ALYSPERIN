@@ -198,6 +198,9 @@ var _shield_material: StandardMaterial3D
 @onready var _input: PlayerInput = $PlayerInput
 @onready var _model: Node3D = $Model
 @onready var _placeholder: Node3D = $Model/Placeholder
+@onready var _placeholder_sword: Node3D = $Model/Placeholder/SwordPlaceholder
+@onready var _right_hand: Node3D = $Model/RightHand
+@onready var _left_hand: Node3D = $Model/LeftHand
 @onready var _attack_pivot: Node3D = $AttackPivot
 @onready var _sword_hitbox: Hitbox = $AttackPivot/SwordHitbox
 @onready var _swing_visual: MeshInstance3D = $AttackPivot/SwingPlaceholder
@@ -220,6 +223,8 @@ func _ready() -> void:
 	_tint_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	_tint_material.albedo_color = TINT_NONE
 	_set_body_model(null)
+	equipment.changed.connect(_refresh_held_models)
+	_refresh_held_models()
 	_swing_material = (_swing_visual.material_override as StandardMaterial3D).duplicate()
 	_swing_visual.material_override = _swing_material
 	_shield_material = (_shield_visual.material_override as StandardMaterial3D).duplicate()
@@ -880,6 +885,38 @@ static func _play_idle(model: Node) -> void:
 	anim_player.play(IDLE_ANIMATION)
 
 
+## Mostra nas mãos o modelo da arma e do escudo equipados (se o item tiver).
+## Só aparência: o golpe continua vindo da SwordHitbox, a defesa do escudo equipado.
+func _refresh_held_models() -> void:
+	var weapon_model: Node3D = _hold(_right_hand, equipment.weapon)
+	_hold(_left_hand, equipment.shield)
+	_placeholder_sword.visible = weapon_model == null
+
+
+func _hold(hand: Node3D, stack: ItemStack) -> Node3D:
+	for old: Node in hand.get_children():
+		hand.remove_child(old)
+		old.queue_free()
+	if stack == null or stack.item == null or stack.item.model_scene == null:
+		return null
+	var data: ItemData = stack.item
+	var model := data.model_scene.instantiate() as Node3D
+	model.name = String(data.id)
+	model.position = data.model_offset
+	model.rotation.y = deg_to_rad(data.model_yaw_degrees)
+	model.scale = Vector3.ONE * data.model_scale
+	hand.add_child(model)
+	for mesh: Node in model.find_children("*", "MeshInstance3D", true, false):
+		(mesh as MeshInstance3D).material_overlay = _tint_material
+	return model
+
+
+## Modelo segurado agora em uma das mãos (null = nada). Usado por testes.
+func held_model(right: bool) -> Node3D:
+	var hand: Node3D = _right_hand if right else _left_hand
+	return hand.get_child(0) as Node3D if hand.get_child_count() > 0 else null
+
+
 ## Modelo de arte em uso (null = boneco provisório). Usado por testes.
 func class_model() -> Node3D:
 	return _class_model
@@ -1158,7 +1195,7 @@ func _update_visuals(delta: float) -> void:
 	_model.scale = Vector3(1.0, 0.6 if state == State.DODGE else 1.0, 1.0)
 	if state == State.DEAD:
 		_tint_material.albedo_color = TINT_DEAD
-		_body.visible = true
+		_set_body_visible(true)
 		return
 	if _flash_time > 0.0:
 		_tint_material.albedo_color = TINT_HIT
@@ -1169,10 +1206,17 @@ func _update_visuals(delta: float) -> void:
 	if health.is_invulnerable() and state != State.DODGE:
 		# Pisca enquanto invulnerável após dano (alterna a cada 1/15 s).
 		_blink_clock += delta
-		_body.visible = int(_blink_clock * 15.0) % 2 == 1
+		_set_body_visible(int(_blink_clock * 15.0) % 2 == 1)
 	else:
 		_blink_clock = 0.0
-		_body.visible = true
+		_set_body_visible(true)
+
+
+## Corpo e o que ele segura piscam juntos.
+func _set_body_visible(value: bool) -> void:
+	_body.visible = value
+	_right_hand.visible = value
+	_left_hand.visible = value
 
 
 ## Vetor só no chão (sem altura).

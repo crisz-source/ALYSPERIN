@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="PackedScene" path="res://assets/weapons/ember_maul/ember_maul.glb" id="1_ytgub"]
+[ext_resource type="Script" path="res://game/items/weapon_data.gd" id="2_sfqox"]
+
+[resource]
+script = ExtResource("2_sfqox")
+weapon_type = &"maca"
+damage = 14
+timing_scale = 1.2
+reach_scale = 1.05
+knockback_multiplier = 1.3
+durability = 70
+id = &"ember_maul"
+display_name = "Malho de brasa"
+description = "Martelo de guerra com coroa de cristal âmbar. Pesado, empurra longe."
+icon_color = Color(0.95, 0.55, 0.2, 1)
+model_scene = ExtResource("1_ytgub")
+model_scale = 0.6
+model_offset = Vector3(0, -0.3, 0)
+model_yaw_degrees = 90.0

@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://cy6huiu062fys"
-path="res://.godot/imported/guardian.glb-16542202bf2f90655c60e7c8a8871f2f.scn"
+uid="uid://dkh0pyd6yeyiq"
+path="res://.godot/imported/ember_maul.glb-5d242b468a7c844c03a1d6c5adababb7.scn"
 
 [deps]
 
-source_file="res://assets/characters/guardian/guardian.glb"
-dest_files=["res://.godot/imported/guardian.glb-16542202bf2f90655c60e7c8a8871f2f.scn"]
+source_file="res://assets/weapons/ember_maul/ember_maul.glb"
+dest_files=["res://.godot/imported/ember_maul.glb-5d242b468a7c844c03a1d6c5adababb7.scn"]
 
 [params]
 

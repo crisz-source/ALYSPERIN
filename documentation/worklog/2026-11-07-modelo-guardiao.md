@@ -1,7 +1,7 @@
 # Primeiro modelo de arte: Guardião
 
 - **Data:** 2026-11-07
-- **Status:** concluído (modelo de teste)
+- **Status:** substituído — modelo removido a pedido do proprietário no mesmo dia (ver `2026-11-07-armas-3d.md`)
 - **Arquivos tocados:** `assets/characters/guardian/` (guardian.glb, source/model.glb, source/.gdignore),
   `tools/dequantize_glb.py`, `game/classes/class_data.gd`, `game/classes/data/guardian.tres`,
   `game/actors/player/player.gd`, `game/actors/player/player.tscn` e cenas de área (regeneradas)

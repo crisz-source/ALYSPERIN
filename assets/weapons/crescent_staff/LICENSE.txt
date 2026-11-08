@@ -1,0 +1,5 @@
+Crescent focus staff (Moonsteel Convergence: MOBA Champions and Arena)
+Origem: https://3dassets.dev/assets/moonsteel-convergence-crescent-focus-staff-3aa4c4cd
+Arquivo: https://cdn.3dassets.dev/assets/18208/v1/model.glb
+Licença: CC0 1.0 Universal (domínio público) - https://creativecommons.org/publicdomain/zero/1.0/
+crescent_staff.glb = source/model.glb convertido por tools/dequantize_glb.py (Godot 4.7 não lê KHR_mesh_quantization).
