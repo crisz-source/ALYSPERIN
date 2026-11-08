@@ -39,6 +39,8 @@ const DODGE_SUCCESS_COLOR := Color(0.55, 0.95, 1.0)
 const BLOCK_SUCCESS_TEXT := "Defesa bem-sucedida!"
 const BLOCK_SUCCESS_COLOR := Color(0.75, 0.85, 1.0)
 const LEVEL_UP_COLOR := Color(1.0, 0.85, 0.35)
+## Duração do texto "Nível N!" (os outros textos flutuantes duram 0,9 s).
+const LEVEL_UP_TEXT_TIME: float = 1.9
 const BROKEN_COLOR := Color(1.0, 0.45, 0.35)
 const MSG_HEALTH_FULL := "A vida já está cheia."
 const MSG_MANA_FULL := "A mana já está cheia."
@@ -1017,7 +1019,10 @@ func _on_leveled_up(new_level: int) -> void:
 	# Subir de nível enche vida e mana (só ao subir; ganhar exp. não enche).
 	health.heal(health.max_health)
 	mana.restore_full()
-	FloatingText.spawn(self, "Nível %d!" % new_level, global_position + Vector3.UP * (TEXT_HEIGHT + 0.8), LEVEL_UP_COLOR)
+	var level_text: FloatingText = FloatingText.spawn(self, "Nível %d!" % new_level, global_position + Vector3.UP * (TEXT_HEIGHT + 0.8), LEVEL_UP_COLOR)
+	# Fica 1 s a mais que os outros textos, subindo mais devagar.
+	level_text.lifetime = LEVEL_UP_TEXT_TIME
+	level_text.rise_speed = 0.6
 	# Filho do modelo (que gira com o personagem): as asas ficam sempre nas costas.
 	_model.add_child(LevelUpEffect.new())
 

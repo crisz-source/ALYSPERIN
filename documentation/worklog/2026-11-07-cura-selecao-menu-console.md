@@ -67,3 +67,7 @@ o mouse gera); vários jogadores de verdade (co-op).
   por aliado). O proprietário citou "25" como exemplo; mantido 15 e perguntado.
 - Testes: `test3d_heal.gd` 30/30 (+2: exp. sem subir não enche; subir enche); verificação
   antiga de "+8 de vida ao subir" atualizada para "cheia ao subir". Demais suítes passando.
+
+## Ajuste: texto "Nível N!" dura 1 s a mais
+- Antes 0,9 s (igual aos números de dano); agora 1,9 s, subindo mais devagar (0,6 m/s).
+  Só esse texto mudou. Teste: visível aos 1,5 s e some por volta de 1,9 s (32/32).
