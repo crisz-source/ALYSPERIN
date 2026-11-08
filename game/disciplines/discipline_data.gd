@@ -23,3 +23,6 @@ extends Resource
 @export_group("Habilidades")
 ## Habilidades da barra (posição na lista = tecla: 0 = tecla 1).
 @export var abilities: Array[AbilityData] = []
+## Habilidade do botão direito do mouse, para classes sem escudo (quem tem
+## escudo usa o botão direito para defender). Ex.: Oração de cura do Sacerdote.
+@export var secondary_ability: AbilityData

@@ -171,6 +171,10 @@ var _firmeza_left: float = 0.0
 var _heal_targeting: HealSpellData = null
 var _heal_slot: int = -1
 var _heal_selection: Array[Node3D] = []
+## Botão direito: borda de "apertou agora" e recarga da habilidade secundária.
+var _defend_held_last: bool = false
+var _defend_pressed: bool = false
+var _secondary_cooldown_left: float = 0.0
 var _base_max_mana: int = 0
 var _body_material: StandardMaterial3D
 var _swing_material: StandardMaterial3D
@@ -239,6 +243,9 @@ func _physics_process(delta: float) -> void:
 	_input.poll(delta)
 	if input_blocked:
 		_input.clear()
+	_defend_pressed = _input.defend_held and not _defend_held_last
+	_defend_held_last = _input.defend_held
+	_secondary_cooldown_left = maxf(_secondary_cooldown_left - delta, 0.0)
 	_state_time += delta
 	_dodge_cooldown_left = maxf(_dodge_cooldown_left - delta, 0.0)
 	_combo_window_left = maxf(_combo_window_left - delta, 0.0)
@@ -464,6 +471,8 @@ func _process_move(delta: float) -> void:
 		if focused_interactable:
 			_interact_with(focused_interactable)
 			return
+	if _try_secondary_ability():
+		return
 	# Defesa vence o ataque: segurando o botão direito, cliques são ignorados.
 	if _can_block():
 		_start_block()
@@ -729,6 +738,40 @@ func use_hotbar_item(slot: int) -> String:
 		if stack and stack.item == item:
 			return use_inventory_slot(i)
 	return _say("Você não tem %s." % item.display_name)
+
+
+## Habilidade do botão direito (classes sem escudo), ou null.
+func secondary_ability() -> AbilityData:
+	return discipline.secondary_ability if discipline else null
+
+
+## 0 = pronta, 1 = acabou de usar.
+func secondary_cooldown_ratio() -> float:
+	var ability: AbilityData = secondary_ability()
+	if ability == null or ability.cooldown <= 0.0:
+		return 0.0
+	return _secondary_cooldown_left / ability.cooldown
+
+
+## Botão direito sem escudo: usa a habilidade secundária da disciplina.
+func _try_secondary_ability() -> bool:
+	var ability: AbilityData = secondary_ability()
+	if not _defend_pressed or ability == null or equipment.shield != null:
+		return false
+	_defend_pressed = false
+	if not is_instance_valid(ability) or not ability.is_implemented() or _secondary_cooldown_left > 0.0:
+		return false
+	if stats.level < ability.unlock_level:
+		_say("%s: liberada no nível %d." % [ability.display_name, ability.unlock_level])
+		return false
+	if not mana.spend(ability.mana_cost):
+		FloatingText.spawn(self, "Sem mana", global_position + Vector3.UP * TEXT_HEIGHT, NO_MANA_COLOR)
+		return false
+	_secondary_cooldown_left = ability.cooldown
+	_change_state(State.ABILITY)
+	_active_ability = ability
+	_ability_fired = false
+	return true
 
 
 func is_ability_unlocked(slot: int) -> bool:

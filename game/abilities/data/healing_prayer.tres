@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="HealSpellData" format=3]
+
+[ext_resource type="Script" path="res://game/abilities/heal_spell_data.gd" id="1_csfmp"]
+
+[resource]
+script = ExtResource("1_csfmp")
+heal_amount = 25
+cast_time = 0.3
+id = &"healing_prayer"
+display_name = "Oração de cura"
+description = "Cura você mesmo (botão direito do mouse)."
+cooldown = 6.0
+mana_cost = 15
+icon_color = Color(0.95, 0.85, 1, 1)

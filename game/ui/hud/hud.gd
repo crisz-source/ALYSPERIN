@@ -133,6 +133,7 @@ func _build_ability_bar() -> void:
 	for old: Node in _ability_bar.get_children():
 		_ability_bar.remove_child(old)
 		old.queue_free()
+	_build_secondary_slot()
 	for i in PlayerInput.ABILITY_SLOTS:
 		var ability: AbilityData = _player.abilities[i] if i < _player.abilities.size() else null
 		var box := ColorRect.new()
@@ -206,11 +207,41 @@ func _slot_position(slot: int) -> Vector2:
 	return Vector2(x0 + index * (SLOT + SLOT_GAP), ROW_NUMBERS_Y if in_numbers else ROW_F_Y)
 
 
+## Espaço da habilidade do botão direito ("Dir"), à esquerda da fileira 1-9.
+func _build_secondary_slot() -> void:
+	var ability: AbilityData = _player.secondary_ability()
+	if ability == null:
+		return
+	var box := ColorRect.new()
+	box.name = "AbilitySecondary"
+	box.size = Vector2(SLOT, SLOT)
+	box.position = _slot_position(0) - Vector2(SLOT + SLOT_GAP * 3.0, 0)
+	box.color = ability.icon_color
+	var shade := ColorRect.new()
+	shade.name = "Cooldown"
+	shade.size = Vector2(SLOT, SLOT)
+	shade.color = Color(0, 0, 0, 0.7)
+	box.add_child(shade)
+	var key := Label.new()
+	key.name = "Key"
+	key.text = "Dir"
+	key.position = Vector2(1, -2)
+	key.add_theme_font_size_override("font_size", 8)
+	key.add_theme_constant_override("outline_size", 2)
+	key.add_theme_color_override("font_outline_color", Color.BLACK)
+	box.add_child(key)
+	_ability_bar.add_child(box)
+
+
 func _update_ability_bar() -> void:
 	if _player == null:
 		return
+	if _ability_bar.has_node("AbilitySecondary"):
+		var sec_shade: ColorRect = _ability_bar.get_node("AbilitySecondary/Cooldown")
+		sec_shade.size.y = SLOT * _player.secondary_cooldown_ratio()
+		sec_shade.position.y = SLOT - sec_shade.size.y
 	for box: Node in _ability_bar.get_children():
-		if not box.has_node("Cooldown"):
+		if not box.has_node("Cooldown") or box.name == "AbilitySecondary":
 			continue
 		var slot: int = int(String(box.name).trim_prefix("Ability")) - 1
 		var unlocked: bool = _player.is_ability_unlocked(slot)
