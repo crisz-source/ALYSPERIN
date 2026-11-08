@@ -141,3 +141,13 @@ contam por um relógio diferente do real. Para medir tempo real, usar `Time.get_
 ## Git
 - Branch principal `main`. Commit ao fim de cada etapa testada.
 - `.godot/` é cache e não vai para o git.
+
+## Resolução e texto (2026-11-08)
+- Interface em resolução cheia (`stretch/mode = canvas_items`, base 640x360 nas coordenadas);
+  o 3D é desenhado a 1/3 sem suavizar (`scaling_3d/mode = nearest`, `scale = 0.333`) para manter o visual pixelado.
+- Todo `Label3D` é desenhado nítido pelo autoload `WorldText` (cópia 2D no mesmo ponto); o original fica
+  numa camada que a câmera não vê. Criar Label3D normalmente: o WorldText cuida sozinho.
+
+## Chefes
+- Partes quebráveis precisam ficar na faixa que o golpe corpo a corpo alcança (0,2 a 1,6 m de altura):
+  sem arqueiro no grupo, o tanque também precisa conseguir quebrar tudo.

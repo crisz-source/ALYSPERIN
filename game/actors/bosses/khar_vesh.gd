@@ -17,6 +17,10 @@ const GROUP: StringName = &"bosses"
 const GRAVITY: float = 20.0
 const MAX_HEALTH: int = 2400
 const XP_REWARD: int = 3000
+## Faixa de altura que a área de golpe corpo a corpo do jogador alcança (m):
+## centro do golpe a 0,9 m, meia altura 0,7. Partes quebráveis ficam dentro dela.
+const MELEE_BAND_LOW: float = 0.2
+const MELEE_BAND_HIGH: float = 1.6
 const DISPLAY_NAME := "Khar'Vesh, a Mãe-Raiz"
 const ITEMS := "res://game/items/data/"
 
@@ -145,7 +149,7 @@ func _build_body() -> void:
 	trunk.name = "Trunk"
 	_model.add_child(trunk)
 	_core_mesh = _mesh_sphere(1.0, _mat(Color(0.9, 0.1, 0.1), Color(1.0, 0.1, 0.05)))
-	_core_mesh.position = Vector3(0, 3.0, -1.0)
+	_core_mesh.position = Vector3(0, 1.1, -1.0)
 	_core_mesh.visible = false
 	_model.add_child(_core_mesh)
 	_aura = OmniLight3D.new()
@@ -158,15 +162,17 @@ func _build_body() -> void:
 
 func _build_parts() -> void:
 	# [id, vida, forma (tamanho), posição local, cor, escala de dano]
+	# Toda parte quebrável fica na faixa que o golpe corpo a corpo alcança
+	# (MELEE_BAND_LOW..HIGH): sem arqueiro, o tanque também precisa quebrar tudo.
 	var specs: Array = [
 		[&"bark", 900, Vector3(3.5, 5.0, 3.5), Vector3(0, 3, 0), BARK_COLOR, 1.0],
-		[&"core", 0, Vector3(2.0, 2.0, 2.0), Vector3(0, 3, -1.0), Color(0.9, 0.1, 0.1), 1.5],
-		[&"mouth", 250, Vector3(1.0, 1.6, 0.6), Vector3(0, 3.6, -1.7), Color(0.55, 0.05, 0.05), 1.0],
-		[&"whip_left", 250, Vector3(0.5, 0.5, 3.0), Vector3(-2.2, 2.5, -1.2), Color(0.18, 0.12, 0.08), 1.0],
-		[&"whip_right", 250, Vector3(0.5, 0.5, 3.0), Vector3(2.2, 2.5, -1.2), Color(0.18, 0.12, 0.08), 1.0],
-		[&"bulb_1", 150, Vector3(0.9, 0.9, 0.9), Vector3(-0.8, 3.5, 1.6), Color(0.9, 0.1, 0.15, 0.75), 1.0],
-		[&"bulb_2", 150, Vector3(0.9, 0.9, 0.9), Vector3(0.8, 3.0, 1.7), Color(0.9, 0.1, 0.15, 0.75), 1.0],
-		[&"bulb_3", 150, Vector3(0.9, 0.9, 0.9), Vector3(0.0, 4.3, 1.5), Color(0.9, 0.1, 0.15, 0.75), 1.0],
+		[&"core", 0, Vector3(1.6, 1.4, 1.2), Vector3(0, 1.1, -1.3), Color(0.9, 0.1, 0.1), 1.5],
+		[&"mouth", 250, Vector3(1.0, 0.9, 0.6), Vector3(0, 1.3, -1.75), Color(0.55, 0.05, 0.05), 1.0],
+		[&"whip_left", 250, Vector3(0.5, 0.5, 3.0), Vector3(-2.0, 0.8, -1.4), Color(0.18, 0.12, 0.08), 1.0],
+		[&"whip_right", 250, Vector3(0.5, 0.5, 3.0), Vector3(2.0, 0.8, -1.4), Color(0.18, 0.12, 0.08), 1.0],
+		[&"bulb_1", 150, Vector3(0.9, 0.9, 0.9), Vector3(-0.9, 0.9, 1.75), Color(0.9, 0.1, 0.15, 0.75), 1.0],
+		[&"bulb_2", 150, Vector3(0.9, 0.9, 0.9), Vector3(0.9, 0.9, 1.75), Color(0.9, 0.1, 0.15, 0.75), 1.0],
+		[&"bulb_3", 150, Vector3(0.9, 0.9, 0.9), Vector3(0.0, 1.45, 1.8), Color(0.9, 0.1, 0.15, 0.75), 1.0],
 	]
 	for spec: Array in specs:
 		var part := BossPart.new()

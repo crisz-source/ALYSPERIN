@@ -17,6 +17,7 @@ config/features=PackedStringArray("4.7")
 [autoload]
 
 Hitstop="*res://game/systems/hitstop.gd"
+WorldText="*res://game/systems/world_text.gd"
 
 [debug]
 
@@ -29,7 +30,7 @@ window/size/viewport_height=360
 window/size/mode=3
 window/size/window_width_override=1920
 window/size/window_height_override=1080
-window/stretch/mode="viewport"
+window/stretch/mode="canvas_items"
 window/stretch/scale_mode="integer"
 
 [input]
@@ -218,6 +219,8 @@ chat={
 [rendering]
 
 textures/canvas_textures/default_texture_filter=0
+scaling_3d/mode=5
+scaling_3d/scale=0.333333
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
 environment/defaults/default_clear_color=Color(0.07, 0.06, 0.08, 1)
