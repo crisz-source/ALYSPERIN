@@ -841,9 +841,9 @@ func _confirm_heal() -> void:
 		_say("Selecione um aliado primeiro.")
 		return
 	var ability: HealSpellData = _heal_targeting
-	var cost: int = ability.mana_cost * _heal_selection.size()
-	if not mana.spend(cost):
-		_say("Mana insuficiente para curar %d aliado(s) (%d de mana)." % [_heal_selection.size(), cost])
+	# Custo fixo por uso: o mesmo para 1 ou para vários aliados.
+	if not mana.spend(ability.mana_cost):
+		_say("Mana insuficiente (%d de mana)." % ability.mana_cost)
 		return
 	for ally: Node3D in _heal_selection:
 		var ally_health: HealthComponent = ally.get("health")
@@ -1014,6 +1014,9 @@ func _apply_growth() -> void:
 
 func _on_leveled_up(new_level: int) -> void:
 	_apply_growth()
+	# Subir de nível enche vida e mana (só ao subir; ganhar exp. não enche).
+	health.heal(health.max_health)
+	mana.restore_full()
 	FloatingText.spawn(self, "Nível %d!" % new_level, global_position + Vector3.UP * (TEXT_HEIGHT + 0.8), LEVEL_UP_COLOR)
 	# Filho do modelo (que gira com o personagem): as asas ficam sempre nas costas.
 	_model.add_child(LevelUpEffect.new())

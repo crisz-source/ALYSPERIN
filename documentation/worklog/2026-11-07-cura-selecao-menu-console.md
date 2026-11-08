@@ -60,3 +60,10 @@ o mouse gera); vários jogadores de verdade (co-op).
   viewport (640,360), escala 3,0.
 - Testes: `test3d_heal.gd` 28/28 (seleção por mira, não desmarca, clique não ataca); demais
   10 suítes passando.
+
+## Ajuste: nível enche vida/mana; custo fixo da cura
+- Subir de nível agora enche vida e mana (100%); ganhar exp. sem subir não enche.
+- Luz curativa: custo **fixo** de 15 de mana por uso, qualquer número de aliados (antes 15
+  por aliado). O proprietário citou "25" como exemplo; mantido 15 e perguntado.
+- Testes: `test3d_heal.gd` 30/30 (+2: exp. sem subir não enche; subir enche); verificação
+  antiga de "+8 de vida ao subir" atualizada para "cheia ao subir". Demais suítes passando.
