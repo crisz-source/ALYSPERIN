@@ -6,9 +6,10 @@
 script = ExtResource("1_n58r5")
 heal_amount = 25
 cast_time = 0.3
+requires_target = true
 id = &"healing_light"
 display_name = "Luz curativa"
-description = "Cura 25 de vida (no co-op: o aliado na mira)."
+description = "Selecione um ou mais aliados com a mira e aperte Espaço: cura 25 em cada (15 de mana por aliado)."
 cooldown = 3.0
 mana_cost = 15
 icon_color = Color(1, 0.95, 0.6, 1)

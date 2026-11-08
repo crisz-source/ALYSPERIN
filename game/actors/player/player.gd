@@ -44,6 +44,10 @@ const MSG_HEALTH_FULL := "A vida já está cheia."
 const MSG_MANA_FULL := "A mana já está cheia."
 const MSG_INVENTORY_FULL := "Inventário cheio."
 const NO_MANA_COLOR := Color(0.5, 0.7, 1.0)
+## Distância máxima para selecionar um aliado com a mira (m).
+const HEAL_TARGET_RANGE: float = 25.0
+## Camadas que a mira de cura enxerga: mundo (bloqueia) e jogadores/aliados.
+const HEAL_TARGET_MASK: int = 1 | 2
 ## Altura (acima dos pés) onde aparecem textos flutuantes.
 const TEXT_HEIGHT: float = 2.1
 ## Passivo Muralha (Bastião): duração e redução de dano da Firmeza.
@@ -161,6 +165,10 @@ var player_class: ClassData = null
 var discipline: DisciplineData = null
 ## Passivo Muralha (Bastião): tempo restante de Firmeza (menos dano).
 var _firmeza_left: float = 0.0
+## Modo de seleção de cura (Luz curativa): a habilidade, a tecla e os aliados marcados.
+var _heal_targeting: HealSpellData = null
+var _heal_slot: int = -1
+var _heal_selection: Array[Node3D] = []
 var _base_max_mana: int = 0
 var _body_material: StandardMaterial3D
 var _swing_material: StandardMaterial3D
@@ -445,6 +453,8 @@ func _say(message: String) -> String:
 # --- Estados ---------------------------------------------------------------
 
 func _process_move(delta: float) -> void:
+	if _heal_targeting and _process_heal_targeting():
+		return
 	if _try_start_dodge():
 		return
 	if _input.has_interact():
@@ -653,6 +663,14 @@ func _try_start_ability() -> bool:
 	if not ability.is_implemented():
 		_say("%s: ainda em desenvolvimento." % ability.display_name)
 		return false
+	var targeted_heal := ability as HealSpellData
+	if targeted_heal and targeted_heal.requires_target:
+		# Mesma tecla de novo = cancela. Mana e recarga só na confirmação (Espaço).
+		if _heal_targeting == targeted_heal:
+			cancel_heal_targeting()
+		elif _ability_cooldowns[slot] <= 0.0:
+			_start_heal_targeting(targeted_heal, slot)
+		return false
 	if ability is ShieldBashData and equipment.shield == null:
 		_say("Golpe de escudo precisa de um escudo.")
 		return false
@@ -734,6 +752,108 @@ func _try_start_dodge() -> bool:
 	_change_state(State.DODGE)
 	health.set_invulnerable(true)
 	return true
+
+
+# --- Cura com seleção de aliados ----------------------------------------------
+
+func is_heal_targeting() -> bool:
+	return _heal_targeting != null
+
+
+func heal_selection() -> Array[Node3D]:
+	return _heal_selection
+
+
+## Aliado (outro jogador ou aliado de teste) no centro da tela, ou null.
+func ally_in_crosshair() -> Node3D:
+	var cam: Camera3D = _camera.camera
+	var center: Vector2 = cam.get_viewport().get_visible_rect().size / 2.0
+	var from: Vector3 = cam.project_ray_origin(center)
+	var query := PhysicsRayQueryParameters3D.create(from, from + cam.project_ray_normal(center) * HEAL_TARGET_RANGE, HEAL_TARGET_MASK)
+	query.exclude = [get_rid()]
+	var hit: Dictionary = get_world_3d().direct_space_state.intersect_ray(query)
+	var node := hit.get("collider") as Node3D
+	if node == null or node == self or not ("health" in node):
+		return null
+	if not (node.is_in_group(AllyDummy.GROUP) or node is Player):
+		return null
+	return node if not (node.get("health") as HealthComponent).is_dead else null
+
+
+func cancel_heal_targeting() -> void:
+	if _heal_targeting == null:
+		return
+	for ally: Node3D in _heal_selection:
+		if is_instance_valid(ally) and ally.has_method("set_heal_selected"):
+			ally.call("set_heal_selected", false)
+	_heal_selection.clear()
+	_heal_targeting = null
+	_heal_slot = -1
+
+
+## Tinta o corpo ao ser selecionado para cura por outro jogador (co-op).
+func set_heal_selected(value: bool) -> void:
+	_body_material.albedo_color = PLACEHOLDER_COLOR.lerp(Color(0.45, 1.0, 0.5), 0.65) if value else PLACEHOLDER_COLOR
+
+
+func _start_heal_targeting(ability: HealSpellData, slot: int) -> void:
+	cancel_heal_targeting()
+	_heal_targeting = ability
+	_heal_slot = slot
+
+
+## Durante a seleção: clique marca/desmarca o aliado na mira, Espaço cura os
+## marcados, botão direito cancela. Devolve true se usou o comando do quadro.
+func _process_heal_targeting() -> bool:
+	if input_blocked:
+		cancel_heal_targeting()
+		return false
+	if _input.defend_held:
+		cancel_heal_targeting()
+		return true
+	if _input.has_attack():
+		_input.consume_attack()
+		var ally: Node3D = ally_in_crosshair()
+		if ally:
+			_toggle_heal_selection(ally)
+		return true
+	if _input.has_dodge():
+		_input.consume_dodge()
+		_confirm_heal()
+		return true
+	return false
+
+
+func _toggle_heal_selection(ally: Node3D) -> void:
+	var selected: bool = not _heal_selection.has(ally)
+	if selected:
+		_heal_selection.append(ally)
+	else:
+		_heal_selection.erase(ally)
+	if ally.has_method("set_heal_selected"):
+		ally.call("set_heal_selected", selected)
+
+
+func _confirm_heal() -> void:
+	_heal_selection = _heal_selection.filter(func(a: Node3D) -> bool: return is_instance_valid(a))
+	if _heal_selection.is_empty():
+		_say("Selecione um aliado primeiro.")
+		return
+	var ability: HealSpellData = _heal_targeting
+	var cost: int = ability.mana_cost * _heal_selection.size()
+	if not mana.spend(cost):
+		_say("Mana insuficiente para curar %d aliado(s) (%d de mana)." % [_heal_selection.size(), cost])
+		return
+	for ally: Node3D in _heal_selection:
+		var ally_health: HealthComponent = ally.get("health")
+		# Passivo Graça: curar quem está com a vida cheia vira escudo de vida.
+		if _has_passive(&"graca") and ally_health.current_health >= ally_health.max_health:
+			ally_health.add_shield(ability.heal_amount / 2)
+			FloatingText.spawn(self, "Escudo +%d" % (ability.heal_amount / 2), ally.global_position + Vector3.UP * 2.4, Color(1.0, 0.95, 0.6))
+		ally_health.heal(ability.heal_amount)
+		FloatingText.spawn(self, "+%d" % ability.heal_amount, ally.global_position + Vector3.UP * 2.1, Color(0.5, 1.0, 0.5))
+	_ability_cooldowns[_heal_slot] = ability.cooldown
+	cancel_heal_targeting()
 
 
 func _interact_with(target: Interactable) -> void:
@@ -819,6 +939,7 @@ func _on_sword_hit(target: Hurtbox) -> void:
 
 
 func _on_damaged(info: DamageInfo) -> void:
+	cancel_heal_targeting()
 	if health.is_dead:
 		return
 	health.grant_invulnerability(post_hit_invulnerability)

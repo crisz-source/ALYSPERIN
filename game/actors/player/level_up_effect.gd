@@ -2,13 +2,13 @@ class_name LevelUpEffect
 extends Node3D
 ## Efeito de subir de nível (PROVISÓRIO: formas simples, sem arte): duas asas
 ## douradas se abrem atrás do personagem e uma coroa surge acima da cabeça,
-## com um brilho; ficam ~5 s (a coroa girando devagar) e depois sobem e somem.
+## com um brilho; ficam ~4 s (a coroa girando devagar) e depois sobem e somem.
 ## Filho do modelo do jogador.
 ##
 ## Só apresentação: criado pelo Player ao subir de nível e se apaga sozinho.
 
 const GOLD := Color(1.0, 0.82, 0.3)
-const DURATION: float = 5.0
+const DURATION: float = 4.0
 ## Últimos segundos: o efeito sobe e desaparece.
 const FADE_TIME: float = 1.2
 const HEAD_HEIGHT: float = 2.15

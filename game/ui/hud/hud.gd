@@ -32,6 +32,7 @@ var _player: Player
 var _crosshair: Crosshair
 var _stats_label: Label
 var _stats_clock: float = 0.0
+var _heal_hint: Label
 
 @onready var _health_fill: ColorRect = $PlayerHealth/Fill
 @onready var _help_label: Label = $HelpPlaceholder
@@ -68,6 +69,17 @@ func _ready() -> void:
 	_stats_label.add_theme_color_override("font_color", Color(0.85, 0.85, 0.9))
 	add_child(_stats_label)
 	_update_stats()
+	_heal_hint = Label.new()
+	_heal_hint.name = "HealHint"
+	_heal_hint.position = Vector2(0, 222)
+	_heal_hint.size = Vector2(640, 16)
+	_heal_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_heal_hint.add_theme_font_size_override("font_size", 10)
+	_heal_hint.add_theme_constant_override("outline_size", 3)
+	_heal_hint.add_theme_color_override("font_outline_color", Color.BLACK)
+	_heal_hint.add_theme_color_override("font_color", Color(0.6, 1.0, 0.6))
+	_heal_hint.visible = false
+	add_child(_heal_hint)
 
 
 func bind_player(player: Player) -> void:
@@ -216,7 +228,15 @@ func _update_crosshair() -> void:
 	if _player == null:
 		return
 	_crosshair.visible = not _player.input_blocked and not _player.health.is_dead
-	_crosshair.targeted = _crosshair.visible and enemy_in_crosshair() != null
+	var healing: bool = _player.is_heal_targeting()
+	_crosshair.heal_mode = healing
+	_crosshair.ally_targeted = healing and _crosshair.visible and _player.ally_in_crosshair() != null
+	_crosshair.targeted = not healing and _crosshair.visible and enemy_in_crosshair() != null
+	_heal_hint.visible = healing and _crosshair.visible
+	if _heal_hint.visible:
+		var count: int = _player.heal_selection().size()
+		_heal_hint.text = "Clique em um aliado para selecionar  (botão direito cancela)" if count == 0 \
+			else "Aperte Espaço para curar  (%d selecionado%s)" % [count, "" if count == 1 else "s"]
 
 
 ## Inimigo no centro da tela (raio a partir da câmera; paredes bloqueiam), ou null.
