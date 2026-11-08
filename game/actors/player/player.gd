@@ -36,6 +36,8 @@ const SWING_COLOR := Color(1.0, 1.0, 0.85, 0.6)
 const FINISHER_SWING_TINT := Color(1.0, 0.75, 0.45, 0.7)
 const DODGE_SUCCESS_TEXT := "Esquiva perfeita!"
 const DODGE_SUCCESS_COLOR := Color(0.55, 0.95, 1.0)
+const BLOCK_SUCCESS_TEXT := "Defesa bem-sucedida!"
+const BLOCK_SUCCESS_COLOR := Color(0.75, 0.85, 1.0)
 const LEVEL_UP_COLOR := Color(1.0, 0.85, 0.35)
 const BROKEN_COLOR := Color(1.0, 0.45, 0.35)
 const MSG_HEALTH_FULL := "A vida já está cheia."
@@ -771,9 +773,10 @@ func _on_blocked(info: DamageInfo) -> void:
 	# Passivo Muralha: bloquear dá Firmeza (menos dano por alguns segundos).
 	if _has_passive(&"muralha"):
 		if _firmeza_left <= 0.0:
-			FloatingText.spawn(self, "Firmeza", global_position + Vector3.UP * (TEXT_HEIGHT + 0.3), Color(0.75, 0.85, 1.0))
+			FloatingText.spawn(self, "Firmeza", global_position + Vector3.UP * (TEXT_HEIGHT + 0.5), Color(0.6, 0.75, 1.0))
 		_firmeza_left = FIRMEZA_TIME
 	equipment.notify_wear()
+	FloatingText.spawn(self, BLOCK_SUCCESS_TEXT, global_position + Vector3.UP * TEXT_HEIGHT, BLOCK_SUCCESS_COLOR)
 	_shield_flash_time = 0.08
 	_camera.shake(1.5, 0.08)
 	Hitstop.request(hitstop_block)

@@ -70,3 +70,15 @@ provocação (só cor do inimigo e texto flutuante, sem efeitos próprios).
 - [ ] Teste manual do proprietário
 - [ ] Etapa B: efeitos de status completos (lentidão, congelar, queimar, veneno, medo, escudo em aliados)
 - [ ] Habilidades de nível 10+ do Bastião e do Sacerdote; disciplinas "Em breve"; outras 4 classes
+
+## Ajustes pedidos depois (mira, defesa, nível)
+- **Mira parecia estar na ponta da arma.** Medido: a ponta da espada aparecia a 14 px do
+  centro da tela e a cabeça a 26 px (a câmera por cima do ombro colocava o personagem no
+  centro). Causa: posição do pivô da câmera. Correção: pivô mais alto e mais ao lado
+  (`Pitch` em (1,0; 0,9; 0)). Depois: espada a 40 px, cabeça a 49 px; personagem embaixo à
+  esquerda, mira livre. Teste novo garante distância mínima.
+- **"Defesa bem-sucedida!"** a cada bloqueio (texto flutuante azul-claro); "Firmeza" do
+  Bastião sobe um pouco para não sobrepor.
+- **Animação de nível ~5 s**: asas e coroa ficam ~3,8 s e somem em 1,2 s (subindo).
+- Testes: `test3d_ui.gd` 22/22 (+4: efeito visível aos 3,5 s, some até ~5,5 s, espada e
+  cabeça longe do centro, mensagem de defesa); demais 8 suítes passando.

@@ -2,12 +2,15 @@ class_name LevelUpEffect
 extends Node3D
 ## Efeito de subir de nível (PROVISÓRIO: formas simples, sem arte): duas asas
 ## douradas se abrem atrás do personagem e uma coroa surge acima da cabeça,
-## com um brilho; depois tudo sobe um pouco e some. Filho do modelo do jogador.
+## com um brilho; ficam ~5 s (a coroa girando devagar) e depois sobem e somem.
+## Filho do modelo do jogador.
 ##
 ## Só apresentação: criado pelo Player ao subir de nível e se apaga sozinho.
 
 const GOLD := Color(1.0, 0.82, 0.3)
-const DURATION: float = 1.8
+const DURATION: float = 5.0
+## Últimos segundos: o efeito sobe e desaparece.
+const FADE_TIME: float = 1.2
 const HEAD_HEIGHT: float = 2.15
 
 var _material: StandardMaterial3D
@@ -90,9 +93,11 @@ func _animate() -> void:
 		tween.tween_property(wing, "scale", Vector3.ONE, 0.35).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	tween.tween_property(_crown, "scale", Vector3.ONE, 0.4).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT).set_delay(0.1)
 	tween.tween_property(_crown, "rotation:y", TAU, DURATION)
-	tween.tween_property(self, "position:y", 0.4, DURATION - 0.6).set_delay(0.6)
-	tween.tween_property(_material, "albedo_color:a", 0.0, 0.6).set_delay(DURATION - 0.6)
-	tween.tween_property(_light, "light_energy", 0.0, DURATION)
+	tween.tween_property(self, "position:y", 0.4, FADE_TIME).set_delay(DURATION - FADE_TIME)
+	tween.tween_property(_material, "albedo_color:a", 0.0, FADE_TIME).set_delay(DURATION - FADE_TIME)
+	# Brilho forte no começo, depois fica fraco enquanto as asas estão abertas.
+	tween.tween_property(_light, "light_energy", 1.0, 1.0)
+	tween.tween_property(_light, "light_energy", 0.0, FADE_TIME).set_delay(DURATION - FADE_TIME)
 	tween.chain().tween_callback(queue_free)
 
 

@@ -40,49 +40,49 @@ size = Vector3(0.9, 0.9, 0.9)
 [sub_resource type="BoxShape3D" id="BoxShape3D_q446r"]
 size = Vector3(0.9, 0.9, 0.9)
 
-[node name="BasicEnemy" type="CharacterBody3D" unique_id=2052354605]
+[node name="BasicEnemy" type="CharacterBody3D" unique_id=531875906]
 collision_layer = 4
 collision_mask = 5
 script = ExtResource("1_dkhml")
 
-[node name="CollisionShape" type="CollisionShape3D" parent="." unique_id=1091866595]
+[node name="CollisionShape" type="CollisionShape3D" parent="." unique_id=2078102569]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 shape = SubResource("CapsuleShape3D_mle0g")
 
-[node name="LungeTelegraph" type="MeshInstance3D" parent="." unique_id=1886521341]
+[node name="LungeTelegraph" type="MeshInstance3D" parent="." unique_id=1256218164]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, 0)
 visible = false
 material_override = SubResource("StandardMaterial3D_blckt")
 cast_shadow = 0
 mesh = SubResource("PlaneMesh_7re40")
 
-[node name="Model" type="Node3D" parent="." unique_id=1016470832]
+[node name="Model" type="Node3D" parent="." unique_id=269474674]
 
-[node name="BodyPlaceholder" type="MeshInstance3D" parent="Model" unique_id=1541997265]
+[node name="BodyPlaceholder" type="MeshInstance3D" parent="Model" unique_id=1863587978]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
 material_override = SubResource("StandardMaterial3D_nn014")
 mesh = SubResource("BoxMesh_40kpa")
 
-[node name="FacingIndicator" type="MeshInstance3D" parent="Model" unique_id=1090966299]
+[node name="FacingIndicator" type="MeshInstance3D" parent="Model" unique_id=559224657]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.62, -0.47)
 material_override = SubResource("StandardMaterial3D_gscio")
 mesh = SubResource("BoxMesh_gq21i")
 
-[node name="HealthComponent" type="Node" parent="." unique_id=793131492]
+[node name="HealthComponent" type="Node" parent="." unique_id=1216486171]
 script = ExtResource("2_65ebo")
 max_health = 30
 
-[node name="Hurtbox" type="Area3D" parent="." unique_id=251984611 node_paths=PackedStringArray("health")]
+[node name="Hurtbox" type="Area3D" parent="." unique_id=387795889 node_paths=PackedStringArray("health")]
 collision_layer = 4
 collision_mask = 0
 script = ExtResource("3_vb8ev")
 health = NodePath("../HealthComponent")
 
-[node name="CollisionShape" type="CollisionShape3D" parent="Hurtbox" unique_id=1044595798]
+[node name="CollisionShape" type="CollisionShape3D" parent="Hurtbox" unique_id=1890146245]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
 shape = SubResource("BoxShape3D_8fqma")
 
-[node name="LungeHitbox" type="Area3D" parent="." unique_id=702795317 node_paths=PackedStringArray("attacker")]
+[node name="LungeHitbox" type="Area3D" parent="." unique_id=449607097 node_paths=PackedStringArray("attacker")]
 collision_layer = 16
 collision_mask = 2
 script = ExtResource("4_ukgti")
@@ -90,10 +90,10 @@ damage = 15
 knockback_force = 12.5
 attacker = NodePath("..")
 
-[node name="CollisionShape" type="CollisionShape3D" parent="LungeHitbox" unique_id=66216132]
+[node name="CollisionShape" type="CollisionShape3D" parent="LungeHitbox" unique_id=1690964184]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
 shape = SubResource("BoxShape3D_q446r")
 
-[node name="HealthBar" type="Node3D" parent="." unique_id=947927564]
+[node name="HealthBar" type="Node3D" parent="." unique_id=991883577]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, 0)
 script = ExtResource("5_jfe3p")

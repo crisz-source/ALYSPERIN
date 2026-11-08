@@ -113,95 +113,95 @@ script = ExtResource("8_a20ea")
 item = ExtResource("13_m4n5g")
 durability = 40
 
-[node name="Player" type="CharacterBody3D" unique_id=859502370]
+[node name="Player" type="CharacterBody3D" unique_id=1543250328]
 collision_layer = 2
 script = ExtResource("1_i5w6q")
 abilities = Array[ExtResource("2_fxn5h")]([ExtResource("3_cxuv5")])
 
-[node name="CollisionShape" type="CollisionShape3D" parent="." unique_id=1318476194]
+[node name="CollisionShape" type="CollisionShape3D" parent="." unique_id=918251134]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
 shape = SubResource("CapsuleShape3D_7c4js")
 
-[node name="Model" type="Node3D" parent="." unique_id=1558496579]
+[node name="Model" type="Node3D" parent="." unique_id=154388798]
 
-[node name="BodyPlaceholder" type="MeshInstance3D" parent="Model" unique_id=1116528724]
+[node name="BodyPlaceholder" type="MeshInstance3D" parent="Model" unique_id=2065160886]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
 material_override = SubResource("StandardMaterial3D_6xo6p")
 mesh = SubResource("CapsuleMesh_0nwbe")
 
-[node name="VisorPlaceholder" type="MeshInstance3D" parent="Model" unique_id=1540590532]
+[node name="VisorPlaceholder" type="MeshInstance3D" parent="Model" unique_id=1148283513]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.35, -0.32)
 material_override = SubResource("StandardMaterial3D_3do8f")
 mesh = SubResource("BoxMesh_0fe1s")
 
-[node name="SwordPlaceholder" type="MeshInstance3D" parent="Model" unique_id=92785908]
+[node name="SwordPlaceholder" type="MeshInstance3D" parent="Model" unique_id=237027531]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.42, 0.9, -0.35)
 material_override = SubResource("StandardMaterial3D_d4m7k")
 mesh = SubResource("BoxMesh_0g54q")
 
-[node name="HealthComponent" type="Node" parent="." unique_id=839649856]
+[node name="HealthComponent" type="Node" parent="." unique_id=1340602837]
 script = ExtResource("4_qq66o")
 
-[node name="Hurtbox" type="Area3D" parent="." unique_id=823477189 node_paths=PackedStringArray("health")]
+[node name="Hurtbox" type="Area3D" parent="." unique_id=1863859274 node_paths=PackedStringArray("health")]
 collision_layer = 2
 collision_mask = 0
 script = ExtResource("5_x4qyq")
 health = NodePath("../HealthComponent")
 
-[node name="CollisionShape" type="CollisionShape3D" parent="Hurtbox" unique_id=1042793170]
+[node name="CollisionShape" type="CollisionShape3D" parent="Hurtbox" unique_id=1637355499]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
 shape = SubResource("CapsuleShape3D_bu7in")
 
-[node name="AttackPivot" type="Node3D" parent="." unique_id=293201430]
+[node name="AttackPivot" type="Node3D" parent="." unique_id=691225180]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
 
-[node name="SwordHitbox" type="Area3D" parent="AttackPivot" unique_id=1104083749 node_paths=PackedStringArray("attacker")]
+[node name="SwordHitbox" type="Area3D" parent="AttackPivot" unique_id=2007761280 node_paths=PackedStringArray("attacker")]
 collision_layer = 8
 collision_mask = 4
 script = ExtResource("6_i15os")
 knockback_force = 8.75
 attacker = NodePath("../..")
 
-[node name="CollisionShape" type="CollisionShape3D" parent="AttackPivot/SwordHitbox" unique_id=455792514]
+[node name="CollisionShape" type="CollisionShape3D" parent="AttackPivot/SwordHitbox" unique_id=975196015]
 shape = SubResource("ConvexPolygonShape3D_rsjix")
 
-[node name="SwingPlaceholder" type="MeshInstance3D" parent="AttackPivot" unique_id=1958035479]
+[node name="SwingPlaceholder" type="MeshInstance3D" parent="AttackPivot" unique_id=194089682]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.2, 0)
 material_override = SubResource("StandardMaterial3D_ihiqv")
 cast_shadow = 0
 mesh = SubResource("ArrayMesh_3luqa")
 
-[node name="ShieldPlaceholder" type="MeshInstance3D" parent="AttackPivot" unique_id=348240881]
+[node name="ShieldPlaceholder" type="MeshInstance3D" parent="AttackPivot" unique_id=1327162750]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.6)
 material_override = SubResource("StandardMaterial3D_hkbyu")
 mesh = SubResource("BoxMesh_il4ec")
 
-[node name="SpinHitbox" type="Area3D" parent="." unique_id=232808564 node_paths=PackedStringArray("attacker")]
+[node name="SpinHitbox" type="Area3D" parent="." unique_id=1264638839 node_paths=PackedStringArray("attacker")]
 collision_layer = 8
 collision_mask = 4
 script = ExtResource("6_i15os")
 attacker = NodePath("..")
 
-[node name="CollisionShape" type="CollisionShape3D" parent="SpinHitbox" unique_id=1883142950]
+[node name="CollisionShape" type="CollisionShape3D" parent="SpinHitbox" unique_id=1950472547]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
 shape = SubResource("CylinderShape3D_f7g0i")
 
-[node name="SpinPlaceholder" type="MeshInstance3D" parent="." unique_id=2078742259]
+[node name="SpinPlaceholder" type="MeshInstance3D" parent="." unique_id=245481268]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0)
 material_override = SubResource("StandardMaterial3D_4y8h1")
 cast_shadow = 0
 mesh = SubResource("CylinderMesh_s8joe")
 
-[node name="InteractionDetector" type="Area3D" parent="." unique_id=249869858]
+[node name="InteractionDetector" type="Area3D" parent="." unique_id=138808342]
 collision_layer = 0
 collision_mask = 32
 monitorable = false
 
-[node name="CollisionShape" type="CollisionShape3D" parent="InteractionDetector" unique_id=1187319433]
+[node name="CollisionShape" type="CollisionShape3D" parent="InteractionDetector" unique_id=398720862]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
 shape = SubResource("SphereShape3D_xrjoj")
 
-[node name="InteractPrompt" type="Label3D" parent="." unique_id=2079021699]
+[node name="InteractPrompt" type="Label3D" parent="." unique_id=991583086]
 pixel_size = 0.0008
 billboard = 1
 no_depth_test = true
@@ -209,38 +209,38 @@ fixed_size = true
 font_size = 40
 outline_size = 10
 
-[node name="Inventory" type="Node" parent="." unique_id=544857846]
+[node name="Inventory" type="Node" parent="." unique_id=1557104545]
 script = ExtResource("7_1svlo")
 starting_items = Array[ExtResource("8_a20ea")]([SubResource("Resource_cm075"), SubResource("Resource_k1elb")])
 
-[node name="Equipment" type="Node" parent="." unique_id=1993062168]
+[node name="Equipment" type="Node" parent="." unique_id=1305592470]
 script = ExtResource("11_41lfd")
 starting_weapon = SubResource("Resource_47yrc")
 starting_shield = SubResource("Resource_cea6g")
 
-[node name="ManaComponent" type="Node" parent="." unique_id=2069444589]
+[node name="ManaComponent" type="Node" parent="." unique_id=2096558722]
 script = ExtResource("14_6o7jk")
 
-[node name="QuestLog" type="Node" parent="." unique_id=775994241]
+[node name="QuestLog" type="Node" parent="." unique_id=1108169504]
 script = ExtResource("15_747sf")
 
-[node name="CharacterStats" type="Node" parent="." unique_id=1713990317]
+[node name="CharacterStats" type="Node" parent="." unique_id=1283219377]
 script = ExtResource("16_5qatl")
 
-[node name="PlayerInput" type="Node" parent="." unique_id=1873630577]
+[node name="PlayerInput" type="Node" parent="." unique_id=102550183]
 script = ExtResource("17_qsypv")
 
-[node name="CameraRig" type="Node3D" parent="." unique_id=1390110656]
+[node name="CameraRig" type="Node3D" parent="." unique_id=1763452604]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
 script = ExtResource("18_lje7i")
 
-[node name="Pitch" type="Node3D" parent="CameraRig" unique_id=645161765]
-transform = Transform3D(1, 0, 0, 0, 0.9135454, 0.40673664, 0, -0.40673664, 0.9135454, 0.6, 0.2, 0)
+[node name="Pitch" type="Node3D" parent="CameraRig" unique_id=841287534]
+transform = Transform3D(1, 0, 0, 0, 0.9135454, 0.40673664, 0, -0.40673664, 0.9135454, 1, 0.9, 0)
 
-[node name="SpringArm" type="SpringArm3D" parent="CameraRig/Pitch" unique_id=529996948]
+[node name="SpringArm" type="SpringArm3D" parent="CameraRig/Pitch" unique_id=1180816257]
 spring_length = 6.5
 margin = 0.3
 
-[node name="Camera" type="Camera3D" parent="CameraRig/Pitch/SpringArm" unique_id=1009434277]
+[node name="Camera" type="Camera3D" parent="CameraRig/Pitch/SpringArm" unique_id=651353874]
 current = true
 fov = 65.0

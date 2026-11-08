@@ -16,14 +16,14 @@ emission_energy_multiplier = 3.0
 radius = 0.15
 height = 0.3
 
-[node name="Projectile" type="Area3D" unique_id=945585484]
+[node name="Projectile" type="Area3D" unique_id=973592503]
 collision_layer = 8
 collision_mask = 5
 script = ExtResource("1_u8f4w")
 
-[node name="CollisionShape" type="CollisionShape3D" parent="." unique_id=504867577]
+[node name="CollisionShape" type="CollisionShape3D" parent="." unique_id=1117633828]
 shape = SubResource("SphereShape3D_3m7ta")
 
-[node name="Visual" type="MeshInstance3D" parent="." unique_id=1136608269]
+[node name="Visual" type="MeshInstance3D" parent="." unique_id=1349506265]
 material_override = SubResource("StandardMaterial3D_ukxgw")
 mesh = SubResource("SphereMesh_ww64p")
