@@ -39,8 +39,20 @@ const COMBO_POSES: Array[Array] = [
 	[Vector3(0.6, 0.0, 0.0), Vector3(-2.1, 0.0, 0.0)],     # 3: de cima para baixo
 ]
 
+## Modelo com esqueleto (KayKit): animações por estado. [nome, repete?]
+const ANIM_IDLE := "Idle"
+const ANIM_RUN := "Running_A"
+const ANIM_COMBO_1H: Array[String] = ["1H_Melee_Attack_Slice_Diagonal", "1H_Melee_Attack_Slice_Horizontal", "1H_Melee_Attack_Chop"]
+const ANIM_COMBO_2H: Array[String] = ["2H_Melee_Attack_Slice", "2H_Melee_Attack_Stab", "2H_Melee_Attack_Chop"]
+const LOOPING: Array[String] = ["Idle", "Running_A", "Blocking", "2H_Melee_Idle", "Spellcasting"]
+## Velocidade máxima de uma animação ao encaixar num tempo curto (senão vira borrão).
+const MAX_ANIM_SPEED: float = 3.0
+const RUN_THRESHOLD: float = 0.4
+
 var _player: Player
 var _model: Node3D
+var _anim_key: String = ""
+var _last_state_time: float = 0.0
 var _right: Node3D
 var _left: Node3D
 var _clock: float = 0.0
@@ -69,6 +81,10 @@ func _process(delta: float) -> void:
 ## Calcula e aplica a pose deste instante (público para os testes).
 func update_pose(delta: float) -> void:
 	_clock += delta
+	var anim_player: AnimationPlayer = _skeletal_player()
+	if anim_player:
+		_update_skeletal(anim_player)
+		return
 	var target := _target_pose()
 	var w: float = 1.0 - exp(-FOLLOW_RATE * delta)
 	_right_pos = _right_pos.lerp(target.right_pos, w)
@@ -83,6 +99,87 @@ func update_pose(delta: float) -> void:
 	_model.rotation = Vector3(_lean.x, Player.yaw_of(_player.facing) + target.spin, _lean.z)
 	_model.position = Vector3(0.0, target.bob, 0.0)
 	_model.scale = Vector3(1.0, DODGE_SQUASH if _player.state == Player.State.DODGE else 1.0, 1.0)
+
+
+# --- Modelo com esqueleto (KayKit) ----------------------------------------------
+
+func _skeletal_player() -> AnimationPlayer:
+	var model: Node3D = _player.class_model()
+	if model == null:
+		return null
+	var found: Array[Node] = model.find_children("*", "AnimationPlayer", true, false)
+	return found[0] as AnimationPlayer if not found.is_empty() else null
+
+
+## Animação do estado atual: [nome, duração para encaixar (0 = velocidade normal)].
+func skeletal_animation() -> Array:
+	var p: Player = _player
+	var ability: AbilityData = p.active_ability()
+	match p.state:
+		Player.State.MOVE:
+			var moving: bool = Player.flat(p.velocity).length() > RUN_THRESHOLD
+			return [ANIM_RUN if moving else ANIM_IDLE, 0.0]
+		Player.State.ATTACK:
+			var combo: Array[String] = ANIM_COMBO_1H if p.equipment.shield != null else ANIM_COMBO_2H
+			var t: Vector3 = p.attack_phase_times()
+			return [combo[clampi(p.combo_step(), 0, combo.size() - 1)], t.x + t.y + t.z]
+		Player.State.BLOCK:
+			return ["Blocking", 0.0]
+		Player.State.DODGE:
+			return ["Dodge_Forward", p.dodge_duration]
+		Player.State.HURT:
+			return ["Hit_A", p.hurt_duration]
+		Player.State.DEAD:
+			return ["Death_A", 0.0]
+		Player.State.ABILITY:
+			if ability is SpinSlashData:
+				return ["2H_Melee_Attack_Spin", (ability as SpinSlashData).duration]
+			if ability is ShieldBashData:
+				return ["Block_Attack", (ability as ShieldBashData).duration]
+			if ability is TauntData:
+				return ["Cheer", 0.6]
+			if ability is ProjectileSpellData:
+				return ["Spellcast_Shoot", (ability as ProjectileSpellData).cast_time + 0.08]
+			if ability is HealSpellData:
+				return ["Spellcast_Raise", (ability as HealSpellData).cast_time + 0.1]
+			if ability is SupportSpellData:
+				return ["Spellcast_Raise", (ability as SupportSpellData).cast_time + 0.1]
+	return [ANIM_IDLE, 0.0]
+
+
+func _update_skeletal(anim_player: AnimationPlayer) -> void:
+	# O corpo só gira para a frente do jogador; poses e inclinações vêm das animações.
+	_model.rotation = Vector3(0.0, Player.yaw_of(_player.facing), 0.0)
+	_model.position = Vector3.ZERO
+	_model.scale = Vector3.ONE
+	var spec: Array = skeletal_animation()
+	var anim_name: String = spec[0]
+	if not anim_player.has_animation(anim_name):
+		anim_name = ANIM_IDLE
+	var t: float = _player.state_time()
+	var key: String = "%d|%d|%s" % [_player.state, _player.combo_step(), anim_name]
+	# Mesmo estado recomeçado (ex.: golpe seguinte do combo) também reinicia.
+	var restarted: bool = t < _last_state_time
+	_last_state_time = t
+	if key == _anim_key and not restarted:
+		if anim_name == ANIM_RUN:
+			anim_player.speed_scale = clampf(Player.flat(_player.velocity).length() / _player.max_speed * 1.2, 0.6, 1.4)
+		return
+	_anim_key = key
+	var anim: Animation = anim_player.get_animation(anim_name)
+	if LOOPING.has(anim_name):
+		anim.loop_mode = Animation.LOOP_LINEAR
+	var fit: float = spec[1]
+	anim_player.speed_scale = clampf(anim.length / fit, 0.25, MAX_ANIM_SPEED) if fit > 0.0 else 1.0
+	anim_player.play(anim_name, 0.08 if fit == 0.0 else 0.03)
+	if fit > 0.0:
+		anim_player.seek(0.0, true)
+
+
+## Animação tocando agora no modelo com esqueleto ("" se não houver). Usado por testes.
+func current_animation() -> String:
+	var anim_player: AnimationPlayer = _skeletal_player()
+	return anim_player.current_animation if anim_player else ""
 
 
 class Pose:

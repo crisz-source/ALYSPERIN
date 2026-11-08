@@ -1,99 +1,102 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://game/actors/enemies/basic_enemy/basic_enemy.gd" id="1_dkhml"]
-[ext_resource type="Script" path="res://game/components/health_component.gd" id="2_65ebo"]
-[ext_resource type="Script" path="res://game/components/hurtbox.gd" id="3_vb8ev"]
-[ext_resource type="Script" path="res://game/components/hitbox.gd" id="4_ukgti"]
-[ext_resource type="Script" path="res://game/ui/health_bar_3d/health_bar_3d.gd" id="5_jfe3p"]
+[ext_resource type="Script" path="res://game/actors/enemies/basic_enemy/basic_enemy.gd" id="1_65ebo"]
+[ext_resource type="PackedScene" path="res://assets/characters/kaykit/Skeleton_Minion.glb" id="2_vb8ev"]
+[ext_resource type="Script" path="res://game/components/health_component.gd" id="3_ukgti"]
+[ext_resource type="Script" path="res://game/components/hurtbox.gd" id="4_jfe3p"]
+[ext_resource type="Script" path="res://game/components/hitbox.gd" id="5_mle0g"]
+[ext_resource type="Script" path="res://game/ui/health_bar_3d/health_bar_3d.gd" id="6_blckt"]
 
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_mle0g"]
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_7re40"]
 radius = 0.4
 height = 1.0
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_blckt"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nn014"]
 transparency = 1
 shading_mode = 0
 albedo_color = Color(1, 0.2, 0.15, 0.25)
 
-[sub_resource type="PlaneMesh" id="PlaneMesh_7re40"]
+[sub_resource type="PlaneMesh" id="PlaneMesh_40kpa"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nn014"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gscio"]
 albedo_color = Color(0.78, 0.25, 0.25, 1)
 roughness = 0.9
 
-[sub_resource type="BoxMesh" id="BoxMesh_40kpa"]
+[sub_resource type="BoxMesh" id="BoxMesh_gq21i"]
 size = Vector3(0.9, 0.9, 0.9)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gscio"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8fqma"]
 albedo_color = Color(1, 0.9, 0.6, 1)
 roughness = 0.9
 emission_enabled = true
 emission = Color(1, 0.9, 0.6, 1)
 emission_energy_multiplier = 2.0
 
-[sub_resource type="BoxMesh" id="BoxMesh_gq21i"]
+[sub_resource type="BoxMesh" id="BoxMesh_q446r"]
 size = Vector3(0.6, 0.12, 0.08)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_8fqma"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_unhh4"]
 size = Vector3(0.9, 0.9, 0.9)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_q446r"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_6b3vp"]
 size = Vector3(0.9, 0.9, 0.9)
 
-[node name="BasicEnemy" type="CharacterBody3D" unique_id=1495317648]
+[node name="BasicEnemy" type="CharacterBody3D" unique_id=2055668906]
 collision_layer = 4
 collision_mask = 5
-script = ExtResource("1_dkhml")
+script = ExtResource("1_65ebo")
+model_scene = ExtResource("2_vb8ev")
+model_scale = 0.6
 
-[node name="CollisionShape" type="CollisionShape3D" parent="." unique_id=1124257207]
+[node name="CollisionShape" type="CollisionShape3D" parent="." unique_id=1565644068]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
-shape = SubResource("CapsuleShape3D_mle0g")
+shape = SubResource("CapsuleShape3D_7re40")
 
-[node name="LungeTelegraph" type="MeshInstance3D" parent="." unique_id=129812420]
+[node name="LungeTelegraph" type="MeshInstance3D" parent="." unique_id=1787538665]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, 0)
 visible = false
-material_override = SubResource("StandardMaterial3D_blckt")
-cast_shadow = 0
-mesh = SubResource("PlaneMesh_7re40")
-
-[node name="Model" type="Node3D" parent="." unique_id=1655290423]
-
-[node name="BodyPlaceholder" type="MeshInstance3D" parent="Model" unique_id=771273693]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
 material_override = SubResource("StandardMaterial3D_nn014")
-mesh = SubResource("BoxMesh_40kpa")
+cast_shadow = 0
+mesh = SubResource("PlaneMesh_40kpa")
 
-[node name="FacingIndicator" type="MeshInstance3D" parent="Model" unique_id=1487831148]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.62, -0.47)
+[node name="Model" type="Node3D" parent="." unique_id=986426407]
+
+[node name="BodyPlaceholder" type="MeshInstance3D" parent="Model" unique_id=736421707]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
 material_override = SubResource("StandardMaterial3D_gscio")
 mesh = SubResource("BoxMesh_gq21i")
 
-[node name="HealthComponent" type="Node" parent="." unique_id=1966409024]
-script = ExtResource("2_65ebo")
+[node name="FacingIndicator" type="MeshInstance3D" parent="Model" unique_id=1897825941]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.62, -0.47)
+material_override = SubResource("StandardMaterial3D_8fqma")
+mesh = SubResource("BoxMesh_q446r")
+
+[node name="HealthComponent" type="Node" parent="." unique_id=71877242]
+script = ExtResource("3_ukgti")
 max_health = 30
 
-[node name="Hurtbox" type="Area3D" parent="." unique_id=1735286676 node_paths=PackedStringArray("health")]
+[node name="Hurtbox" type="Area3D" parent="." unique_id=467612978 node_paths=PackedStringArray("health")]
 collision_layer = 4
 collision_mask = 0
-script = ExtResource("3_vb8ev")
+script = ExtResource("4_jfe3p")
 health = NodePath("../HealthComponent")
 
-[node name="CollisionShape" type="CollisionShape3D" parent="Hurtbox" unique_id=188104403]
+[node name="CollisionShape" type="CollisionShape3D" parent="Hurtbox" unique_id=1459210780]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
-shape = SubResource("BoxShape3D_8fqma")
+shape = SubResource("BoxShape3D_unhh4")
 
-[node name="LungeHitbox" type="Area3D" parent="." unique_id=1872350069 node_paths=PackedStringArray("attacker")]
+[node name="LungeHitbox" type="Area3D" parent="." unique_id=1238636480 node_paths=PackedStringArray("attacker")]
 collision_layer = 16
 collision_mask = 2
-script = ExtResource("4_ukgti")
+script = ExtResource("5_mle0g")
 damage = 15
 knockback_force = 12.5
 attacker = NodePath("..")
 
-[node name="CollisionShape" type="CollisionShape3D" parent="LungeHitbox" unique_id=2083166830]
+[node name="CollisionShape" type="CollisionShape3D" parent="LungeHitbox" unique_id=264910702]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
-shape = SubResource("BoxShape3D_q446r")
+shape = SubResource("BoxShape3D_6b3vp")
 
-[node name="HealthBar" type="Node3D" parent="." unique_id=1548470093]
+[node name="HealthBar" type="Node3D" parent="." unique_id=856553621]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, 0)
-script = ExtResource("5_jfe3p")
+script = ExtResource("6_blckt")

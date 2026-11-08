@@ -23,33 +23,33 @@ size = Vector3(0.08, 0.7, 0.08)
 [sub_resource type="BoxShape3D" id="BoxShape3D_6wr85"]
 size = Vector3(1.6, 1.5, 1.6)
 
-[node name="Lever" type="StaticBody3D" unique_id=2094971491]
+[node name="Lever" type="StaticBody3D" unique_id=1872553145]
 collision_mask = 0
 script = ExtResource("1_aumwl")
 
-[node name="CollisionShape" type="CollisionShape3D" parent="." unique_id=993278194]
+[node name="CollisionShape" type="CollisionShape3D" parent="." unique_id=477489891]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
 shape = SubResource("BoxShape3D_utw2r")
 
-[node name="BasePlaceholder" type="MeshInstance3D" parent="." unique_id=2059955748]
+[node name="BasePlaceholder" type="MeshInstance3D" parent="." unique_id=977330341]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
 material_override = SubResource("StandardMaterial3D_ngwuf")
 mesh = SubResource("BoxMesh_4jkqq")
 
-[node name="HandlePivot" type="Node3D" parent="." unique_id=2002166556]
+[node name="HandlePivot" type="Node3D" parent="." unique_id=1877402732]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
 
-[node name="HandlePlaceholder" type="MeshInstance3D" parent="HandlePivot" unique_id=1197934222]
+[node name="HandlePlaceholder" type="MeshInstance3D" parent="HandlePivot" unique_id=640893701]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0)
 material_override = SubResource("StandardMaterial3D_uavi3")
 mesh = SubResource("BoxMesh_7hh11")
 
-[node name="Interactable" type="Area3D" parent="." unique_id=288313907]
+[node name="Interactable" type="Area3D" parent="." unique_id=276483975]
 collision_layer = 32
 collision_mask = 0
 script = ExtResource("2_vkemy")
 prompt_offset = Vector3(0, 1.6, 0)
 
-[node name="CollisionShape" type="CollisionShape3D" parent="Interactable" unique_id=1521528719]
+[node name="CollisionShape" type="CollisionShape3D" parent="Interactable" unique_id=552957794]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
 shape = SubResource("BoxShape3D_6wr85")

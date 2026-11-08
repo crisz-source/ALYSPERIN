@@ -470,7 +470,8 @@ func apply_class(new_class: ClassData) -> void:
 	_ability_cooldowns.resize(abilities.size())
 	_ability_cooldowns.fill(0.0)
 	_secondary_cooldown_left = 0.0
-	_set_body_model(new_class.model_scene)
+	_set_body_model(new_class.model_scene, new_class.model_scale)
+	_refresh_held_models()
 	_apply_growth()
 	class_changed.emit(player_class)
 
@@ -1022,8 +1023,9 @@ func set_heal_selected(value: bool) -> void:
 
 ## Troca o corpo visível: modelo da classe ou, sem modelo, o boneco provisório.
 ## Colisão, golpes e câmera não dependem do corpo, só a aparência muda.
-func _set_body_model(scene: PackedScene) -> void:
+func _set_body_model(scene: PackedScene, model_scale: float = 1.0) -> void:
 	if _class_model:
+		_model.remove_child(_class_model)
 		_class_model.queue_free()
 		_class_model = null
 	if scene:
@@ -1031,12 +1033,37 @@ func _set_body_model(scene: PackedScene) -> void:
 		_class_model.name = "ClassModel"
 		# Modelos importados olham para +Z; o jogo usa -Z como frente.
 		_class_model.rotation.y = PI
+		_class_model.scale = Vector3.ONE * model_scale
 		_model.add_child(_class_model)
+		_hide_builtin_gear(_class_model)
 		_play_idle(_class_model)
 	_placeholder.visible = _class_model == null
 	_body = _class_model if _class_model else _placeholder
 	for mesh: Node in _body.find_children("*", "MeshInstance3D", true, false):
 		(mesh as MeshInstance3D).material_overlay = _tint_material
+
+
+## Modelos de personagem (KayKit) já vêm com espadas, escudos, cajados presos
+## às mãos: ficam escondidos; nas mãos aparece o que está equipado de verdade.
+const BUILTIN_GEAR_WORDS: Array[String] = ["sword", "shield", "staff", "wand", "spellbook", "axe", "crossbow", "dagger"]
+
+
+static func _hide_builtin_gear(model: Node) -> void:
+	for mesh: Node in model.find_children("*", "MeshInstance3D", true, false):
+		var lower: String = String(mesh.name).to_lower()
+		for word: String in BUILTIN_GEAR_WORDS:
+			if lower.contains(word):
+				(mesh as Node3D).visible = false
+				break
+
+
+## Onde prender o item: no osso da mão do modelo (se houver) ou na mão provisória.
+func _held_parent(right: bool) -> Node3D:
+	if _class_model:
+		var slot: Node3D = _class_model.find_child("handslot_r" if right else "handslot_l", true, false) as Node3D
+		if slot:
+			return slot
+	return _right_hand if right else _left_hand
 
 
 static func _play_idle(model: Node) -> void:
@@ -1053,25 +1080,43 @@ static func _play_idle(model: Node) -> void:
 ## Mostra nas mãos o modelo da arma e do escudo equipados (se o item tiver).
 ## Só aparência: o golpe continua vindo da SwordHitbox, a defesa do escudo equipado.
 func _refresh_held_models() -> void:
-	var weapon_model: Node3D = _hold(_right_hand, equipment.weapon)
-	_hold(_left_hand, equipment.shield)
-	_placeholder_sword.visible = weapon_model == null
+	for hand: Node3D in [_right_hand, _left_hand]:
+		_clear_held(hand)
+	var weapon_model: Node3D = _hold(true, equipment.weapon)
+	_hold(false, equipment.shield)
+	_placeholder_sword.visible = weapon_model == null and _class_model == null
 
 
-func _hold(hand: Node3D, stack: ItemStack) -> Node3D:
-	for old: Node in hand.get_children():
-		if old == _placeholder_sword:
-			continue
-		hand.remove_child(old)
-		old.queue_free()
+## Marca dos itens que o jogador segura (não confunde com peças do modelo).
+const HELD_META: StringName = &"held_item"
+
+
+func _clear_held(parent: Node) -> void:
+	for old: Node in parent.get_children():
+		if old.has_meta(HELD_META):
+			parent.remove_child(old)
+			old.queue_free()
+
+
+func _hold(right: bool, stack: ItemStack) -> Node3D:
+	var hand: Node3D = _held_parent(right)
+	_clear_held(hand)
 	if stack == null or stack.item == null or stack.item.model_scene == null:
 		return null
 	var data: ItemData = stack.item
 	var model := data.model_scene.instantiate() as Node3D
 	model.name = String(data.id)
+	model.set_meta(HELD_META, true)
 	model.position = data.model_offset
 	model.rotation.y = deg_to_rad(data.model_yaw_degrees)
 	model.scale = Vector3.ONE * data.model_scale
+	if hand != _right_hand and hand != _left_hand:
+		# Osso da mão do modelo: desfaz a escala do modelo (o item mantém o tamanho
+		# no mundo) e gira 180° (o modelo inteiro está girado para olhar para -Z).
+		var model_scale: float = _class_model.scale.x
+		model.position /= model_scale
+		model.scale /= model_scale
+		model.rotation.y += PI
 	hand.add_child(model)
 	for mesh: Node in model.find_children("*", "MeshInstance3D", true, false):
 		(mesh as MeshInstance3D).material_overlay = _tint_material
@@ -1080,9 +1125,8 @@ func _hold(hand: Node3D, stack: ItemStack) -> Node3D:
 
 ## Modelo segurado agora em uma das mãos (null = nada). Usado por testes.
 func held_model(right: bool) -> Node3D:
-	var hand: Node3D = _right_hand if right else _left_hand
-	for child: Node in hand.get_children():
-		if child != _placeholder_sword:
+	for child: Node in _held_parent(right).get_children():
+		if child.has_meta(HELD_META):
 			return child as Node3D
 	return null
 

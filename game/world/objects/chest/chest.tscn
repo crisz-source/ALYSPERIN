@@ -23,30 +23,30 @@ size = Vector3(0.92, 0.15, 0.62)
 [sub_resource type="BoxShape3D" id="BoxShape3D_snswc"]
 size = Vector3(1.8, 1.2, 1.6)
 
-[node name="Chest" type="StaticBody3D" unique_id=1734500506]
+[node name="Chest" type="StaticBody3D" unique_id=103197499]
 collision_mask = 0
 script = ExtResource("1_kmvbp")
 
-[node name="CollisionShape" type="CollisionShape3D" parent="." unique_id=512724985]
+[node name="CollisionShape" type="CollisionShape3D" parent="." unique_id=2134162325]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
 shape = SubResource("BoxShape3D_wum7h")
 
-[node name="BoxPlaceholder" type="MeshInstance3D" parent="." unique_id=1843075865]
+[node name="BoxPlaceholder" type="MeshInstance3D" parent="." unique_id=1898532690]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
 material_override = SubResource("StandardMaterial3D_xvnbp")
 mesh = SubResource("BoxMesh_0g8h2")
 
-[node name="LidPlaceholder" type="MeshInstance3D" parent="." unique_id=394969701]
+[node name="LidPlaceholder" type="MeshInstance3D" parent="." unique_id=920424669]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.57, 0)
 material_override = SubResource("StandardMaterial3D_wnr2g")
 mesh = SubResource("BoxMesh_qycpy")
 
-[node name="Interactable" type="Area3D" parent="." unique_id=1741733594]
+[node name="Interactable" type="Area3D" parent="." unique_id=2038949173]
 collision_layer = 32
 collision_mask = 0
 script = ExtResource("2_8qbs0")
 prompt_offset = Vector3(0, 1.3, 0)
 
-[node name="CollisionShape" type="CollisionShape3D" parent="Interactable" unique_id=1865360079]
+[node name="CollisionShape" type="CollisionShape3D" parent="Interactable" unique_id=14328904]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 shape = SubResource("BoxShape3D_snswc")

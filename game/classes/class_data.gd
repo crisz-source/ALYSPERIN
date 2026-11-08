@@ -16,6 +16,8 @@ extends Resource
 ## Modelo 3D do personagem (cena importada, olhando para -Z, pés em y = 0).
 ## Vazio = boneco provisório (cápsula).
 @export var model_scene: PackedScene
+## Escala do modelo (KayKit tem ~2,4 de altura; 0,7 = ~1,7 m como o jogador).
+@export var model_scale: float = 1.0
 
 @export_group("Equipamento")
 ## Tipos de arma que a classe pode usar (WeaponData.weapon_type).

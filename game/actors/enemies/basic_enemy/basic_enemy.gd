@@ -78,6 +78,21 @@ const TEXT_HEIGHT: float = 1.6
 @export var kind: StringName = &"basic_enemy"
 @export var death_fade_time: float = 0.4
 
+@export_group("Aparência")
+## Modelo com esqueleto e animações (KayKit). Vazio = cubo provisório.
+@export var model_scene: PackedScene
+@export var model_scale: float = 1.0
+## Com modelo, o corpo fica um pouco mais no chão antes de sumir (animação de morte).
+@export var model_death_time: float = 1.4
+
+## Animação por estado (modelo com esqueleto).
+const ANIMS: Dictionary = {
+	State.IDLE: "Idle", State.CHASE: "Running_A", State.WINDUP: "1H_Melee_Attack_Stab",
+	State.LUNGE: "1H_Melee_Attack_Stab", State.RECOVER: "Idle_Combat", State.HURT: "Hit_A",
+	State.STAGGER: "Hit_B", State.DEAD: "Death_C_Skeletons",
+}
+const LOOPING_ANIMS: Array[String] = ["Idle", "Running_A", "Idle_Combat"]
+
 var state: State = State.IDLE
 var target: Player = null
 ## Para onde o inimigo está virado (a seta mostra). Define o que é "costas".
@@ -97,6 +112,10 @@ var _stagger_duration: float = 0.0
 var _taunted_by: Player = null
 var _taunt_left: float = 0.0
 var _telegraph_material: StandardMaterial3D
+var _skin: Node3D
+var _anim: AnimationPlayer
+var _overlay: StandardMaterial3D
+var _anim_state: int = -1
 ## Efeitos de status ativos. Criado no _ready.
 var status: StatusEffects
 
@@ -125,6 +144,7 @@ func _ready() -> void:
 	_spawn_position = global_position
 	health.damage_modifier = _apply_backstab
 	_build_telegraph()
+	_build_skin()
 	status = StatusEffects.attach(self, health, TEXT_HEIGHT + 0.35)
 	status.effect_started.connect(_on_status_started)
 
@@ -186,10 +206,15 @@ func _process_state(delta: float) -> void:
 				_change_state(State.CHASE)
 		State.DEAD:
 			velocity = velocity.move_toward(Vector3.ZERO, friction * delta)
-			var t: float = clampf(_state_time / death_fade_time, 0.0, 1.0)
-			_model.scale = Vector3(1.0, 1.0 - 0.9 * t, 1.0)
-			if _state_time >= death_fade_time:
-				queue_free()
+			if _skin:
+				# A animação de morte desmonta o esqueleto; depois some.
+				if _state_time >= model_death_time:
+					queue_free()
+			else:
+				var t: float = clampf(_state_time / death_fade_time, 0.0, 1.0)
+				_model.scale = Vector3(1.0, 1.0 - 0.9 * t, 1.0)
+				if _state_time >= death_fade_time:
+					queue_free()
 
 
 ## Vira para o alvo enquanto persegue/prepara; na investida, para a direção dela.
@@ -232,6 +257,57 @@ func _process_chase(delta: float) -> void:
 		_aim_at_target()
 		return
 	velocity = velocity.move_toward(to_target.normalized() * move_speed * status.speed_multiplier(), acceleration * delta)
+
+
+## Troca o cubo provisório pelo modelo com esqueleto (se houver).
+func _build_skin() -> void:
+	if model_scene == null:
+		return
+	_skin = model_scene.instantiate() as Node3D
+	_skin.name = "Skin"
+	_skin.rotation.y = PI  # modelos olham para +Z; o jogo usa -Z
+	_skin.scale = Vector3.ONE * model_scale
+	_model.add_child(_skin)
+	_body.visible = false
+	_overlay = StandardMaterial3D.new()
+	_overlay.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	_overlay.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	_overlay.albedo_color = Color(1, 1, 1, 0)
+	for mesh: Node in _skin.find_children("*", "MeshInstance3D", true, false):
+		(mesh as MeshInstance3D).material_overlay = _overlay
+	var players: Array[Node] = _skin.find_children("*", "AnimationPlayer", true, false)
+	_anim = players[0] as AnimationPlayer if not players.is_empty() else null
+
+
+## Animação do estado (reinicia ao trocar de estado; ajusta ao tempo do golpe).
+func _update_animation() -> void:
+	if _anim == null:
+		return
+	var name: String = ANIMS.get(state, "Idle")
+	if state == _anim_state or not _anim.has_animation(name):
+		if state == State.CHASE:
+			_anim.speed_scale = clampf(_flat(velocity).length() / maxf(move_speed, 0.1), 0.5, 1.3)
+		return
+	if state == State.LUNGE and _anim.current_animation == name:
+		_anim_state = state  # a investida continua o mesmo golpe da preparação
+		return
+	_anim_state = state
+	var anim: Animation = _anim.get_animation(name)
+	if LOOPING_ANIMS.has(name):
+		anim.loop_mode = Animation.LOOP_LINEAR
+	var fit: float = 0.0
+	match state:
+		State.WINDUP:
+			fit = windup_time + lunge_time
+		State.HURT:
+			fit = hurt_time
+	_anim.speed_scale = clampf(anim.length / fit, 0.3, 3.0) if fit > 0.0 else 1.0
+	_anim.play(name, 0.1)
+
+
+## Animação tocando agora ("" sem modelo). Usado por testes.
+func current_animation() -> String:
+	return _anim.current_animation if _anim else ""
 
 
 ## Força do inimigo (masmorras): vida, dano da investida e experiência.
@@ -417,6 +493,9 @@ func _update_visuals(delta: float) -> void:
 	if _telegraph.visible:
 		_telegraph.global_rotation = Vector3(0, Player.yaw_of(_lunge_direction), 0)
 		_telegraph_material.albedo_color = TELEGRAPH_LOCKED_COLOR if is_aim_locked() else TELEGRAPH_TRACKING_COLOR
+	_update_animation()
+	if _overlay:
+		_overlay.albedo_color = _overlay_color()
 	if state == State.DEAD:
 		return
 	if _flash_time > 0.0:
@@ -433,6 +512,19 @@ func _update_visuals(delta: float) -> void:
 		var fx: Color = status.tint()
 		_body_material.albedo_color = BODY_COLOR.lerp(Color(fx.r, fx.g, fx.b), fx.a)
 		_body.scale = Vector3.ONE
+
+
+## Cor por cima do modelo com esqueleto: mesmos avisos do cubo (piscar, preparação, efeitos).
+func _overlay_color() -> Color:
+	if state == State.DEAD:
+		return Color(1, 1, 1, 0)
+	if _flash_time > 0.0:
+		return Color(1, 1, 1, 0.7)
+	if status.has(StatusEffects.FREEZE):
+		return Color(0.55, 0.85, 1.0, 0.55)
+	if state == State.WINDUP:
+		return Color(1.0, 0.5, 0.1, 0.25 + 0.2 * sin(_state_time * 30.0))
+	return status.tint()
 
 
 ## Congelar para o inimigo como um atordoamento (costas expostas), com cor azul.
