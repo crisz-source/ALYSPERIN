@@ -234,6 +234,15 @@ func _process_chase(delta: float) -> void:
 	velocity = velocity.move_toward(to_target.normalized() * move_speed * status.speed_multiplier(), acceleration * delta)
 
 
+## Força do inimigo (masmorras): vida, dano da investida e experiência.
+func scale_stats(max_hp: int, damage: int, xp: int) -> void:
+	health.max_health = max_hp
+	health.current_health = max_hp
+	health.health_changed.emit(max_hp, max_hp)
+	_hitbox.damage = damage
+	xp_reward = xp
+
+
 ## Atordoa por `seconds` (não age; costas expostas). Golpe de escudo, bloqueio.
 func apply_stun(seconds: float) -> void:
 	if health.is_dead:

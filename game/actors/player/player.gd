@@ -376,7 +376,7 @@ func current_attack_damage(step: int) -> int:
 		base *= weapon.broken_damage_multiplier
 	if weapon:
 		base *= gs_damage_multiplier(effective_gs_of(weapon.gear_score))
-	return maxi(roundi(base * combo_damage_multiplier[step] * stats.damage_multiplier()), 1)
+	return maxi(roundi(base * combo_damage_multiplier[step] * stats.damage_multiplier(effective_level())), 1)
 
 
 # --- Gear Score e Dungeon Sync ----------------------------------------------
@@ -428,6 +428,20 @@ func effective_level() -> int:
 
 func is_synced() -> bool:
 	return sync_level_cap > 0 or sync_gs_cap > 0
+
+
+## Entra no Dungeon Sync: vida, mana, dano e habilidades passam a usar os tetos.
+func apply_sync(level_cap: int, gs_cap: int) -> void:
+	sync_level_cap = level_cap
+	sync_gs_cap = gs_cap
+	_apply_growth()
+
+
+## Sai do Dungeon Sync: volta aos valores reais (nada do personagem foi alterado).
+func clear_sync() -> void:
+	sync_level_cap = 0
+	sync_gs_cap = 0
+	_apply_growth()
 
 
 ## Volta à vida no ponto indicado, com vida e mana cheias. Itens, equipamento e
@@ -824,7 +838,10 @@ func _try_start_ability() -> bool:
 		return false
 	var ability: AbilityData = abilities[slot]
 	if not is_ability_unlocked(slot):
-		_say("%s: liberada no nível %d." % [ability.display_name, ability.unlock_level])
+		if stats.level >= ability.unlock_level:
+			_say("%s: bloqueada pela sincronização (nível efetivo %d)." % [ability.display_name, effective_level()])
+		else:
+			_say("%s: liberada no nível %d." % [ability.display_name, ability.unlock_level])
 		return false
 	if not ability.is_implemented():
 		_say("%s: ainda em desenvolvimento." % ability.display_name)
@@ -923,7 +940,7 @@ func _try_secondary_ability() -> bool:
 	_defend_pressed = false
 	if not is_instance_valid(ability) or not ability.is_implemented() or _secondary_cooldown_left > 0.0:
 		return false
-	if stats.level < ability.unlock_level:
+	if effective_level() < ability.unlock_level:
 		_say("%s: liberada no nível %d." % [ability.display_name, ability.unlock_level])
 		return false
 	if not mana.spend(ability.mana_cost):
@@ -937,7 +954,7 @@ func _try_secondary_ability() -> bool:
 
 
 func is_ability_unlocked(slot: int) -> bool:
-	return slot < abilities.size() and abilities[slot] != null and stats.level >= abilities[slot].unlock_level
+	return slot < abilities.size() and abilities[slot] != null and effective_level() >= abilities[slot].unlock_level
 
 
 ## 0 = pronta, 1 = acabou de usar.
@@ -1283,7 +1300,7 @@ func _can_self_revive() -> bool:
 		return false
 	for a: AbilityData in abilities:
 		var s := a as SupportSpellData
-		if s and s.mechanic == SupportSpellData.Mechanic.REVIVE and stats.level >= s.unlock_level:
+		if s and s.mechanic == SupportSpellData.Mechanic.REVIVE and effective_level() >= s.unlock_level:
 			return true
 	return false
 
@@ -1375,8 +1392,8 @@ func _can_block() -> bool:
 
 ## Vida e mana máximas = base + crescimento por nível (igual para todas as classes).
 func _apply_growth() -> void:
-	health.set_max_health(_base_max_health + stats.bonus_max_health())
-	mana.set_max_mana(_base_max_mana + stats.bonus_max_mana())
+	health.set_max_health(_base_max_health + stats.bonus_max_health(effective_level()))
+	mana.set_max_mana(_base_max_mana + stats.bonus_max_mana(effective_level()))
 
 
 func _on_leveled_up(new_level: int) -> void:

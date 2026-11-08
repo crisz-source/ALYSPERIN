@@ -43,13 +43,14 @@ func add_xp(amount: int) -> void:
 	xp_changed.emit(xp, xp_to_next())
 
 
-func bonus_max_health() -> int:
-	return (level - 1) * health_per_level
+## at_level > 0 = calcula para outro nível (ex.: nível efetivo da masmorra).
+func bonus_max_health(at_level: int = 0) -> int:
+	return ((at_level if at_level > 0 else level) - 1) * health_per_level
 
 
-func bonus_max_mana() -> int:
-	return (level - 1) * mana_per_level
+func bonus_max_mana(at_level: int = 0) -> int:
+	return ((at_level if at_level > 0 else level) - 1) * mana_per_level
 
 
-func damage_multiplier() -> float:
-	return 1.0 + (level - 1) * damage_per_level
+func damage_multiplier(at_level: int = 0) -> float:
+	return 1.0 + ((at_level if at_level > 0 else level) - 1) * damage_per_level

@@ -17,25 +17,25 @@ size = Vector3(1, 3, 3)
 [sub_resource type="BoxShape3D" id="BoxShape3D_dlbss"]
 size = Vector3(2, 3, 4)
 
-[node name="Door" type="StaticBody3D" unique_id=1437240889]
+[node name="Door" type="StaticBody3D" unique_id=342029714]
 collision_mask = 0
 script = ExtResource("1_21dn7")
 
-[node name="CollisionShape" type="CollisionShape3D" parent="." unique_id=438797324]
+[node name="CollisionShape" type="CollisionShape3D" parent="." unique_id=1591887344]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
 shape = SubResource("BoxShape3D_sowbx")
 
-[node name="Visual" type="MeshInstance3D" parent="." unique_id=745261800]
+[node name="Visual" type="MeshInstance3D" parent="." unique_id=1038780311]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
 material_override = SubResource("StandardMaterial3D_0rh0c")
 mesh = SubResource("BoxMesh_5ycar")
 
-[node name="Interactable" type="Area3D" parent="." unique_id=1400177218]
+[node name="Interactable" type="Area3D" parent="." unique_id=1185117619]
 collision_layer = 32
 collision_mask = 0
 script = ExtResource("2_sj31x")
 prompt_offset = Vector3(0, 3.4, 0)
 
-[node name="CollisionShape" type="CollisionShape3D" parent="Interactable" unique_id=1245785263]
+[node name="CollisionShape" type="CollisionShape3D" parent="Interactable" unique_id=1073060621]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
 shape = SubResource("BoxShape3D_dlbss")

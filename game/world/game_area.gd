@@ -15,6 +15,20 @@ extends Node3D
 @export var death_screen_delay: float = 1.2
 ## Classes oferecidas ao começar. Vazio = não pergunta (ex.: arena de teste).
 @export var class_options: Array[ClassData] = []
+@export_group("Masmorra")
+## Masmorra com entrada nesta área (vazio = nenhuma).
+@export var dungeon: DungeonData
+@export var dungeon_entrance_position: Vector3 = Vector3.ZERO
+
+## Longe da área: a masmorra é montada aqui, na mesma cena (o jogador e tudo
+## que ele carrega continuam os mesmos; sem troca de cena).
+const DUNGEON_ORIGIN := Vector3(0, 0, -600)
+
+## Masmorra em andamento (null = fora).
+var current_dungeon: DungeonMap = null
+var _return_point: Vector3 = Vector3.ZERO
+var _area_respawn_point: Vector3 = Vector3.ZERO
+var _dungeon_enemies: Array[BasicEnemy] = []
 
 @onready var player: Player = $Entities/Player
 @onready var entities: Node3D = $Entities
@@ -41,6 +55,11 @@ func _ready() -> void:
 	console.name = "AdminConsole"
 	add_child(console)
 	console.bind(self)
+	if dungeon:
+		var entrance := DungeonEntrance.create(dungeon)
+		entities.add_child(entrance)
+		entrance.global_position = dungeon_entrance_position
+		entrance.enter_requested.connect(func(_by: Player, d: DungeonData) -> void: enter_dungeon(d))
 	_ask_class()
 
 
@@ -66,6 +85,56 @@ func _on_dialogue_requested(speaker: String, lines: Array[String], on_finished: 
 func _on_class_chosen(chosen_class: ClassData) -> void:
 	player.apply_class(chosen_class)
 	player.input_blocked = false
+
+
+## Leva o jogador para a masmorra (sincronizado). Devolve o motivo se não puder.
+func enter_dungeon(data: DungeonData) -> String:
+	var refusal: String = data.entry_refusal(player.stats.level, player.gear_score())
+	if not refusal.is_empty() or current_dungeon:
+		return refusal
+	current_dungeon = DungeonMap.new()
+	current_dungeon.data = data
+	add_child(current_dungeon)
+	current_dungeon.global_position = DUNGEON_ORIGIN
+	current_dungeon.exit_requested.connect(func(_by: Player) -> void: exit_dungeon())
+	var scene: PackedScene = load(ENEMY_SCENE_PATH)
+	for i in current_dungeon.enemy_points().size():
+		var enemy: BasicEnemy = scene.instantiate()
+		enemy.name = "Ruinas%d" % (i + 1)
+		entities.add_child(enemy)
+		enemy.global_position = current_dungeon.enemy_points()[i]
+		enemy.scale_stats(data.enemy_health, data.enemy_damage, data.enemy_xp)
+		enemy.set("_spawn_position", enemy.global_position)
+		_dungeon_enemies.append(enemy)
+	_return_point = player.global_position
+	_area_respawn_point = player.respawn_point
+	player.apply_sync(data.level_cap, data.gs_cap)
+	player.health.heal(player.health.max_health)
+	player.self_revive_available = true
+	player.respawn_point = current_dungeon.start_point()
+	player.global_position = current_dungeon.start_point()
+	player.velocity = Vector3.ZERO
+	player.message_requested.emit("%s — sincronizado: nível %d, GS %d." % [data.display_name, player.effective_level(), player.effective_gear_score()])
+	return ""
+
+
+## Volta para a área: tira o sync, remove o mapa e os monstros da masmorra.
+func exit_dungeon() -> void:
+	if current_dungeon == null:
+		return
+	for enemy: BasicEnemy in _dungeon_enemies:
+		if is_instance_valid(enemy):
+			enemy.queue_free()
+	_dungeon_enemies.clear()
+	for node: Node in get_tree().get_nodes_in_group(&"bosses"):
+		node.queue_free()
+	current_dungeon.queue_free()
+	current_dungeon = null
+	player.clear_sync()
+	player.respawn_point = _area_respawn_point
+	player.global_position = _return_point
+	player.velocity = Vector3.ZERO
+	player.message_requested.emit("Você saiu da masmorra.")
 
 
 func continue_after_death() -> void:
