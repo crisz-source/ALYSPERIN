@@ -97,6 +97,12 @@ conhecidos. Detalhes técnicos de cada etapa ficam em `documentation/worklog/`.
 - [x] 173 verificações automáticas passando
 - Ver `documentation/worklog/2026-11-07-migracao-3d.md`
 
+### Animação de combate por código — `PlayerAnimator`
+- [x] Combo com 3 movimentos (direita→esquerda, esquerda→direita, de cima para baixo) nos tempos reais do golpe
+- [x] Defesa, Golpe de escudo, esquiva, dano, morte, Golpe giratório, cura, Raio sagrado, Provocar, andar e parado
+- [x] Só apresentação: 29 verificações novas; as 270 antigas seguem passando
+- Ver `documentation/worklog/2026-11-08-animacao-por-codigo.md`
+
 ### Armas 3D (CC0) — `assets/weapons/`
 - [x] Malho de brasa (maça) e Escudo sentinela: equipamento inicial do Guardião
 - [x] Cajado crescente: arma do Devoto (mesmo item `apprentice_staff`, novo nome e modelo)
@@ -123,7 +129,7 @@ conhecidos. Detalhes técnicos de cada etapa ficam em `documentation/worklog/`.
 ## Itens provisórios no projeto
 - `test_arena.tscn`: chão quadriculado desenhado por código, paredes e pilares em
   `ColorRect`, texto de ajuda — no lugar de tilemap/arte reais.
-- Armas 3D seguradas paradas na mão (sem animação de golpe); corpo do personagem continua cápsula.
+- Animação por código (`PlayerAnimator`) no lugar de animações de verdade; corpo do personagem continua cápsula.
 - `player.tscn`: corpo azul (`BodyPlaceholder`), seta amarela (`FacingIndicator`) e
   arco claro do golpe (`SwingPlaceholder`) no lugar de sprites/efeitos.
 - `basic_enemy.tscn`: inimigo inteiro é provisório (quadrado vermelho, sem nome nem

@@ -128,151 +128,151 @@ emission_energy_multiplier = 3.0
 [sub_resource type="BoxMesh" id="BoxMesh_tnl37"]
 size = Vector3(0.15, 0.3, 0.15)
 
-[node name="TestArena" type="Node3D" unique_id=1176955427]
+[node name="TestArena" type="Node3D" unique_id=1045201850]
 script = ExtResource("1_274wh")
 enemy_scene = ExtResource("2_rgs4t")
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1802413229]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=98731993]
 environment = SubResource("Environment_te1sv")
 
-[node name="MoonLight" type="DirectionalLight3D" parent="." unique_id=1024133968]
+[node name="MoonLight" type="DirectionalLight3D" parent="." unique_id=713543140]
 transform = Transform3D(0.8660254, 0.40957603, -0.28678823, 0, 0.57357645, 0.81915206, 0.5, -0.7094065, 0.49673176, 0, 0, 0)
 light_color = Color(0.6, 0.65, 0.85, 1)
 light_energy = 0.5
 shadow_enabled = true
 
-[node name="Level" type="Node3D" parent="." unique_id=1024724406]
+[node name="Level" type="Node3D" parent="." unique_id=1559849232]
 
-[node name="Floor" type="StaticBody3D" parent="Level" unique_id=493629312]
+[node name="Floor" type="StaticBody3D" parent="Level" unique_id=723759976]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32, -0.5, 18)
 collision_mask = 0
 
-[node name="CollisionShape" type="CollisionShape3D" parent="Level/Floor" unique_id=773675793]
+[node name="CollisionShape" type="CollisionShape3D" parent="Level/Floor" unique_id=86297375]
 shape = SubResource("BoxShape3D_t0jte")
 
-[node name="Visual" type="MeshInstance3D" parent="Level/Floor" unique_id=106618763]
+[node name="Visual" type="MeshInstance3D" parent="Level/Floor" unique_id=607938512]
 material_override = SubResource("StandardMaterial3D_dl5pp")
 mesh = SubResource("BoxMesh_81t7n")
 
-[node name="WallNorth" type="StaticBody3D" parent="Level" unique_id=115665534]
+[node name="WallNorth" type="StaticBody3D" parent="Level" unique_id=1008203536]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32, 1.5, 0.5)
 collision_mask = 0
 
-[node name="CollisionShape" type="CollisionShape3D" parent="Level/WallNorth" unique_id=473805200]
+[node name="CollisionShape" type="CollisionShape3D" parent="Level/WallNorth" unique_id=1493256751]
 shape = SubResource("BoxShape3D_fh8n2")
 
-[node name="Visual" type="MeshInstance3D" parent="Level/WallNorth" unique_id=1554478847]
+[node name="Visual" type="MeshInstance3D" parent="Level/WallNorth" unique_id=1936279965]
 material_override = SubResource("StandardMaterial3D_coo2h")
 mesh = SubResource("BoxMesh_b8noy")
 
-[node name="WallSouth" type="StaticBody3D" parent="Level" unique_id=1386533126]
+[node name="WallSouth" type="StaticBody3D" parent="Level" unique_id=1944391221]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32, 1.5, 35.5)
 collision_mask = 0
 
-[node name="CollisionShape" type="CollisionShape3D" parent="Level/WallSouth" unique_id=769080202]
+[node name="CollisionShape" type="CollisionShape3D" parent="Level/WallSouth" unique_id=1307767733]
 shape = SubResource("BoxShape3D_8y6xv")
 
-[node name="Visual" type="MeshInstance3D" parent="Level/WallSouth" unique_id=1609047396]
+[node name="Visual" type="MeshInstance3D" parent="Level/WallSouth" unique_id=1077444919]
 material_override = SubResource("StandardMaterial3D_gn34f")
 mesh = SubResource("BoxMesh_siwcr")
 
-[node name="WallWest" type="StaticBody3D" parent="Level" unique_id=181810691]
+[node name="WallWest" type="StaticBody3D" parent="Level" unique_id=1457000391]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 1.5, 18)
 collision_mask = 0
 
-[node name="CollisionShape" type="CollisionShape3D" parent="Level/WallWest" unique_id=888547950]
+[node name="CollisionShape" type="CollisionShape3D" parent="Level/WallWest" unique_id=1653222750]
 shape = SubResource("BoxShape3D_bd05w")
 
-[node name="Visual" type="MeshInstance3D" parent="Level/WallWest" unique_id=327062310]
+[node name="Visual" type="MeshInstance3D" parent="Level/WallWest" unique_id=1063631037]
 material_override = SubResource("StandardMaterial3D_jdxi1")
 mesh = SubResource("BoxMesh_gs3e3")
 
-[node name="WallEast" type="StaticBody3D" parent="Level" unique_id=778742739]
+[node name="WallEast" type="StaticBody3D" parent="Level" unique_id=478026198]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 63.5, 1.5, 18)
 collision_mask = 0
 
-[node name="CollisionShape" type="CollisionShape3D" parent="Level/WallEast" unique_id=2127452220]
+[node name="CollisionShape" type="CollisionShape3D" parent="Level/WallEast" unique_id=1963973435]
 shape = SubResource("BoxShape3D_cwm8m")
 
-[node name="Visual" type="MeshInstance3D" parent="Level/WallEast" unique_id=685818095]
+[node name="Visual" type="MeshInstance3D" parent="Level/WallEast" unique_id=596488507]
 material_override = SubResource("StandardMaterial3D_gjgif")
 mesh = SubResource("BoxMesh_07bpl")
 
-[node name="Pillar1" type="StaticBody3D" parent="Level" unique_id=64255518]
+[node name="Pillar1" type="StaticBody3D" parent="Level" unique_id=1103304146]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 1.5, 12)
 collision_mask = 0
 
-[node name="CollisionShape" type="CollisionShape3D" parent="Level/Pillar1" unique_id=254391621]
+[node name="CollisionShape" type="CollisionShape3D" parent="Level/Pillar1" unique_id=656604640]
 shape = SubResource("BoxShape3D_l0aoe")
 
-[node name="Visual" type="MeshInstance3D" parent="Level/Pillar1" unique_id=883037763]
+[node name="Visual" type="MeshInstance3D" parent="Level/Pillar1" unique_id=1607482165]
 material_override = SubResource("StandardMaterial3D_y2w8t")
 mesh = SubResource("BoxMesh_3574f")
 
-[node name="Torch1" type="OmniLight3D" parent="Level" unique_id=1813082740]
+[node name="Torch1" type="OmniLight3D" parent="Level" unique_id=845528666]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 2.2, 12.65)
 light_color = Color(1, 0.6, 0.25, 1)
 light_energy = 1.6
 omni_range = 7.0
 
-[node name="Flame" type="MeshInstance3D" parent="Level/Torch1" unique_id=341779553]
+[node name="Flame" type="MeshInstance3D" parent="Level/Torch1" unique_id=542514636]
 material_override = SubResource("StandardMaterial3D_gukns")
 mesh = SubResource("BoxMesh_ehnev")
 
-[node name="Pillar2" type="StaticBody3D" parent="Level" unique_id=207176324]
+[node name="Pillar2" type="StaticBody3D" parent="Level" unique_id=734347367]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42, 1.5, 12)
 collision_mask = 0
 
-[node name="CollisionShape" type="CollisionShape3D" parent="Level/Pillar2" unique_id=1268274801]
+[node name="CollisionShape" type="CollisionShape3D" parent="Level/Pillar2" unique_id=425133326]
 shape = SubResource("BoxShape3D_ks7xy")
 
-[node name="Visual" type="MeshInstance3D" parent="Level/Pillar2" unique_id=2035743164]
+[node name="Visual" type="MeshInstance3D" parent="Level/Pillar2" unique_id=1152081760]
 material_override = SubResource("StandardMaterial3D_2fedx")
 mesh = SubResource("BoxMesh_2u8xy")
 
-[node name="Torch2" type="OmniLight3D" parent="Level" unique_id=510474030]
+[node name="Torch2" type="OmniLight3D" parent="Level" unique_id=1868328329]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42, 2.2, 12.65)
 light_color = Color(1, 0.6, 0.25, 1)
 light_energy = 1.6
 omni_range = 7.0
 
-[node name="Flame" type="MeshInstance3D" parent="Level/Torch2" unique_id=194658019]
+[node name="Flame" type="MeshInstance3D" parent="Level/Torch2" unique_id=1840692672]
 material_override = SubResource("StandardMaterial3D_m58f6")
 mesh = SubResource("BoxMesh_jmcuw")
 
-[node name="Pillar3" type="StaticBody3D" parent="Level" unique_id=1631271130]
+[node name="Pillar3" type="StaticBody3D" parent="Level" unique_id=747913248]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32, 1.5, 25.75)
 collision_mask = 0
 
-[node name="CollisionShape" type="CollisionShape3D" parent="Level/Pillar3" unique_id=1637445960]
+[node name="CollisionShape" type="CollisionShape3D" parent="Level/Pillar3" unique_id=83670765]
 shape = SubResource("BoxShape3D_68lce")
 
-[node name="Visual" type="MeshInstance3D" parent="Level/Pillar3" unique_id=425335694]
+[node name="Visual" type="MeshInstance3D" parent="Level/Pillar3" unique_id=532831786]
 material_override = SubResource("StandardMaterial3D_ldmyt")
 mesh = SubResource("BoxMesh_nu8xe")
 
-[node name="Torch3" type="OmniLight3D" parent="Level" unique_id=1330805365]
+[node name="Torch3" type="OmniLight3D" parent="Level" unique_id=481982643]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32, 2.2, 26.4)
 light_color = Color(1, 0.6, 0.25, 1)
 light_energy = 1.6
 omni_range = 7.0
 
-[node name="Flame" type="MeshInstance3D" parent="Level/Torch3" unique_id=1774251961]
+[node name="Flame" type="MeshInstance3D" parent="Level/Torch3" unique_id=1130948181]
 material_override = SubResource("StandardMaterial3D_p4u0q")
 mesh = SubResource("BoxMesh_tnl37")
 
-[node name="Entities" type="Node3D" parent="." unique_id=1588884174]
+[node name="Entities" type="Node3D" parent="." unique_id=1026532688]
 
-[node name="Player" parent="Entities" unique_id=134423447 instance=ExtResource("3_w5yd4")]
+[node name="Player" parent="Entities" unique_id=1561187096 instance=ExtResource("3_w5yd4")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32, 0, 18)
 
-[node name="BasicEnemy1" parent="Entities" unique_id=698581724 groups=["arena_enemies"] instance=ExtResource("2_rgs4t")]
+[node name="BasicEnemy1" parent="Entities" unique_id=1643958142 groups=["arena_enemies"] instance=ExtResource("2_rgs4t")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.5, 0, 7.5)
 
-[node name="BasicEnemy2" parent="Entities" unique_id=188970561 groups=["arena_enemies"] instance=ExtResource("2_rgs4t")]
+[node name="BasicEnemy2" parent="Entities" unique_id=414451064 groups=["arena_enemies"] instance=ExtResource("2_rgs4t")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 51.25, 0, 8.75)
 
-[node name="BasicEnemy3" parent="Entities" unique_id=1537766755 groups=["arena_enemies"] instance=ExtResource("2_rgs4t")]
+[node name="BasicEnemy3" parent="Entities" unique_id=1336647643 groups=["arena_enemies"] instance=ExtResource("2_rgs4t")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 50, 0, 29.4)
 
 [node name="Hud" parent="." unique_id=1524649923 instance=ExtResource("4_runn2")]

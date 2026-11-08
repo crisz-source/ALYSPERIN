@@ -198,7 +198,7 @@ var _shield_material: StandardMaterial3D
 @onready var _input: PlayerInput = $PlayerInput
 @onready var _model: Node3D = $Model
 @onready var _placeholder: Node3D = $Model/Placeholder
-@onready var _placeholder_sword: Node3D = $Model/Placeholder/SwordPlaceholder
+@onready var _placeholder_sword: Node3D = $Model/RightHand/SwordPlaceholder
 @onready var _right_hand: Node3D = $Model/RightHand
 @onready var _left_hand: Node3D = $Model/LeftHand
 @onready var _attack_pivot: Node3D = $AttackPivot
@@ -291,6 +291,28 @@ func _physics_process(delta: float) -> void:
 	velocity.y = vertical - GRAVITY * delta if not is_on_floor() else minf(vertical, 0.0)
 	move_and_slide()
 	_update_visuals(delta)
+
+
+# --- Leitura para a animação (PlayerAnimator) -------------------------------
+
+## Tempo desde que o estado atual começou (s).
+func state_time() -> float:
+	return _state_time
+
+
+## Golpe atual do combo (0, 1 ou 2 = finalizador).
+func combo_step() -> int:
+	return _combo_step
+
+
+## Duração das fases do golpe atual: x = preparação, y = golpe, z = recuperação (s).
+func attack_phase_times() -> Vector3:
+	return Vector3(_attack_windup_now, _attack_active_now, _attack_recovery_now)
+
+
+## Habilidade em uso (estado ABILITY) ou null.
+func active_ability() -> AbilityData:
+	return _active_ability
 
 
 ## A câmera que o jogador usa (HUD/testes podem precisar dela).
@@ -895,6 +917,8 @@ func _refresh_held_models() -> void:
 
 func _hold(hand: Node3D, stack: ItemStack) -> Node3D:
 	for old: Node in hand.get_children():
+		if old == _placeholder_sword:
+			continue
 		hand.remove_child(old)
 		old.queue_free()
 	if stack == null or stack.item == null or stack.item.model_scene == null:
@@ -914,7 +938,10 @@ func _hold(hand: Node3D, stack: ItemStack) -> Node3D:
 ## Modelo segurado agora em uma das mãos (null = nada). Usado por testes.
 func held_model(right: bool) -> Node3D:
 	var hand: Node3D = _right_hand if right else _left_hand
-	return hand.get_child(0) as Node3D if hand.get_child_count() > 0 else null
+	for child: Node in hand.get_children():
+		if child != _placeholder_sword:
+			return child as Node3D
+	return null
 
 
 ## Modelo de arte em uso (null = boneco provisório). Usado por testes.
@@ -1184,7 +1211,6 @@ func _set_facing(new_facing: Vector3) -> void:
 	if f.length() < 0.001:
 		return
 	facing = f.normalized()
-	_model.rotation.y = yaw_of(facing)
 
 
 ## Apresentação provisória: só lê o estado, nunca muda regras de jogo.
@@ -1192,7 +1218,6 @@ func _update_visuals(delta: float) -> void:
 	_flash_time = maxf(_flash_time - delta, 0.0)
 	_shield_flash_time = maxf(_shield_flash_time - delta, 0.0)
 	_shield_material.albedo_color = Color.WHITE if _shield_flash_time > 0.0 else SHIELD_COLOR
-	_model.scale = Vector3(1.0, 0.6 if state == State.DODGE else 1.0, 1.0)
 	if state == State.DEAD:
 		_tint_material.albedo_color = TINT_DEAD
 		_set_body_visible(true)

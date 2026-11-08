@@ -1,66 +1,67 @@
 [gd_scene format=4]
 
-[ext_resource type="Script" path="res://game/actors/player/player.gd" id="1_i5w6q"]
-[ext_resource type="Script" path="res://game/abilities/ability_data.gd" id="2_fxn5h"]
-[ext_resource type="Resource" path="res://game/abilities/data/spin_slash.tres" id="3_cxuv5"]
-[ext_resource type="Script" path="res://game/components/health_component.gd" id="4_qq66o"]
-[ext_resource type="Script" path="res://game/components/hurtbox.gd" id="5_x4qyq"]
-[ext_resource type="Script" path="res://game/components/hitbox.gd" id="6_i15os"]
-[ext_resource type="Script" path="res://game/inventory/inventory.gd" id="7_1svlo"]
-[ext_resource type="Script" path="res://game/items/item_stack.gd" id="8_a20ea"]
-[ext_resource type="Resource" path="res://game/items/data/healing_herb.tres" id="9_b3c30"]
-[ext_resource type="Resource" path="res://game/items/data/mana_potion.tres" id="10_2vult"]
-[ext_resource type="Script" path="res://game/inventory/equipment.gd" id="11_41lfd"]
-[ext_resource type="Resource" path="res://game/items/data/short_sword.tres" id="12_4s16b"]
-[ext_resource type="Resource" path="res://game/items/data/wooden_shield.tres" id="13_m4n5g"]
-[ext_resource type="Script" path="res://game/components/mana_component.gd" id="14_6o7jk"]
-[ext_resource type="Script" path="res://game/quests/quest_log.gd" id="15_747sf"]
-[ext_resource type="Script" path="res://game/actors/player/character_stats.gd" id="16_5qatl"]
-[ext_resource type="Script" path="res://game/actors/player/player_input.gd" id="17_qsypv"]
-[ext_resource type="Script" path="res://game/actors/player/player_camera.gd" id="18_lje7i"]
+[ext_resource type="Script" path="res://game/actors/player/player.gd" id="1_fxn5h"]
+[ext_resource type="Script" path="res://game/abilities/ability_data.gd" id="2_cxuv5"]
+[ext_resource type="Resource" path="res://game/abilities/data/spin_slash.tres" id="3_qq66o"]
+[ext_resource type="Script" path="res://game/actors/player/player_animator.gd" id="4_x4qyq"]
+[ext_resource type="Script" path="res://game/components/health_component.gd" id="5_i15os"]
+[ext_resource type="Script" path="res://game/components/hurtbox.gd" id="6_1svlo"]
+[ext_resource type="Script" path="res://game/components/hitbox.gd" id="7_a20ea"]
+[ext_resource type="Script" path="res://game/inventory/inventory.gd" id="8_b3c30"]
+[ext_resource type="Script" path="res://game/items/item_stack.gd" id="9_2vult"]
+[ext_resource type="Resource" path="res://game/items/data/healing_herb.tres" id="10_41lfd"]
+[ext_resource type="Resource" path="res://game/items/data/mana_potion.tres" id="11_4s16b"]
+[ext_resource type="Script" path="res://game/inventory/equipment.gd" id="12_m4n5g"]
+[ext_resource type="Resource" path="res://game/items/data/short_sword.tres" id="13_6o7jk"]
+[ext_resource type="Resource" path="res://game/items/data/wooden_shield.tres" id="14_747sf"]
+[ext_resource type="Script" path="res://game/components/mana_component.gd" id="15_5qatl"]
+[ext_resource type="Script" path="res://game/quests/quest_log.gd" id="16_qsypv"]
+[ext_resource type="Script" path="res://game/actors/player/character_stats.gd" id="17_lje7i"]
+[ext_resource type="Script" path="res://game/actors/player/player_input.gd" id="18_7c4js"]
+[ext_resource type="Script" path="res://game/actors/player/player_camera.gd" id="19_6xo6p"]
 
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_7c4js"]
-radius = 0.35
-height = 1.6
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6xo6p"]
-albedo_color = Color(0.36, 0.62, 0.92, 1)
-roughness = 0.9
-
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_0nwbe"]
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_0nwbe"]
 radius = 0.35
 height = 1.6
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3do8f"]
+albedo_color = Color(0.36, 0.62, 0.92, 1)
+roughness = 0.9
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_0fe1s"]
+radius = 0.35
+height = 1.6
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_d4m7k"]
 albedo_color = Color(1, 0.85, 0.3, 1)
 roughness = 0.9
 emission_enabled = true
 emission = Color(1, 0.85, 0.3, 1)
 emission_energy_multiplier = 1.5
 
-[sub_resource type="BoxMesh" id="BoxMesh_0fe1s"]
+[sub_resource type="BoxMesh" id="BoxMesh_0g54q"]
 size = Vector3(0.4, 0.1, 0.08)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_d4m7k"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bu7in"]
 albedo_color = Color(0.85, 0.88, 0.95, 1)
 roughness = 0.9
 
-[sub_resource type="BoxMesh" id="BoxMesh_0g54q"]
-size = Vector3(0.06, 0.06, 0.9)
+[sub_resource type="BoxMesh" id="BoxMesh_rsjix"]
+size = Vector3(0.06, 0.9, 0.06)
 
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_bu7in"]
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_ihiqv"]
 radius = 0.35
 height = 1.6
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_rsjix"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_3luqa"]
 points = PackedVector3Array(0, -0.7, 0, 0, 0.7, 0, -1.3594617, -0.7, -0.6339274, -1.3594617, 0.7, -0.6339274, -1.1277597, -0.7, -0.98901874, -1.1277597, 0.7, -0.98901874, -0.8059494, -0.7, -1.2650871, -0.8059494, 0.7, -1.2650871, -0.4197435, -0.7, -1.4400748, -0.4197435, 0.7, -1.4400748, 0, -0.7, -1.5, 0, 0.7, -1.5, 0.4197435, -0.7, -1.4400748, 0.4197435, 0.7, -1.4400748, 0.8059494, -0.7, -1.2650871, 0.8059494, 0.7, -1.2650871, 1.1277597, -0.7, -0.98901874, 1.1277597, 0.7, -0.98901874, 1.3594617, -0.7, -0.6339274, 1.3594617, 0.7, -0.6339274)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ihiqv"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hkbyu"]
 transparency = 1
 shading_mode = 0
 albedo_color = Color(1, 1, 0.85, 0.6)
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_3luqa"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_il4ec"]
 _surfaces = [{
 "aabb": AABB(-1.3594617, 0, -1.5, 2.7189233, 1e-05, 1.5),
 "format": 34359738369,
@@ -70,146 +71,149 @@ _surfaces = [{
 "vertex_data": PackedByteArray("AAAAAAAAAAAAAAAAraibvwAAAAAOzmC/1wKuvwAAAAARSSK/AAAAAAAAAAAAAAAAJsKDvwAAAADfp4u/raibvwAAAAAOzmC/AAAAAAAAAAAAAAAAs1JOvwAAAABg7qG/JsKDvwAAAADfp4u/AAAAAAAAAAAAAAAAccYNvwAAAABKb7K/s1JOvwAAAABg7qG/AAAAAAAAAAAAAAAABFmQvgAAAAAElLy/ccYNvwAAAABKb7K/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAMC/BFmQvgAAAAAElLy/AAAAAAAAAAAAAAAABFmQPgAAAAAElLy/AAAAAAAAAAAAAMC/AAAAAAAAAAAAAAAAccYNPwAAAABKb7K/BFmQPgAAAAAElLy/AAAAAAAAAAAAAAAAs1JOPwAAAABg7qG/ccYNPwAAAABKb7K/AAAAAAAAAAAAAAAAJsKDPwAAAADfp4u/s1JOPwAAAABg7qG/AAAAAAAAAAAAAAAAraibPwAAAAAOzmC/JsKDPwAAAADfp4u/AAAAAAAAAAAAAAAA1wKuPwAAAAARSSK/raibPwAAAAAOzmC/")
 }]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hkbyu"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_f7g0i"]
 transparency = 1
 albedo_color = Color(0.75, 0.85, 1, 0.85)
 roughness = 0.9
 
-[sub_resource type="BoxMesh" id="BoxMesh_il4ec"]
+[sub_resource type="BoxMesh" id="BoxMesh_4y8h1"]
 size = Vector3(0.9, 1, 0.08)
 
-[sub_resource type="CylinderShape3D" id="CylinderShape3D_f7g0i"]
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_s8joe"]
 height = 1.6
 radius = 1.9
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4y8h1"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xrjoj"]
 transparency = 1
 shading_mode = 0
 albedo_color = Color(1, 1, 0.85, 0.4)
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_s8joe"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_cm075"]
 top_radius = 1.9
 bottom_radius = 1.9
 height = 0.05
 
-[sub_resource type="SphereShape3D" id="SphereShape3D_xrjoj"]
+[sub_resource type="SphereShape3D" id="SphereShape3D_k1elb"]
 radius = 0.9
 
-[sub_resource type="Resource" id="Resource_cm075"]
-script = ExtResource("8_a20ea")
-item = ExtResource("9_b3c30")
-
-[sub_resource type="Resource" id="Resource_k1elb"]
-script = ExtResource("8_a20ea")
-item = ExtResource("10_2vult")
-
 [sub_resource type="Resource" id="Resource_47yrc"]
-script = ExtResource("8_a20ea")
-item = ExtResource("12_4s16b")
-durability = 80
+script = ExtResource("9_2vult")
+item = ExtResource("10_41lfd")
 
 [sub_resource type="Resource" id="Resource_cea6g"]
-script = ExtResource("8_a20ea")
-item = ExtResource("13_m4n5g")
+script = ExtResource("9_2vult")
+item = ExtResource("11_4s16b")
+
+[sub_resource type="Resource" id="Resource_urqpf"]
+script = ExtResource("9_2vult")
+item = ExtResource("13_6o7jk")
+durability = 80
+
+[sub_resource type="Resource" id="Resource_ylf2i"]
+script = ExtResource("9_2vult")
+item = ExtResource("14_747sf")
 durability = 40
 
-[node name="Player" type="CharacterBody3D" unique_id=134423447]
+[node name="Player" type="CharacterBody3D" unique_id=1561187096]
 collision_layer = 2
-script = ExtResource("1_i5w6q")
-abilities = Array[ExtResource("2_fxn5h")]([ExtResource("3_cxuv5")])
+script = ExtResource("1_fxn5h")
+abilities = Array[ExtResource("2_cxuv5")]([ExtResource("3_qq66o")])
 
-[node name="CollisionShape" type="CollisionShape3D" parent="." unique_id=1383921973]
+[node name="CollisionShape" type="CollisionShape3D" parent="." unique_id=1348630729]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
-shape = SubResource("CapsuleShape3D_7c4js")
+shape = SubResource("CapsuleShape3D_0nwbe")
 
-[node name="Model" type="Node3D" parent="." unique_id=914523562]
+[node name="Model" type="Node3D" parent="." unique_id=397627260]
 
-[node name="Placeholder" type="Node3D" parent="Model" unique_id=698302516]
+[node name="Placeholder" type="Node3D" parent="Model" unique_id=842944401]
 
-[node name="BodyPlaceholder" type="MeshInstance3D" parent="Model/Placeholder" unique_id=246135167]
+[node name="BodyPlaceholder" type="MeshInstance3D" parent="Model/Placeholder" unique_id=1324666714]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
-material_override = SubResource("StandardMaterial3D_6xo6p")
-mesh = SubResource("CapsuleMesh_0nwbe")
-
-[node name="VisorPlaceholder" type="MeshInstance3D" parent="Model/Placeholder" unique_id=702710807]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.35, -0.32)
 material_override = SubResource("StandardMaterial3D_3do8f")
-mesh = SubResource("BoxMesh_0fe1s")
+mesh = SubResource("CapsuleMesh_0fe1s")
 
-[node name="SwordPlaceholder" type="MeshInstance3D" parent="Model/Placeholder" unique_id=502717403]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.42, 0.9, -0.35)
+[node name="VisorPlaceholder" type="MeshInstance3D" parent="Model/Placeholder" unique_id=899267447]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.35, -0.32)
 material_override = SubResource("StandardMaterial3D_d4m7k")
 mesh = SubResource("BoxMesh_0g54q")
 
-[node name="RightHand" type="Node3D" parent="Model" unique_id=1488542052]
+[node name="RightHand" type="Node3D" parent="Model" unique_id=267667985]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.45, 0.85, -0.15)
 
-[node name="LeftHand" type="Node3D" parent="Model" unique_id=1303296600]
+[node name="SwordPlaceholder" type="MeshInstance3D" parent="Model/RightHand" unique_id=1633592129]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
+material_override = SubResource("StandardMaterial3D_bu7in")
+mesh = SubResource("BoxMesh_rsjix")
+
+[node name="LeftHand" type="Node3D" parent="Model" unique_id=1178585316]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.45, 0.85, -0.15)
 
-[node name="HealthComponent" type="Node" parent="." unique_id=591666938]
-script = ExtResource("4_qq66o")
+[node name="PlayerAnimator" type="Node" parent="." unique_id=186639444]
+script = ExtResource("4_x4qyq")
 
-[node name="Hurtbox" type="Area3D" parent="." unique_id=1540483760 node_paths=PackedStringArray("health")]
+[node name="HealthComponent" type="Node" parent="." unique_id=792210095]
+script = ExtResource("5_i15os")
+
+[node name="Hurtbox" type="Area3D" parent="." unique_id=140514020 node_paths=PackedStringArray("health")]
 collision_layer = 2
 collision_mask = 0
-script = ExtResource("5_x4qyq")
+script = ExtResource("6_1svlo")
 health = NodePath("../HealthComponent")
 
-[node name="CollisionShape" type="CollisionShape3D" parent="Hurtbox" unique_id=1824090042]
+[node name="CollisionShape" type="CollisionShape3D" parent="Hurtbox" unique_id=174252871]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
-shape = SubResource("CapsuleShape3D_bu7in")
+shape = SubResource("CapsuleShape3D_ihiqv")
 
-[node name="AttackPivot" type="Node3D" parent="." unique_id=2044956573]
+[node name="AttackPivot" type="Node3D" parent="." unique_id=1862344082]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
 
-[node name="SwordHitbox" type="Area3D" parent="AttackPivot" unique_id=1416631955 node_paths=PackedStringArray("attacker")]
+[node name="SwordHitbox" type="Area3D" parent="AttackPivot" unique_id=50440716 node_paths=PackedStringArray("attacker")]
 collision_layer = 8
 collision_mask = 4
-script = ExtResource("6_i15os")
+script = ExtResource("7_a20ea")
 knockback_force = 8.75
 attacker = NodePath("../..")
 
-[node name="CollisionShape" type="CollisionShape3D" parent="AttackPivot/SwordHitbox" unique_id=309913599]
-shape = SubResource("ConvexPolygonShape3D_rsjix")
+[node name="CollisionShape" type="CollisionShape3D" parent="AttackPivot/SwordHitbox" unique_id=1544578189]
+shape = SubResource("ConvexPolygonShape3D_3luqa")
 
-[node name="SwingPlaceholder" type="MeshInstance3D" parent="AttackPivot" unique_id=1939349297]
+[node name="SwingPlaceholder" type="MeshInstance3D" parent="AttackPivot" unique_id=45832712]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.2, 0)
-material_override = SubResource("StandardMaterial3D_ihiqv")
-cast_shadow = 0
-mesh = SubResource("ArrayMesh_3luqa")
-
-[node name="ShieldPlaceholder" type="MeshInstance3D" parent="AttackPivot" unique_id=557156580]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.6)
 material_override = SubResource("StandardMaterial3D_hkbyu")
-mesh = SubResource("BoxMesh_il4ec")
+cast_shadow = 0
+mesh = SubResource("ArrayMesh_il4ec")
 
-[node name="SpinHitbox" type="Area3D" parent="." unique_id=378487677 node_paths=PackedStringArray("attacker")]
+[node name="ShieldPlaceholder" type="MeshInstance3D" parent="AttackPivot" unique_id=1995646772]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.6)
+material_override = SubResource("StandardMaterial3D_f7g0i")
+mesh = SubResource("BoxMesh_4y8h1")
+
+[node name="SpinHitbox" type="Area3D" parent="." unique_id=179045004 node_paths=PackedStringArray("attacker")]
 collision_layer = 8
 collision_mask = 4
-script = ExtResource("6_i15os")
+script = ExtResource("7_a20ea")
 attacker = NodePath("..")
 
-[node name="CollisionShape" type="CollisionShape3D" parent="SpinHitbox" unique_id=491936719]
+[node name="CollisionShape" type="CollisionShape3D" parent="SpinHitbox" unique_id=249898904]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
-shape = SubResource("CylinderShape3D_f7g0i")
+shape = SubResource("CylinderShape3D_s8joe")
 
-[node name="SpinPlaceholder" type="MeshInstance3D" parent="." unique_id=1408999650]
+[node name="SpinPlaceholder" type="MeshInstance3D" parent="." unique_id=232147379]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0)
-material_override = SubResource("StandardMaterial3D_4y8h1")
+material_override = SubResource("StandardMaterial3D_xrjoj")
 cast_shadow = 0
-mesh = SubResource("CylinderMesh_s8joe")
+mesh = SubResource("CylinderMesh_cm075")
 
-[node name="InteractionDetector" type="Area3D" parent="." unique_id=906773402]
+[node name="InteractionDetector" type="Area3D" parent="." unique_id=2013772412]
 collision_layer = 0
 collision_mask = 32
 monitorable = false
 
-[node name="CollisionShape" type="CollisionShape3D" parent="InteractionDetector" unique_id=2087940904]
+[node name="CollisionShape" type="CollisionShape3D" parent="InteractionDetector" unique_id=809748399]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
-shape = SubResource("SphereShape3D_xrjoj")
+shape = SubResource("SphereShape3D_k1elb")
 
-[node name="InteractPrompt" type="Label3D" parent="." unique_id=327319031]
+[node name="InteractPrompt" type="Label3D" parent="." unique_id=1737995222]
 pixel_size = 0.0008
 billboard = 1
 no_depth_test = true
@@ -217,38 +221,38 @@ fixed_size = true
 font_size = 40
 outline_size = 10
 
-[node name="Inventory" type="Node" parent="." unique_id=1456221369]
-script = ExtResource("7_1svlo")
-starting_items = Array[ExtResource("8_a20ea")]([SubResource("Resource_cm075"), SubResource("Resource_k1elb")])
+[node name="Inventory" type="Node" parent="." unique_id=1703924983]
+script = ExtResource("8_b3c30")
+starting_items = Array[ExtResource("9_2vult")]([SubResource("Resource_47yrc"), SubResource("Resource_cea6g")])
 
-[node name="Equipment" type="Node" parent="." unique_id=932309523]
-script = ExtResource("11_41lfd")
-starting_weapon = SubResource("Resource_47yrc")
-starting_shield = SubResource("Resource_cea6g")
+[node name="Equipment" type="Node" parent="." unique_id=1325658719]
+script = ExtResource("12_m4n5g")
+starting_weapon = SubResource("Resource_urqpf")
+starting_shield = SubResource("Resource_ylf2i")
 
-[node name="ManaComponent" type="Node" parent="." unique_id=839913087]
-script = ExtResource("14_6o7jk")
+[node name="ManaComponent" type="Node" parent="." unique_id=313885640]
+script = ExtResource("15_5qatl")
 
-[node name="QuestLog" type="Node" parent="." unique_id=1781033224]
-script = ExtResource("15_747sf")
+[node name="QuestLog" type="Node" parent="." unique_id=60316651]
+script = ExtResource("16_qsypv")
 
-[node name="CharacterStats" type="Node" parent="." unique_id=233600866]
-script = ExtResource("16_5qatl")
+[node name="CharacterStats" type="Node" parent="." unique_id=366562486]
+script = ExtResource("17_lje7i")
 
-[node name="PlayerInput" type="Node" parent="." unique_id=1284365052]
-script = ExtResource("17_qsypv")
+[node name="PlayerInput" type="Node" parent="." unique_id=25367190]
+script = ExtResource("18_7c4js")
 
-[node name="CameraRig" type="Node3D" parent="." unique_id=346089520]
+[node name="CameraRig" type="Node3D" parent="." unique_id=468001954]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
-script = ExtResource("18_lje7i")
+script = ExtResource("19_6xo6p")
 
-[node name="Pitch" type="Node3D" parent="CameraRig" unique_id=1909315051]
+[node name="Pitch" type="Node3D" parent="CameraRig" unique_id=1128293062]
 transform = Transform3D(1, 0, 0, 0, 0.9135454, 0.40673664, 0, -0.40673664, 0.9135454, 1, 0.9, 0)
 
-[node name="SpringArm" type="SpringArm3D" parent="CameraRig/Pitch" unique_id=534008493]
+[node name="SpringArm" type="SpringArm3D" parent="CameraRig/Pitch" unique_id=1145789484]
 spring_length = 6.5
 margin = 0.3
 
-[node name="Camera" type="Camera3D" parent="CameraRig/Pitch/SpringArm" unique_id=1160479267]
+[node name="Camera" type="Camera3D" parent="CameraRig/Pitch/SpringArm" unique_id=967204422]
 current = true
 fov = 65.0
