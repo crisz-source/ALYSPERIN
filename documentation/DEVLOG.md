@@ -97,6 +97,12 @@ conhecidos. Detalhes técnicos de cada etapa ficam em `documentation/worklog/`.
 - [x] 173 verificações automáticas passando
 - Ver `documentation/worklog/2026-11-07-migracao-3d.md`
 
+### Efeitos de status e habilidades de nível alto
+- [x] Lento, congelar, queimar, veneno, atordoar, medo, provocar (+ Postura, Protegido, Inabalável)
+- [x] 8 habilidades de nível alto do Guardião e do Devoto; revive solo do Devoto
+- [x] Console: `/efeito NOME [eu]`
+- Ver `documentation/worklog/2026-11-08-status-e-habilidades-altas.md`
+
 ### Animação de combate por código — `PlayerAnimator`
 - [x] Combo com 3 movimentos (direita→esquerda, esquerda→direita, de cima para baixo) nos tempos reais do golpe
 - [x] Defesa, Golpe de escudo, esquiva, dano, morte, Golpe giratório, cura, Raio sagrado, Provocar, andar e parado

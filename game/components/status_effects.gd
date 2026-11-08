@@ -86,7 +86,9 @@ func _ready() -> void:
 		health.died.connect(clear_all)
 
 
-## Aplica (ou renova) um efeito. Renovar fica com a maior duração e a maior força.
+## Aplica (ou renova) um efeito. Renovação: mais forte substitui (força e duração
+## novas); igual estende a duração; mais fraco é ignorado. Não se mistura força de
+## um com duração de outro (ex.: cúpula 50% curta + Muralha 30% longa).
 ## strength: lentidão = fração da velocidade perdida (0,4 = 40% mais lento);
 ## queimadura/veneno = dano por segundo.
 func apply(id: StringName, duration: float, strength: float = 0.0, source: Node = null) -> void:
@@ -95,8 +97,13 @@ func apply(id: StringName, duration: float, strength: float = 0.0, source: Node 
 	assert(INFO.has(id), "StatusEffects: efeito desconhecido %s" % id)
 	var fresh: bool = not _effects.has(id)
 	var e: Dictionary = _effects.get(id, {"time": 0.0, "strength": 0.0, "source": null, "tick": TICK_INTERVAL})
-	e.time = maxf(e.time, duration)
-	e.strength = maxf(e.strength, strength)
+	if fresh or strength > e.strength:
+		e.time = duration
+		e.strength = strength
+	elif is_equal_approx(strength, e.strength):
+		e.time = maxf(e.time, duration)
+	else:
+		return
 	if source:
 		e.source = source
 	_effects[id] = e
