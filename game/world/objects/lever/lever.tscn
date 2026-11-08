@@ -23,33 +23,33 @@ size = Vector3(0.08, 0.7, 0.08)
 [sub_resource type="BoxShape3D" id="BoxShape3D_6wr85"]
 size = Vector3(1.6, 1.5, 1.6)
 
-[node name="Lever" type="StaticBody3D" unique_id=488065670]
+[node name="Lever" type="StaticBody3D" unique_id=1488369474]
 collision_mask = 0
 script = ExtResource("1_aumwl")
 
-[node name="CollisionShape" type="CollisionShape3D" parent="." unique_id=837354850]
+[node name="CollisionShape" type="CollisionShape3D" parent="." unique_id=365972932]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
 shape = SubResource("BoxShape3D_utw2r")
 
-[node name="BasePlaceholder" type="MeshInstance3D" parent="." unique_id=153148708]
+[node name="BasePlaceholder" type="MeshInstance3D" parent="." unique_id=1781941620]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
 material_override = SubResource("StandardMaterial3D_ngwuf")
 mesh = SubResource("BoxMesh_4jkqq")
 
-[node name="HandlePivot" type="Node3D" parent="." unique_id=471747077]
+[node name="HandlePivot" type="Node3D" parent="." unique_id=451008188]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
 
-[node name="HandlePlaceholder" type="MeshInstance3D" parent="HandlePivot" unique_id=117118166]
+[node name="HandlePlaceholder" type="MeshInstance3D" parent="HandlePivot" unique_id=36135302]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0)
 material_override = SubResource("StandardMaterial3D_uavi3")
 mesh = SubResource("BoxMesh_7hh11")
 
-[node name="Interactable" type="Area3D" parent="." unique_id=170668721]
+[node name="Interactable" type="Area3D" parent="." unique_id=214661458]
 collision_layer = 32
 collision_mask = 0
 script = ExtResource("2_vkemy")
 prompt_offset = Vector3(0, 1.6, 0)
 
-[node name="CollisionShape" type="CollisionShape3D" parent="Interactable" unique_id=1871492726]
+[node name="CollisionShape" type="CollisionShape3D" parent="Interactable" unique_id=509408345]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
 shape = SubResource("BoxShape3D_6wr85")

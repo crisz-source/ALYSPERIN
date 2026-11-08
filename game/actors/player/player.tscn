@@ -114,106 +114,106 @@ script = ExtResource("9_2vult")
 item = ExtResource("14_747sf")
 durability = 40
 
-[node name="Player" type="CharacterBody3D" unique_id=1852627097]
+[node name="Player" type="CharacterBody3D" unique_id=742296858]
 collision_layer = 2
 script = ExtResource("1_fxn5h")
 abilities = Array[ExtResource("2_cxuv5")]([ExtResource("3_qq66o")])
 
-[node name="CollisionShape" type="CollisionShape3D" parent="." unique_id=1577621855]
+[node name="CollisionShape" type="CollisionShape3D" parent="." unique_id=425848810]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
 shape = SubResource("CapsuleShape3D_0nwbe")
 
-[node name="Model" type="Node3D" parent="." unique_id=292162625]
+[node name="Model" type="Node3D" parent="." unique_id=142811572]
 
-[node name="Placeholder" type="Node3D" parent="Model" unique_id=1791387729]
+[node name="Placeholder" type="Node3D" parent="Model" unique_id=1108152118]
 
-[node name="BodyPlaceholder" type="MeshInstance3D" parent="Model/Placeholder" unique_id=183002419]
+[node name="BodyPlaceholder" type="MeshInstance3D" parent="Model/Placeholder" unique_id=483422988]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
 material_override = SubResource("StandardMaterial3D_3do8f")
 mesh = SubResource("CapsuleMesh_0fe1s")
 
-[node name="VisorPlaceholder" type="MeshInstance3D" parent="Model/Placeholder" unique_id=1094065776]
+[node name="VisorPlaceholder" type="MeshInstance3D" parent="Model/Placeholder" unique_id=2038157059]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.35, -0.32)
 material_override = SubResource("StandardMaterial3D_d4m7k")
 mesh = SubResource("BoxMesh_0g54q")
 
-[node name="RightHand" type="Node3D" parent="Model" unique_id=1367955863]
+[node name="RightHand" type="Node3D" parent="Model" unique_id=906385769]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.45, 0.85, -0.15)
 
-[node name="SwordPlaceholder" type="MeshInstance3D" parent="Model/RightHand" unique_id=75343689]
+[node name="SwordPlaceholder" type="MeshInstance3D" parent="Model/RightHand" unique_id=1069940834]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
 material_override = SubResource("StandardMaterial3D_bu7in")
 mesh = SubResource("BoxMesh_rsjix")
 
-[node name="LeftHand" type="Node3D" parent="Model" unique_id=668702120]
+[node name="LeftHand" type="Node3D" parent="Model" unique_id=1669989204]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.45, 0.85, -0.15)
 
-[node name="PlayerAnimator" type="Node" parent="." unique_id=331281770]
+[node name="PlayerAnimator" type="Node" parent="." unique_id=219101410]
 script = ExtResource("4_x4qyq")
 
-[node name="HealthComponent" type="Node" parent="." unique_id=133125339]
+[node name="HealthComponent" type="Node" parent="." unique_id=1559504601]
 script = ExtResource("5_i15os")
 
-[node name="Hurtbox" type="Area3D" parent="." unique_id=1170929711 node_paths=PackedStringArray("health")]
+[node name="Hurtbox" type="Area3D" parent="." unique_id=1525574087 node_paths=PackedStringArray("health")]
 collision_layer = 2
 collision_mask = 0
 script = ExtResource("6_1svlo")
 health = NodePath("../HealthComponent")
 
-[node name="CollisionShape" type="CollisionShape3D" parent="Hurtbox" unique_id=638769875]
+[node name="CollisionShape" type="CollisionShape3D" parent="Hurtbox" unique_id=694700925]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
 shape = SubResource("CapsuleShape3D_ihiqv")
 
-[node name="AttackPivot" type="Node3D" parent="." unique_id=362221041]
+[node name="AttackPivot" type="Node3D" parent="." unique_id=1755329577]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
 
-[node name="SwordHitbox" type="Area3D" parent="AttackPivot" unique_id=2025161136 node_paths=PackedStringArray("attacker")]
+[node name="SwordHitbox" type="Area3D" parent="AttackPivot" unique_id=613349184 node_paths=PackedStringArray("attacker")]
 collision_layer = 8
 collision_mask = 4
 script = ExtResource("7_a20ea")
 knockback_force = 8.75
 attacker = NodePath("../..")
 
-[node name="CollisionShape" type="CollisionShape3D" parent="AttackPivot/SwordHitbox" unique_id=1687828250]
+[node name="CollisionShape" type="CollisionShape3D" parent="AttackPivot/SwordHitbox" unique_id=1555169715]
 shape = SubResource("ConvexPolygonShape3D_3luqa")
 
-[node name="SwingPlaceholder" type="MeshInstance3D" parent="AttackPivot" unique_id=1486437510]
+[node name="SwingPlaceholder" type="MeshInstance3D" parent="AttackPivot" unique_id=1614806517]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.2, 0)
 material_override = SubResource("StandardMaterial3D_hkbyu")
 cast_shadow = 0
 mesh = SubResource("ArrayMesh_il4ec")
 
-[node name="ShieldPlaceholder" type="MeshInstance3D" parent="AttackPivot" unique_id=59694968]
+[node name="ShieldPlaceholder" type="MeshInstance3D" parent="AttackPivot" unique_id=245758958]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.6)
 material_override = SubResource("StandardMaterial3D_f7g0i")
 mesh = SubResource("BoxMesh_4y8h1")
 
-[node name="SpinHitbox" type="Area3D" parent="." unique_id=1181716562 node_paths=PackedStringArray("attacker")]
+[node name="SpinHitbox" type="Area3D" parent="." unique_id=756201238 node_paths=PackedStringArray("attacker")]
 collision_layer = 8
 collision_mask = 4
 script = ExtResource("7_a20ea")
 attacker = NodePath("..")
 
-[node name="CollisionShape" type="CollisionShape3D" parent="SpinHitbox" unique_id=1766953221]
+[node name="CollisionShape" type="CollisionShape3D" parent="SpinHitbox" unique_id=1144991012]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
 shape = SubResource("CylinderShape3D_s8joe")
 
-[node name="SpinPlaceholder" type="MeshInstance3D" parent="." unique_id=1217620976]
+[node name="SpinPlaceholder" type="MeshInstance3D" parent="." unique_id=438565229]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0)
 material_override = SubResource("StandardMaterial3D_xrjoj")
 cast_shadow = 0
 mesh = SubResource("CylinderMesh_cm075")
 
-[node name="InteractionDetector" type="Area3D" parent="." unique_id=1528679727]
+[node name="InteractionDetector" type="Area3D" parent="." unique_id=1494362133]
 collision_layer = 0
 collision_mask = 32
 monitorable = false
 
-[node name="CollisionShape" type="CollisionShape3D" parent="InteractionDetector" unique_id=153393726]
+[node name="CollisionShape" type="CollisionShape3D" parent="InteractionDetector" unique_id=1596952449]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
 shape = SubResource("SphereShape3D_k1elb")
 
-[node name="InteractPrompt" type="Label3D" parent="." unique_id=1846151003]
+[node name="InteractPrompt" type="Label3D" parent="." unique_id=1293504473]
 pixel_size = 0.0008
 billboard = 1
 no_depth_test = true
@@ -221,38 +221,38 @@ fixed_size = true
 font_size = 40
 outline_size = 10
 
-[node name="Inventory" type="Node" parent="." unique_id=1063353369]
+[node name="Inventory" type="Node" parent="." unique_id=1372117018]
 script = ExtResource("8_b3c30")
 starting_items = Array[ExtResource("9_2vult")]([SubResource("Resource_47yrc"), SubResource("Resource_cea6g")])
 
-[node name="Equipment" type="Node" parent="." unique_id=674151531]
+[node name="Equipment" type="Node" parent="." unique_id=1015330359]
 script = ExtResource("12_m4n5g")
 starting_weapon = SubResource("Resource_urqpf")
 starting_shield = SubResource("Resource_ylf2i")
 
-[node name="ManaComponent" type="Node" parent="." unique_id=86053929]
+[node name="ManaComponent" type="Node" parent="." unique_id=1183549965]
 script = ExtResource("15_5qatl")
 
-[node name="QuestLog" type="Node" parent="." unique_id=1947352013]
+[node name="QuestLog" type="Node" parent="." unique_id=650895957]
 script = ExtResource("16_qsypv")
 
-[node name="CharacterStats" type="Node" parent="." unique_id=397641145]
+[node name="CharacterStats" type="Node" parent="." unique_id=1269696112]
 script = ExtResource("17_lje7i")
 
-[node name="PlayerInput" type="Node" parent="." unique_id=2070825259]
+[node name="PlayerInput" type="Node" parent="." unique_id=1921645393]
 script = ExtResource("18_7c4js")
 
-[node name="CameraRig" type="Node3D" parent="." unique_id=1199210390]
+[node name="CameraRig" type="Node3D" parent="." unique_id=1362338791]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
 script = ExtResource("19_6xo6p")
 
-[node name="Pitch" type="Node3D" parent="CameraRig" unique_id=1735360895]
+[node name="Pitch" type="Node3D" parent="CameraRig" unique_id=1287214568]
 transform = Transform3D(1, 0, 0, 0, 0.9135454, 0.40673664, 0, -0.40673664, 0.9135454, 1, 0.9, 0)
 
-[node name="SpringArm" type="SpringArm3D" parent="CameraRig/Pitch" unique_id=1993318504]
+[node name="SpringArm" type="SpringArm3D" parent="CameraRig/Pitch" unique_id=1789640794]
 spring_length = 6.5
 margin = 0.3
 
-[node name="Camera" type="Camera3D" parent="CameraRig/Pitch/SpringArm" unique_id=1898524640]
+[node name="Camera" type="Camera3D" parent="CameraRig/Pitch/SpringArm" unique_id=1076994046]
 current = true
 fov = 65.0
