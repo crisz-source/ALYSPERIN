@@ -32,7 +32,7 @@ var block_filter: Callable
 ## Opcional: func(info: DamageInfo) -> void que pode alterar info.amount antes
 ## do dano (ex.: golpe pelas costas). Quem sabe para onde está virado é o dono.
 var damage_modifier: Callable
-## Escudo de vida: absorve dano antes da vida (ex.: passivo Graça do Sacerdote).
+## Escudo de vida: absorve dano antes da vida (ex.: passivo Graça do Devoto).
 var shield_points: int = 0
 
 

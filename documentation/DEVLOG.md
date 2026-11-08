@@ -38,6 +38,7 @@ conhecidos. Detalhes técnicos de cada etapa ficam em `documentation/worklog/`.
 | 2026-11-07 | Ferramentas de teste: menu (P) e console de administrador (Enter: /add players N, /add mob N, /boss, /help) |
 | 2026-11-07 | Luz curativa: passar a mira seleciona (sem clicar), Espaço cura. Jogo em tela cheia 1920x1080 (visual pixel: 640x360 x3) |
 | 2026-11-07 | Subir de nível enche vida e mana (só ao subir). Luz curativa: custo fixo de 15 de mana por uso, para 1 ou vários aliados |
+| 2026-11-07 | **Sem disciplinas** (decisão do proprietário): cada personagem escolhe só a classe. Guardião (tanque) usa espada e escudo; Devoto (cura) usa cajado. Oração de cura (autocura) no botão direito do Devoto |
 | 2026-11-07 | Chefes aprovados; Fúria aos 70%, 50% e 20% de vida; óleos de arma aprovados |
 | 2026-11-07 | ~~Morrer recomeça a área do zero~~ → substituído: morrer mostra "Você morreu!" / "Deseja continuar?"; Sim volta ao último ponto de descanso mantendo itens e experiência |
 
@@ -85,9 +86,9 @@ conhecidos. Detalhes técnicos de cada etapa ficam em `documentation/worklog/`.
 - [x] Morte com "continuar" (volta ao início da área; botão "Não" a definir pelo proprietário)
 - [x] Mana; magias (Dardo arcano, Cura); NPC com diálogo; missões (derrotar / coletar)
 - [x] ~~Disciplinas provisórias~~ substituídas pelas classes reais (Etapa A)
-- [x] Etapa A (reduzida): **Guardião/Bastião** (tanque) e **Devoto/Sacerdote** (cura) jogáveis;
-  tela de criação classe → disciplina; armas por classe; base igual para todos
-- [ ] Outras disciplinas e classes; Gear Score; masmorras com sincronização
+- [x] Etapa A (reduzida): **Guardião** (tanque, espada e escudo) e **Devoto** (cura, cajado) jogáveis;
+  tela de criação só com a classe (sem disciplinas); armas por classe; base igual para todos
+- [ ] Outras classes; Gear Score; masmorras com sincronização
 - [ ] Enigmas, chefes
 
 ### Migração para 3D em terceira pessoa — ✅ concluída (2026-11-07)

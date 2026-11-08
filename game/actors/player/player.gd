@@ -17,8 +17,8 @@ signal dodge_succeeded
 signal message_requested(text: String)
 ## O jogador descartou um item: a área decide onde ele aparece no chão.
 signal item_dropped(stack: ItemStack, at_position: Vector3)
-## Disciplina escolhida/trocada: habilidades mudaram (HUD refaz a barra).
-signal discipline_changed(discipline: DisciplineData)
+## Classe escolhida/trocada: habilidades mudaram (HUD refaz a barra).
+signal class_changed(player_class: ClassData)
 ## Itens colocados na barra de habilidades mudaram.
 signal hotbar_changed
 ## Um NPC quer conversar: a área abre a caixa de diálogo e chama on_finished no fim.
@@ -52,7 +52,7 @@ const HEAL_TARGET_RANGE: float = 25.0
 const HEAL_TARGET_MASK: int = 1 | 2
 ## Altura (acima dos pés) onde aparecem textos flutuantes.
 const TEXT_HEIGHT: float = 2.1
-## Passivo Muralha (Bastião): duração e redução de dano da Firmeza.
+## Passivo Muralha (Guardião): duração e redução de dano da Firmeza.
 const FIRMEZA_TIME: float = 3.0
 const FIRMEZA_REDUCTION: float = 0.3
 
@@ -162,10 +162,9 @@ var _ability_cooldowns: Array[float] = []
 var _active_ability: AbilityData = null
 ## A habilidade em andamento já fez efeito (disparou/curou)?
 var _ability_fired: bool = false
-## Classe e disciplina escolhidas (null = nenhuma ainda).
+## Classe escolhida (null = nenhuma ainda).
 var player_class: ClassData = null
-var discipline: DisciplineData = null
-## Passivo Muralha (Bastião): tempo restante de Firmeza (menos dano).
+## Passivo Muralha (Guardião): tempo restante de Firmeza (menos dano).
 var _firmeza_left: float = 0.0
 ## Modo de seleção de cura (Luz curativa): a habilidade, a tecla e os aliados marcados.
 var _heal_targeting: HealSpellData = null
@@ -302,24 +301,20 @@ func respawn(at: Vector3) -> void:
 	_change_state(State.MOVE)
 
 
-## Aplica classe e disciplina: equipamento inicial da classe e habilidades da
-## disciplina. A base de vida/mana/dano não muda (igual para todos).
-func apply_class(new_class: ClassData, new_discipline: DisciplineData) -> void:
+## Aplica a classe: equipamento inicial, habilidades e passivo. A base de
+## vida/mana/dano não muda (igual para todos).
+func apply_class(new_class: ClassData) -> void:
+	cancel_heal_targeting()
 	player_class = new_class
 	equipment.weapon = new_class.starting_weapon.copy() if new_class.starting_weapon else null
 	equipment.shield = new_class.starting_shield.copy() if new_class.uses_shield and new_class.starting_shield else null
 	equipment.notify_wear()
-	apply_discipline(new_discipline)
-
-
-## Troca as habilidades pelas da disciplina.
-func apply_discipline(new_discipline: DisciplineData) -> void:
-	discipline = new_discipline
-	abilities = discipline.abilities.duplicate()
+	abilities = new_class.abilities.duplicate()
 	_ability_cooldowns.resize(abilities.size())
 	_ability_cooldowns.fill(0.0)
+	_secondary_cooldown_left = 0.0
 	_apply_growth()
-	discipline_changed.emit(discipline)
+	class_changed.emit(player_class)
 
 
 ## Experiência ganha (ex.: inimigo derrotado).
@@ -742,7 +737,7 @@ func use_hotbar_item(slot: int) -> String:
 
 ## Habilidade do botão direito (classes sem escudo), ou null.
 func secondary_ability() -> AbilityData:
-	return discipline.secondary_ability if discipline else null
+	return player_class.secondary_ability if player_class else null
 
 
 ## 0 = pronta, 1 = acabou de usar.
@@ -1027,7 +1022,7 @@ func _update_focus() -> void:
 
 
 func _has_passive(id: StringName) -> bool:
-	return discipline != null and discipline.passive_id == id
+	return player_class != null and player_class.passive_id == id
 
 
 ## Modificadores de dano recebido do próprio jogador (passivos).

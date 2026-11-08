@@ -1,6 +1,0 @@
-[gd_scene format=3]
-
-[ext_resource type="Script" path="res://game/ui/discipline_select/discipline_select_screen.gd" id="1_i0tut"]
-
-[node name="DisciplineSelectScreen" type="CanvasLayer" unique_id=621980726]
-script = ExtResource("1_i0tut")

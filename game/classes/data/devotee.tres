@@ -1,0 +1,58 @@
+[gd_resource type="Resource" script_class="ClassData" format=3]
+
+[ext_resource type="Script" path="res://game/abilities/ability_data.gd" id="1_mlard"]
+[ext_resource type="Script" path="res://game/abilities/heal_spell_data.gd" id="2_einam"]
+[ext_resource type="Script" path="res://game/abilities/projectile_spell_data.gd" id="3_2apmp"]
+[ext_resource type="Resource" path="res://game/abilities/data/blessing_of_protection.tres" id="4_qkeq2"]
+[ext_resource type="Resource" path="res://game/abilities/data/circle_of_healing.tres" id="5_orpas"]
+[ext_resource type="Resource" path="res://game/abilities/data/resurrection.tres" id="6_sblsn"]
+[ext_resource type="Resource" path="res://game/abilities/data/miracle.tres" id="7_162ec"]
+[ext_resource type="Script" path="res://game/classes/class_data.gd" id="8_gsueo"]
+[ext_resource type="Resource" path="res://game/abilities/data/healing_prayer.tres" id="9_d5sir"]
+[ext_resource type="Resource" path="res://game/items/data/apprentice_staff.tres" id="10_3dsqm"]
+[ext_resource type="Script" path="res://game/items/item_stack.gd" id="11_xtdta"]
+
+[sub_resource type="Resource" id="Resource_pckdo"]
+script = ExtResource("2_einam")
+heal_amount = 25
+cast_time = 0.3
+requires_target = true
+id = &"healing_light"
+display_name = "Luz curativa"
+description = "Passe a mira em um ou mais aliados e aperte Espaço: cura 25 em cada (15 de mana por uso, qualquer número de aliados)."
+cooldown = 3.0
+mana_cost = 15
+icon_color = Color(1, 0.95, 0.6, 1)
+
+[sub_resource type="Resource" id="Resource_lrf0d"]
+script = ExtResource("3_2apmp")
+damage = 8
+speed = 220.0
+knockback = 60.0
+projectile_color = Color(1, 0.9, 0.5, 1)
+id = &"holy_ray"
+display_name = "Raio sagrado"
+description = "Projétil sagrado fraco (no co-op: cura os aliados que atravessa)."
+cooldown = 0.8
+mana_cost = 6
+icon_color = Color(1, 0.9, 0.5, 1)
+
+[sub_resource type="Resource" id="Resource_vw4y7"]
+script = ExtResource("11_xtdta")
+item = ExtResource("10_3dsqm")
+durability = 80
+
+[resource]
+script = ExtResource("8_gsueo")
+id = &"devotee"
+display_name = "Devoto"
+role = "Cura"
+description = "Canaliza a fé com um cajado para curar e proteger. Não usa escudo."
+icon_color = Color(1, 0.9, 0.6, 1)
+allowed_weapon_types = Array[StringName]([&"cajado"])
+starting_weapon = SubResource("Resource_vw4y7")
+passive_id = &"graca"
+passive_name = "Graça"
+passive_description = "Curar quem está com a vida cheia vira escudo de vida."
+abilities = Array[ExtResource("1_mlard")]([SubResource("Resource_pckdo"), SubResource("Resource_lrf0d"), ExtResource("4_qkeq2"), ExtResource("5_orpas"), ExtResource("6_sblsn"), ExtResource("7_162ec")])
+secondary_ability = ExtResource("9_d5sir")

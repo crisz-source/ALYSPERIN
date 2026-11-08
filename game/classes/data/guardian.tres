@@ -1,0 +1,57 @@
+[gd_resource type="Resource" script_class="ClassData" format=3]
+
+[ext_resource type="Script" path="res://game/abilities/ability_data.gd" id="1_gtufn"]
+[ext_resource type="Script" path="res://game/abilities/shield_bash_data.gd" id="2_w8jks"]
+[ext_resource type="Script" path="res://game/abilities/taunt_data.gd" id="3_b63mp"]
+[ext_resource type="Resource" path="res://game/abilities/data/steadfast_stance.tres" id="4_dokpf"]
+[ext_resource type="Resource" path="res://game/abilities/data/shared_wall.tres" id="5_i6d08"]
+[ext_resource type="Resource" path="res://game/abilities/data/eternal_bastion.tres" id="6_flyc0"]
+[ext_resource type="Resource" path="res://game/abilities/data/living_fortress.tres" id="7_mieo4"]
+[ext_resource type="Script" path="res://game/classes/class_data.gd" id="8_ioldq"]
+[ext_resource type="Resource" path="res://game/items/data/wooden_shield.tres" id="9_f8pfs"]
+[ext_resource type="Script" path="res://game/items/item_stack.gd" id="10_7vfrv"]
+[ext_resource type="Resource" path="res://game/items/data/short_sword.tres" id="11_x3w3k"]
+
+[sub_resource type="Resource" id="Resource_y62ve"]
+script = ExtResource("2_w8jks")
+id = &"shield_bash"
+display_name = "Golpe de escudo"
+description = "Empurra e atordoa o alvo à frente."
+cooldown = 6.0
+mana_cost = 5
+icon_color = Color(0.6, 0.7, 0.9, 1)
+
+[sub_resource type="Resource" id="Resource_tmyeh"]
+script = ExtResource("3_b63mp")
+id = &"taunt"
+display_name = "Provocar"
+description = "Inimigos próximos atacam você por 4 s."
+cooldown = 10.0
+mana_cost = 5
+icon_color = Color(1, 0.55, 0.3, 1)
+
+[sub_resource type="Resource" id="Resource_hk45v"]
+script = ExtResource("10_7vfrv")
+item = ExtResource("9_f8pfs")
+durability = 40
+
+[sub_resource type="Resource" id="Resource_8jr04"]
+script = ExtResource("10_7vfrv")
+item = ExtResource("11_x3w3k")
+durability = 80
+
+[resource]
+script = ExtResource("8_ioldq")
+id = &"guardian"
+display_name = "Guardião"
+role = "Tanque"
+description = "Linha de frente com espada e escudo. Protege o grupo e segura os inimigos."
+icon_color = Color(0.45, 0.6, 0.85, 1)
+allowed_weapon_types = Array[StringName]([&"espada", &"maca", &"machado"])
+uses_shield = true
+starting_weapon = SubResource("Resource_8jr04")
+starting_shield = SubResource("Resource_hk45v")
+passive_id = &"muralha"
+passive_name = "Muralha"
+passive_description = "Bloquear dá Firmeza: 30% menos dano por 3 s."
+abilities = Array[ExtResource("1_gtufn")]([SubResource("Resource_y62ve"), SubResource("Resource_tmyeh"), ExtResource("4_dokpf"), ExtResource("5_i6d08"), ExtResource("6_flyc0"), ExtResource("7_mieo4")])

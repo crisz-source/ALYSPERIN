@@ -1,6 +1,6 @@
 class_name TauntData
 extends AbilityData
-## Provocar (Guardião/Bastião): inimigos próximos passam a atacar quem provocou
+## Provocar (Guardião): inimigos próximos passam a atacar quem provocou
 ## por alguns segundos, mesmo que outro jogador esteja mais perto (co-op).
 
 ## Alcance da provocação (m).

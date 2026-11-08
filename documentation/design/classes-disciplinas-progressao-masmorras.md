@@ -1,5 +1,11 @@
 # ALYSPERIN — Classes, Disciplinas, Progressão, Gear Score e Masmorras
 
+> **Atualização (2026-11-07, decisão do proprietário): o jogo NÃO terá disciplinas.**
+> Cada personagem escolhe apenas uma classe. Implementadas até agora: **Guardião** (tanque,
+> espada + escudo; habilidades do antigo "Bastião") e **Devoto** (cura, cajado; habilidades do
+> antigo "Sacerdote" + Oração de cura no botão direito). As listas por disciplina abaixo ficam
+> como **banco de ideias** para as habilidades das classes; GS, masmorras e sincronização seguem valendo.
+
 - **Status:** v2 (2026-11-07) — decisões do proprietário aplicadas (ver §10). Nomes das
   habilidades aprovados ("quero o nome habilidades mesmo").
 - **Origem:** especificação do proprietário "Sistema de Classes, Disciplinas, Progressão

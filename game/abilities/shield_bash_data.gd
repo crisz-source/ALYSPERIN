@@ -1,6 +1,6 @@
 class_name ShieldBashData
 extends AbilityData
-## Golpe de escudo (Guardião/Bastião): pancada curta à frente que empurra e
+## Golpe de escudo (Guardião): pancada curta à frente que empurra e
 ## atordoa. Precisa de escudo equipado.
 
 ## Multiplica o dano do 1º golpe da arma (já com nível e desgaste).

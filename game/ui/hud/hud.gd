@@ -89,7 +89,7 @@ func bind_player(player: Player) -> void:
 	player.stats.xp_changed.connect(_on_xp_changed)
 	_on_xp_changed(player.stats.xp, player.stats.xp_to_next())
 	_build_ability_bar()
-	player.discipline_changed.connect(func(_d: DisciplineData) -> void: _build_ability_bar())
+	player.class_changed.connect(func(_c: ClassData) -> void: _build_ability_bar())
 	player.hotbar_changed.connect(_build_ability_bar)
 	player.inventory.changed.connect(_build_ability_bar)
 	player.mana.mana_changed.connect(_on_mana_changed)

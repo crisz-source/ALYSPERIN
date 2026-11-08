@@ -82,3 +82,17 @@ provocação (só cor do inimigo e texto flutuante, sem efeitos próprios).
 - **Animação de nível ~5 s**: asas e coroa ficam ~3,8 s e somem em 1,2 s (subindo).
 - Testes: `test3d_ui.gd` 22/22 (+4: efeito visível aos 3,5 s, some até ~5,5 s, espada e
   cabeça longe do centro, mensagem de defesa); demais 8 suítes passando.
+
+## Mudança: sem disciplinas; Devoto com cajado; Oração de cura
+- Pedido: "vou remover essa questão de disciplinas, quero manter apenas uma classe... tank
+  usa espada e escudo, healer usa um cajado"; antes: "uma skill que cure eu mesmo ao clicar
+  com o botão direito".
+- `ClassData` (agora em `game/classes/`) passou a guardar passivo, habilidades e habilidade
+  do botão direito. `DisciplineData`, `game/disciplines/` e a tela de disciplina foram
+  removidos (recuperáveis no git, commit 0eb93e4). Nova `ClassSelectScreen` (uma etapa).
+- Devoto: **Cajado de aprendiz** (8 de dano, alcance x1,15) no lugar da Maça de peregrino
+  (removida). **Oração de cura** no botão direito: +25 em si, 15 de mana, recarga 6 s, Graça
+  vale; espaço "Dir" na barra. No modo de seleção da Luz curativa o botão direito só cancela.
+- Problema: a primeira gravação do gerador novo foi recusada (arquivo alterado por script);
+  rodou o gerador antigo e a área saiu com a lista de classes vazia → regravado e gerado de novo.
+- Testes: 11 suítes, 261 verificações (criação reescrita 7/7; cura 40/40 com o botão direito).

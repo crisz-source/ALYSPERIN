@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="Script" path="res://game/items/weapon_data.gd" id="1_wj8wf"]
+
+[resource]
+script = ExtResource("1_wj8wf")
+weapon_type = &"cajado"
+damage = 8
+timing_scale = 1.1
+reach_scale = 1.15
+id = &"apprentice_staff"
+display_name = "Cajado de aprendiz"
+description = "Cajado simples de madeira, usado para canalizar a fé."
+icon_color = Color(0.7, 0.55, 0.35, 1)

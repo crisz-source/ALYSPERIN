@@ -4,8 +4,7 @@ extends CanvasLayer
 ## Troca de classe, cria aliados de teste feridos (para testar curas), sobe
 ## de nível e enche vida/mana. Não faz parte do jogo final.
 
-const CLASSES := "res://game/disciplines/classes/"
-const DISCIPLINES := "res://game/disciplines/data/"
+const CLASSES := "res://game/classes/data/"
 const ALLY_COUNT: int = 3
 const ALLY_WOUNDED_HEALTH: int = 40
 
@@ -43,8 +42,8 @@ func _ready() -> void:
 	_box.add_theme_constant_override("separation", 4)
 	_root.add_child(_box)
 	for spec: Array in [
-		["Jogar como Devoto / Sacerdote (cura)", play_devotee],
-		["Jogar como Guardião / Bastião (tanque)", play_guardian],
+		["Jogar como Devoto (cura)", play_devotee],
+		["Jogar como Guardião (tanque)", play_guardian],
 		["Criar %d aliados de teste (feridos)" % ALLY_COUNT, spawn_allies],
 		["Ferir os aliados de teste", wound_allies],
 		["Subir 1 nível", level_up],
@@ -74,13 +73,13 @@ func set_open(value: bool) -> void:
 
 
 func play_devotee() -> void:
-	_area.player.apply_class(load(CLASSES + "devotee.tres"), load(DISCIPLINES + "priest.tres"))
-	_area.player.message_requested.emit("Agora você é Devoto / Sacerdote.")
+	_area.player.apply_class(load(CLASSES + "devotee.tres"))
+	_area.player.message_requested.emit("Agora você é Devoto (cura).")
 
 
 func play_guardian() -> void:
-	_area.player.apply_class(load(CLASSES + "guardian.tres"), load(DISCIPLINES + "bastion.tres"))
-	_area.player.message_requested.emit("Agora você é Guardião / Bastião.")
+	_area.player.apply_class(load(CLASSES + "guardian.tres"))
+	_area.player.message_requested.emit("Agora você é Guardião (tanque).")
 
 
 ## Aliados de teste à frente do jogador, com a vida baixa.
