@@ -29,8 +29,14 @@ enum State { MOVE, ATTACK, BLOCK, DODGE, HURT, ABILITY, DEAD }
 const GROUP: StringName = &"players"
 const COMBO_LENGTH: int = 3
 const GRAVITY: float = 20.0
-const PLACEHOLDER_COLOR := Color(0.36, 0.62, 0.92)
-const DEAD_COLOR := Color(0.35, 0.35, 0.4)
+## Camada de cor por cima do corpo (alfa = intensidade). Vale para qualquer
+## modelo, provisório ou de arte, porque não mexe nos materiais dele.
+const TINT_NONE := Color(1, 1, 1, 0)
+const TINT_HIT := Color(1, 1, 1, 0.75)
+const TINT_DEAD := Color(0.2, 0.2, 0.25, 0.65)
+const TINT_HEAL_SELECTED := Color(0.45, 1.0, 0.5, 0.45)
+## Animação de parado do modelo de arte (se o modelo tiver).
+const IDLE_ANIMATION := &"idle"
 const SHIELD_COLOR := Color(0.75, 0.85, 1.0, 0.85)
 const SWING_COLOR := Color(1.0, 1.0, 0.85, 0.6)
 const FINISHER_SWING_TINT := Color(1.0, 0.75, 0.45, 0.7)
@@ -175,7 +181,11 @@ var _defend_held_last: bool = false
 var _defend_pressed: bool = false
 var _secondary_cooldown_left: float = 0.0
 var _base_max_mana: int = 0
-var _body_material: StandardMaterial3D
+var _tint_material: StandardMaterial3D
+## Corpo visível agora: o boneco provisório ou o modelo da classe.
+var _body: Node3D
+var _class_model: Node3D
+var _heal_selected: bool = false
 var _swing_material: StandardMaterial3D
 var _shield_material: StandardMaterial3D
 
@@ -187,7 +197,7 @@ var _shield_material: StandardMaterial3D
 @onready var quest_log: QuestLog = $QuestLog
 @onready var _input: PlayerInput = $PlayerInput
 @onready var _model: Node3D = $Model
-@onready var _body: MeshInstance3D = $Model/BodyPlaceholder
+@onready var _placeholder: Node3D = $Model/Placeholder
 @onready var _attack_pivot: Node3D = $AttackPivot
 @onready var _sword_hitbox: Hitbox = $AttackPivot/SwordHitbox
 @onready var _swing_visual: MeshInstance3D = $AttackPivot/SwingPlaceholder
@@ -205,8 +215,11 @@ func _ready() -> void:
 		"Player: listas do combo precisam ter %d valores cada" % COMBO_LENGTH)
 	add_to_group(GROUP)
 	# Materiais próprios desta instância (piscar não pode afetar outro personagem).
-	_body_material = (_body.material_override as StandardMaterial3D).duplicate()
-	_body.material_override = _body_material
+	_tint_material = StandardMaterial3D.new()
+	_tint_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	_tint_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	_tint_material.albedo_color = TINT_NONE
+	_set_body_model(null)
 	_swing_material = (_swing_visual.material_override as StandardMaterial3D).duplicate()
 	_swing_visual.material_override = _swing_material
 	_shield_material = (_shield_visual.material_override as StandardMaterial3D).duplicate()
@@ -313,6 +326,7 @@ func apply_class(new_class: ClassData) -> void:
 	_ability_cooldowns.resize(abilities.size())
 	_ability_cooldowns.fill(0.0)
 	_secondary_cooldown_left = 0.0
+	_set_body_model(new_class.model_scene)
 	_apply_growth()
 	class_changed.emit(player_class)
 
@@ -833,7 +847,42 @@ func cancel_heal_targeting() -> void:
 
 ## Tinta o corpo ao ser selecionado para cura por outro jogador (co-op).
 func set_heal_selected(value: bool) -> void:
-	_body_material.albedo_color = PLACEHOLDER_COLOR.lerp(Color(0.45, 1.0, 0.5), 0.65) if value else PLACEHOLDER_COLOR
+	_heal_selected = value
+
+
+## Troca o corpo visível: modelo da classe ou, sem modelo, o boneco provisório.
+## Colisão, golpes e câmera não dependem do corpo, só a aparência muda.
+func _set_body_model(scene: PackedScene) -> void:
+	if _class_model:
+		_class_model.queue_free()
+		_class_model = null
+	if scene:
+		_class_model = scene.instantiate() as Node3D
+		_class_model.name = "ClassModel"
+		# Modelos importados olham para +Z; o jogo usa -Z como frente.
+		_class_model.rotation.y = PI
+		_model.add_child(_class_model)
+		_play_idle(_class_model)
+	_placeholder.visible = _class_model == null
+	_body = _class_model if _class_model else _placeholder
+	for mesh: Node in _body.find_children("*", "MeshInstance3D", true, false):
+		(mesh as MeshInstance3D).material_overlay = _tint_material
+
+
+static func _play_idle(model: Node) -> void:
+	var players: Array[Node] = model.find_children("*", "AnimationPlayer", true, false)
+	if players.is_empty():
+		return
+	var anim_player := players[0] as AnimationPlayer
+	if not anim_player.has_animation(IDLE_ANIMATION):
+		return
+	anim_player.get_animation(IDLE_ANIMATION).loop_mode = Animation.LOOP_LINEAR
+	anim_player.play(IDLE_ANIMATION)
+
+
+## Modelo de arte em uso (null = boneco provisório). Usado por testes.
+func class_model() -> Node3D:
+	return _class_model
 
 
 func _start_heal_targeting(ability: HealSpellData, slot: int) -> void:
@@ -1108,10 +1157,15 @@ func _update_visuals(delta: float) -> void:
 	_shield_material.albedo_color = Color.WHITE if _shield_flash_time > 0.0 else SHIELD_COLOR
 	_model.scale = Vector3(1.0, 0.6 if state == State.DODGE else 1.0, 1.0)
 	if state == State.DEAD:
-		_body_material.albedo_color = DEAD_COLOR
+		_tint_material.albedo_color = TINT_DEAD
 		_body.visible = true
 		return
-	_body_material.albedo_color = Color.WHITE if _flash_time > 0.0 else PLACEHOLDER_COLOR
+	if _flash_time > 0.0:
+		_tint_material.albedo_color = TINT_HIT
+	elif _heal_selected:
+		_tint_material.albedo_color = TINT_HEAL_SELECTED
+	else:
+		_tint_material.albedo_color = TINT_NONE
 	if health.is_invulnerable() and state != State.DODGE:
 		# Pisca enquanto invulnerável após dano (alterna a cada 1/15 s).
 		_blink_clock += delta

@@ -97,6 +97,14 @@ conhecidos. Detalhes técnicos de cada etapa ficam em `documentation/worklog/`.
 - [x] 173 verificações automáticas passando
 - Ver `documentation/worklog/2026-11-07-migracao-3d.md`
 
+### Primeiro modelo de arte — Guardião (modelo de teste do proprietário)
+- [x] `assets/characters/guardian/guardian.glb` (1,70 m, espada e escudo, animações bow/idle/wave)
+- [x] Original guardado sem alteração em `assets/characters/guardian/source/model.glb` (pasta ignorada pelo Godot)
+- [x] `tools/dequantize_glb.py`: converte .glb com `KHR_mesh_quantization` (Godot 4.7 não lê)
+- [x] `ClassData.model_scene`: cada classe pode ter seu modelo; Devoto segue com o boneco provisório
+- [x] Piscar de dano, cinza de morte e verde da cura agora funcionam em qualquer modelo (camada de cor)
+- Ver `documentation/worklog/2026-11-07-modelo-guardiao.md`
+
 ### Protótipo 3D (só visualização) — `prototypes/preview_3d/`
 - [x] Cena separada, sem afetar o jogo 2D: terceira pessoa, câmera no mouse, andar, atacar,
   esquivar, monstro com aviso no chão, números de dano, golpe pelas costas. Formas simples, sem arte.
@@ -112,6 +120,8 @@ conhecidos. Detalhes técnicos de cada etapa ficam em `documentation/worklog/`.
 ## Itens provisórios no projeto
 - `test_arena.tscn`: chão quadriculado desenhado por código, paredes e pilares em
   `ColorRect`, texto de ajuda — no lugar de tilemap/arte reais.
+- `guardian.glb`: modelo de TESTE gerado pelo proprietário (origem/licença a confirmar); só
+  tem animações bow/idle/wave — andar, atacar e defender ainda sem animação.
 - `player.tscn`: corpo azul (`BodyPlaceholder`), seta amarela (`FacingIndicator`) e
   arco claro do golpe (`SwingPlaceholder`) no lugar de sprites/efeitos.
 - `basic_enemy.tscn`: inimigo inteiro é provisório (quadrado vermelho, sem nome nem

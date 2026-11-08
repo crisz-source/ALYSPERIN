@@ -13,6 +13,9 @@ extends Resource
 @export var role: String = ""
 @export_multiline var description: String = ""
 @export var icon_color: Color = Color(0.7, 0.7, 0.7)
+## Modelo 3D do personagem (cena importada, olhando para -Z, pés em y = 0).
+## Vazio = boneco provisório (cápsula).
+@export var model_scene: PackedScene
 
 @export_group("Equipamento")
 ## Tipos de arma que a classe pode usar (WeaponData.weapon_type).
