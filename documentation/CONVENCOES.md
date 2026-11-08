@@ -8,11 +8,24 @@ vence o padrão genérico da internet.
   (4.7.x) sem combinar antes; versão nova (4.8+) é decisão registrada no DEVLOG.
 - **Renderer:** Compatibility (OpenGL 3.3) — leve, suficiente para 2D, roda em GPU integrada.
 
-## Pixel art
+## 3D (desde 2026-11-07)
+- Jogo em **3D, terceira pessoa**. Escala: **1 metro = 1 tile** da versão 2D (16 px).
+- Lógica de combate no **plano do chão (X/Z)**; Y só para gravidade. Use `Player.flat()`
+  e `Player.yaw_of()` (nó que "olha" para -Z) em vez de reinventar as contas.
+- Mira = para onde a câmera olha (`PlayerInput.aim_direction`, preenchido pela câmera;
+  no co-op, pela rede).
+- Camadas de física com a mesma numeração da tabela abaixo (agora em Area3D/corpos 3D).
+- Materiais de instâncias que mudam de cor (piscar, aviso) são **duplicados no _ready**:
+  instâncias da mesma cena compartilham o material original.
+- Textos no mundo: `FloatingText` (Label3D, sempre visível). Mapas: `GridMap` com a
+  biblioteca de blocos em `game/world/tilesets/`.
+
+## Pixel art (visual)
 - Resolução interna **640×360**, ampliada em **escala inteira** (2× = 1280×720, 3× = 1920×1080).
 - Tile base **16×16 px**. Personagens humanoides ≈ **16×32 px** (podem variar por design).
 - Filtro de textura **Nearest** (pixels nítidos) — já é o padrão do projeto.
-- Toda arte provisória fica com sufixo `_placeholder` no nome do arquivo.
+- Toda arte provisória fica com sufixo `_placeholder` no nome do arquivo. O 3D usa o mesmo
+  render em 640×360 ampliado (visual "pixel 3D").
 
 ## Pastas (organização por funcionalidade)
 ```

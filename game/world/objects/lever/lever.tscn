@@ -3,34 +3,53 @@
 [ext_resource type="Script" path="res://game/world/objects/lever/lever.gd" id="1_aumwl"]
 [ext_resource type="Script" path="res://game/components/interactable.gd" id="2_vkemy"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_utw2r"]
-size = Vector2(10, 6)
+[sub_resource type="BoxShape3D" id="BoxShape3D_utw2r"]
+size = Vector3(0.6, 0.4, 0.4)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_ngwuf"]
-size = Vector2(24, 24)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ngwuf"]
+albedo_color = Color(0.35, 0.33, 0.38, 1)
+roughness = 0.9
 
-[node name="Lever" type="StaticBody2D" unique_id=2043247669]
+[sub_resource type="BoxMesh" id="BoxMesh_4jkqq"]
+size = Vector3(0.6, 0.4, 0.4)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_uavi3"]
+albedo_color = Color(0.6, 0.6, 0.65, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_7hh11"]
+size = Vector3(0.08, 0.7, 0.08)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_6wr85"]
+size = Vector3(1.6, 1.5, 1.6)
+
+[node name="Lever" type="StaticBody3D" unique_id=1711930955]
 collision_mask = 0
 script = ExtResource("1_aumwl")
 
-[node name="CollisionShape" type="CollisionShape2D" parent="." unique_id=380468435]
-position = Vector2(0, -3)
-shape = SubResource("RectangleShape2D_utw2r")
+[node name="CollisionShape" type="CollisionShape3D" parent="." unique_id=400405069]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
+shape = SubResource("BoxShape3D_utw2r")
 
-[node name="BasePlaceholder" type="Polygon2D" parent="." unique_id=1207929782]
-color = Color(0.35, 0.33, 0.38, 1)
-polygon = PackedVector2Array(-6, -6, 6, -6, 6, 0, -6, 0)
+[node name="BasePlaceholder" type="MeshInstance3D" parent="." unique_id=881571336]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
+material_override = SubResource("StandardMaterial3D_ngwuf")
+mesh = SubResource("BoxMesh_4jkqq")
 
-[node name="HandlePlaceholder" type="Polygon2D" parent="." unique_id=677523664]
-position = Vector2(0, -5)
-color = Color(0.6, 0.6, 0.65, 1)
-polygon = PackedVector2Array(-1, 0, 1, 0, 1, -11, -1, -11)
+[node name="HandlePivot" type="Node3D" parent="." unique_id=1834972441]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
 
-[node name="Interactable" type="Area2D" parent="." unique_id=242180453]
+[node name="HandlePlaceholder" type="MeshInstance3D" parent="HandlePivot" unique_id=140015597]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0)
+material_override = SubResource("StandardMaterial3D_uavi3")
+mesh = SubResource("BoxMesh_7hh11")
+
+[node name="Interactable" type="Area3D" parent="." unique_id=536011963]
 collision_layer = 32
 collision_mask = 0
 script = ExtResource("2_vkemy")
+prompt_offset = Vector3(0, 1.6, 0)
 
-[node name="CollisionShape" type="CollisionShape2D" parent="Interactable" unique_id=996503714]
-position = Vector2(0, -6)
-shape = SubResource("RectangleShape2D_ngwuf")
+[node name="CollisionShape" type="CollisionShape3D" parent="Interactable" unique_id=1645601645]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+shape = SubResource("BoxShape3D_6wr85")

@@ -1,7 +1,7 @@
 class_name Chest
-extends StaticBody2D
-## Baú (PROVISÓRIO: caixa sem arte). Interagir abre e passa o conteúdo para a
-## bolsa; o que não couber fica guardado para pegar depois.
+extends StaticBody3D
+## Baú (PROVISÓRIO: caixa sem arte), 3D. Interagir abre e passa o conteúdo para
+## a bolsa; o que não couber fica guardado para pegar depois.
 
 const CLOSED_LID := Color(0.5, 0.33, 0.18)
 const OPEN_LID := Color(0.25, 0.16, 0.09)
@@ -11,15 +11,18 @@ const OPEN_LID := Color(0.25, 0.16, 0.09)
 
 var is_open: bool = false
 var _items: Array[ItemStack] = []
+var _lid_material: StandardMaterial3D
 
 @onready var _interactable: Interactable = $Interactable
-@onready var _lid: ColorRect = $LidPlaceholder
+@onready var _lid: MeshInstance3D = $LidPlaceholder
 
 
 func _ready() -> void:
 	for stack: ItemStack in contents:
 		if stack and stack.item:
 			_items.append(stack.copy())
+	_lid_material = (_lid.material_override as StandardMaterial3D).duplicate()
+	_lid.material_override = _lid_material
 	_interactable.handler = _on_interact
 	_refresh()
 
@@ -55,6 +58,8 @@ func _on_interact(by: Player) -> String:
 
 
 func _refresh() -> void:
-	_lid.color = OPEN_LID if is_open else CLOSED_LID
+	_lid_material.albedo_color = OPEN_LID if is_open else CLOSED_LID
+	# Tampa aberta: inclinada para trás.
+	_lid.rotation_degrees.x = -70.0 if is_open else 0.0
 	_interactable.prompt_text = "Abrir" if not is_open else "Pegar o resto"
 	_interactable.enabled = not (is_open and _items.is_empty())

@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="ALYSPERIN"
-run/main_scene="res://game/world/arenas/test_arena/test_arena.tscn"
+run/main_scene="res://game/world/areas/prototype_area/prototype_area.tscn"
 config/features=PackedStringArray("4.7")
 
 [autoload]

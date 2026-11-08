@@ -31,6 +31,7 @@ conhecidos. Detalhes técnicos de cada etapa ficam em `documentation/worklog/`.
 | 2026-11-07 | Barra de vida dos monstros sempre visível; números de dano na tela |
 | 2026-11-07 | Missões em etapas. Marcadores: ! nova; nada em andamento; ? etapa cumprida com continuação; * pronta para entregar (recompensa só no fim) |
 | 2026-11-07 | Golpe pelas costas de monstros/chefes causa x1,5 (número laranja); inimigo mostra a frente com uma seta |
+| 2026-11-07 | **Jogo reconstruído em 3D, terceira pessoa** (decisão do proprietário). História, design e funcionalidades mantidos; versão 2D preservada na etiqueta `versao-2d-final`. Visual "pixel 3D" (render 640×360) |
 | 2026-11-07 | Chefes aprovados; Fúria aos 70%, 50% e 20% de vida; óleos de arma aprovados |
 | 2026-11-07 | ~~Morrer recomeça a área do zero~~ → substituído: morrer mostra "Você morreu!" / "Deseja continuar?"; Sim volta ao último ponto de descanso mantendo itens e experiência |
 
@@ -82,11 +83,17 @@ conhecidos. Detalhes técnicos de cada etapa ficam em `documentation/worklog/`.
 - [ ] Classes/disciplinas definitivas, Gear Score, masmorras com sincronização
 - [ ] Enigmas, chefes
 
+### Migração para 3D em terceira pessoa — ✅ concluída (2026-11-07)
+- [x] Combate 3D (câmera por cima do ombro, mira pela câmera), inimigo, projétil, textos 3D, barra de vida 3D
+- [x] Área de protótipo em 3D (GridMap, mesmo traçado), objetos, NPC, missões, telas
+- [x] 173 verificações automáticas passando
+- Ver `documentation/worklog/2026-11-07-migracao-3d.md`
+
 ### Protótipo 3D (só visualização) — `prototypes/preview_3d/`
 - [x] Cena separada, sem afetar o jogo 2D: terceira pessoa, câmera no mouse, andar, atacar,
   esquivar, monstro com aviso no chão, números de dano, golpe pelas costas. Formas simples, sem arte.
 - Abrir: `godot --path . res://prototypes/preview_3d/preview_3d.tscn`
-- [ ] Decisão do proprietário: seguir só 2D, ou manter as duas versões
+- [x] Decisão do proprietário: jogo inteiro em 3D (protótipo serviu de base para a migração)
 
 ## Problemas conhecidos
 - F5 no editor (jogo embutido na aba "Jogo") não recebe o teclado; clicar dentro não

@@ -1,6 +1,6 @@
 class_name Lever
-extends StaticBody2D
-## Alavanca (PROVISÓRIA: sem arte). Ao ser puxada, abre as portas ligadas a ela.
+extends StaticBody3D
+## Alavanca (PROVISÓRIA: sem arte), 3D. Ao ser puxada, abre as portas ligadas a ela.
 ##
 ## As portas são escolhidas no Inspetor (`targets`). Com `one_shot`, depois de
 ## puxada fica travada e o aviso some.
@@ -16,11 +16,16 @@ const ON_COLOR := Color(0.95, 0.8, 0.3)
 @export var is_on: bool = false
 @export_multiline var pulled_message: String = "Algo se abriu ao longe."
 
-@onready var _handle: Polygon2D = $HandlePlaceholder
+var _material: StandardMaterial3D
+
+@onready var _handle: Node3D = $HandlePivot
+@onready var _handle_mesh: MeshInstance3D = $HandlePivot/HandlePlaceholder
 @onready var _interactable: Interactable = $Interactable
 
 
 func _ready() -> void:
+	_material = (_handle_mesh.material_override as StandardMaterial3D).duplicate()
+	_handle_mesh.material_override = _material
 	_interactable.handler = _on_interact
 	_apply_state()
 
@@ -36,8 +41,8 @@ func _on_interact(_by: Player) -> String:
 
 
 func _apply_state() -> void:
-	_handle.color = ON_COLOR if is_on else OFF_COLOR
-	# Alavanca inclinada para a direita quando ligada.
-	_handle.rotation = deg_to_rad(35.0 if is_on else -35.0)
+	_material.albedo_color = ON_COLOR if is_on else OFF_COLOR
+	# Alavanca inclinada para um lado ou outro.
+	_handle.rotation_degrees.x = 40.0 if is_on else -40.0
 	_interactable.prompt_text = "Puxar"
 	_interactable.enabled = not (one_shot and is_on)

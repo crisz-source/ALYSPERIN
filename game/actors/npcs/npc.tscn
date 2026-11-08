@@ -3,39 +3,48 @@
 [ext_resource type="Script" path="res://game/actors/npcs/npc.gd" id="1_kuote"]
 [ext_resource type="Script" path="res://game/components/interactable.gd" id="2_c8cwq"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_lfcov"]
-size = Vector2(10, 6)
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_lfcov"]
+radius = 0.35
+height = 1.6
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_8fado"]
-size = Vector2(26, 30)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8fado"]
+albedo_color = Color(0.45, 0.75, 0.5, 1)
+roughness = 0.9
 
-[node name="Npc" type="StaticBody2D" unique_id=1564833695]
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_cok6a"]
+radius = 0.35
+height = 1.6
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_pfrpn"]
+size = Vector3(1.8, 1.8, 1.8)
+
+[node name="Npc" type="StaticBody3D" unique_id=197356120]
 collision_mask = 0
 script = ExtResource("1_kuote")
 
-[node name="CollisionShape" type="CollisionShape2D" parent="." unique_id=31972517]
-position = Vector2(0, -3)
-shape = SubResource("RectangleShape2D_lfcov")
+[node name="CollisionShape" type="CollisionShape3D" parent="." unique_id=1318497296]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+shape = SubResource("CapsuleShape3D_lfcov")
 
-[node name="BodyPlaceholder" type="Polygon2D" parent="." unique_id=237674355]
-color = Color(0.45, 0.75, 0.5, 1)
-polygon = PackedVector2Array(-6, -24, 6, -24, 6, 0, -6, 0)
+[node name="BodyPlaceholder" type="MeshInstance3D" parent="." unique_id=1876731033]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+material_override = SubResource("StandardMaterial3D_8fado")
+mesh = SubResource("CapsuleMesh_cok6a")
 
-[node name="QuestMarker" type="Label" parent="." unique_id=464380530]
-offset_left = -3.0
-offset_top = -40.0
-offset_right = -3.0
-offset_bottom = -40.0
-theme_override_font_sizes/font_size = 12
-theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 3
+[node name="QuestMarker" type="Label3D" parent="." unique_id=566273293]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2, 0)
+pixel_size = 0.0015
+billboard = 1
+fixed_size = true
+modulate = Color(1, 0.85, 0.3, 1)
+font_size = 48
 
-[node name="Interactable" type="Area2D" parent="." unique_id=127484504]
+[node name="Interactable" type="Area3D" parent="." unique_id=159991187]
 collision_layer = 32
 collision_mask = 0
 script = ExtResource("2_c8cwq")
+prompt_offset = Vector3(0, 2.6, 0)
 
-[node name="CollisionShape" type="CollisionShape2D" parent="Interactable" unique_id=1921602138]
-position = Vector2(0, -12)
-shape = SubResource("RectangleShape2D_8fado")
+[node name="CollisionShape" type="CollisionShape3D" parent="Interactable" unique_id=1776278781]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("BoxShape3D_pfrpn")

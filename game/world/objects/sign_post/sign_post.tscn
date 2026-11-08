@@ -3,38 +3,49 @@
 [ext_resource type="Script" path="res://game/world/objects/sign_post/sign_post.gd" id="1_04wps"]
 [ext_resource type="Script" path="res://game/components/interactable.gd" id="2_h7jn2"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_pwa13"]
-size = Vector2(4, 4)
+[sub_resource type="BoxShape3D" id="BoxShape3D_pwa13"]
+size = Vector3(0.2, 1.4, 0.2)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_vm7gd"]
-size = Vector2(24, 24)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vm7gd"]
+albedo_color = Color(0.4, 0.28, 0.16, 1)
+roughness = 0.9
 
-[node name="SignPost" type="StaticBody2D" unique_id=780227479]
+[sub_resource type="BoxMesh" id="BoxMesh_yif46"]
+size = Vector3(0.12, 1.4, 0.12)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xafeq"]
+albedo_color = Color(0.62, 0.48, 0.3, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_1c2y7"]
+size = Vector3(0.9, 0.5, 0.08)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_lb062"]
+size = Vector3(1.6, 1.6, 1.6)
+
+[node name="SignPost" type="StaticBody3D" unique_id=1978798389]
 collision_mask = 0
 script = ExtResource("1_04wps")
 
-[node name="CollisionShape" type="CollisionShape2D" parent="." unique_id=1819296153]
-position = Vector2(0, -2)
-shape = SubResource("RectangleShape2D_pwa13")
+[node name="CollisionShape" type="CollisionShape3D" parent="." unique_id=100258195]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
+shape = SubResource("BoxShape3D_pwa13")
 
-[node name="PostPlaceholder" type="ColorRect" parent="." unique_id=306819264]
-offset_left = -1.0
-offset_top = -10.0
-offset_right = 1.0
-color = Color(0.4, 0.28, 0.16, 1)
+[node name="PostPlaceholder" type="MeshInstance3D" parent="." unique_id=970985249]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
+material_override = SubResource("StandardMaterial3D_vm7gd")
+mesh = SubResource("BoxMesh_yif46")
 
-[node name="BoardPlaceholder" type="ColorRect" parent="." unique_id=1488775160]
-offset_left = -8.0
-offset_top = -18.0
-offset_right = 8.0
-offset_bottom = -9.0
-color = Color(0.62, 0.48, 0.3, 1)
+[node name="BoardPlaceholder" type="MeshInstance3D" parent="." unique_id=703759567]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, 0)
+material_override = SubResource("StandardMaterial3D_xafeq")
+mesh = SubResource("BoxMesh_1c2y7")
 
-[node name="Interactable" type="Area2D" parent="." unique_id=1953884106]
+[node name="Interactable" type="Area3D" parent="." unique_id=15515337]
 collision_layer = 32
 collision_mask = 0
 script = ExtResource("2_h7jn2")
 
-[node name="CollisionShape" type="CollisionShape2D" parent="Interactable" unique_id=1420240168]
-position = Vector2(0, -8)
-shape = SubResource("RectangleShape2D_vm7gd")
+[node name="CollisionShape" type="CollisionShape3D" parent="Interactable" unique_id=474434018]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+shape = SubResource("BoxShape3D_lb062")

@@ -1,6 +1,6 @@
 class_name SignPost
-extends StaticBody2D
-## Placa (PROVISÓRIA: sem arte). Interagir mostra o texto no HUD.
+extends StaticBody3D
+## Placa (PROVISÓRIA: sem arte), 3D. Interagir mostra o texto no HUD.
 
 @export_multiline var message: String = ""
 

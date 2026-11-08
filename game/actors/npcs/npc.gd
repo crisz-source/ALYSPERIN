@@ -1,6 +1,6 @@
 class_name Npc
-extends StaticBody2D
-## Personagem não jogável (PROVISÓRIO: retângulo sem arte, sem nome definitivo).
+extends StaticBody3D
+## Personagem não jogável (PROVISÓRIO: cápsula sem arte, sem nome definitivo). 3D.
 ## Conversa com o jogador (E) e pode oferecer uma missão.
 ##
 ## Fluxo com missão: oferece ("!") -> sem marcador enquanto a etapa está em
@@ -16,7 +16,7 @@ extends StaticBody2D
 var _last_player: Player = null
 
 @onready var _interactable: Interactable = $Interactable
-@onready var _marker: Label = $QuestMarker
+@onready var _marker: Label3D = $QuestMarker
 
 
 func _ready() -> void:
