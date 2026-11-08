@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://game/items/item_data.gd" id="1_wfd3p"]
+
+[resource]
+script = ExtResource("1_wfd3p")
+id = &"sprouted_heart"
+display_name = "Coração Germinado"
+description = "Raro. Pulsa como se ainda estivesse vivo."
+icon_color = Color(1, 0.3, 0.35, 1)
+max_stack = 99

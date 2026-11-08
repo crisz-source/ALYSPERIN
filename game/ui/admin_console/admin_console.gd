@@ -6,7 +6,7 @@ extends CanvasLayer
 ## Comandos:
 ##   /add players N  -> N aliados de teste (feridos) perto do jogador
 ##   /add mob N      -> N monstros em volta do jogador
-##   /boss           -> chama o chefe (quando existir)
+##   /boss           -> chama Khar'Vesh, a Mãe-Raiz, à frente do jogador
 ##   /efeito NOME    -> efeito de status nos monstros próximos (com "eu": em você)
 ##   /help           -> lista os comandos
 
@@ -87,7 +87,8 @@ func execute(command: String) -> String:
 	elif parts[0] == "/help":
 		reply = HELP_TEXT
 	elif parts[0] == "/boss":
-		reply = "Nenhum chefe implementado ainda. (Quando Khar'Vesh existir, /boss o chamará.)"
+		var boss: KharVesh = _area.spawn_boss_near_player()
+		reply = "%s apareceu!" % KharVesh.DISPLAY_NAME if boss else "Já existe um chefe em luta."
 	elif parts[0] == "/efeito":
 		reply = _apply_effect(parts)
 	elif parts[0] == "/add" and parts.size() >= 2 and (parts[1] == "players" or parts[1] == "player" or parts[1] == "mob" or parts[1] == "mobs"):
@@ -125,9 +126,11 @@ func _apply_effect(parts: PackedStringArray) -> String:
 		return "Efeito %s em você por %d s." % [parts[1], int(spec[1])]
 	var count: int = 0
 	for node: Node in _area.get_tree().get_nodes_in_group(BasicEnemy.GROUP):
-		var enemy := node as BasicEnemy
-		if enemy and not enemy.health.is_dead and enemy.global_position.distance_to(player.global_position) <= EFFECT_RADIUS:
-			enemy.status.apply(spec[0], spec[1], spec[2], player)
+		var enemy := node as Node3D
+		var fx: StatusEffects = enemy.get("status") if enemy else null
+		var hp: HealthComponent = enemy.get("health") if enemy else null
+		if fx and hp and not hp.is_dead and enemy.global_position.distance_to(player.global_position) <= EFFECT_RADIUS:
+			fx.apply(spec[0], spec[1], spec[2], player)
 			count += 1
 	return "Efeito %s em %d monstro(s) a até %d m." % [parts[1], count, int(EFFECT_RADIUS)]
 

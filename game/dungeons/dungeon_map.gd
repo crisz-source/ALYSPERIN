@@ -29,6 +29,10 @@ const PUDDLE_RADIUS: float = 2.2
 var data: DungeonData
 ## Pedido de saída (portal usado).
 signal exit_requested(by: Player)
+## O jogador passou pela entrada da arena do chefe (uma vez só).
+signal boss_arena_entered
+
+var _arena_triggered: bool = false
 
 
 func _ready() -> void:
@@ -40,6 +44,7 @@ func _ready() -> void:
 	for spot: Vector3 in PUDDLE_SPOTS:
 		_build_puddle(spot)
 	_build_exit_portal(Vector3(0, 0, 4.5))
+	_build_arena_trigger(Vector3(0, 1.5, -45.5))
 	var light := OmniLight3D.new()
 	light.position = Vector3(0, 6, -26)
 	light.omni_range = 60.0
@@ -138,6 +143,26 @@ func _build_puddle(spot: Vector3) -> void:
 	mesh.position = spot + Vector3(0, 0.02, 0)
 	mesh.add_to_group(PUDDLE_GROUP)
 	add_child(mesh)
+
+
+## Faixa invisível no fim do corredor: ao passar, o chefe aparece.
+func _build_arena_trigger(pos: Vector3) -> void:
+	var area := Area3D.new()
+	area.name = "BossArenaTrigger"
+	area.collision_layer = 0
+	area.collision_mask = 2  # jogador
+	area.monitorable = false
+	area.position = pos
+	var shape := CollisionShape3D.new()
+	var box := BoxShape3D.new()
+	box.size = Vector3(DOOR_WIDTH, 3.0, 1.0)
+	shape.shape = box
+	area.add_child(shape)
+	area.body_entered.connect(func(body: Node3D) -> void:
+		if body is Player and not _arena_triggered:
+			_arena_triggered = true
+			boss_arena_entered.emit())
+	add_child(area)
 
 
 func _build_exit_portal(pos: Vector3) -> void:

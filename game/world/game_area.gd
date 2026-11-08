@@ -97,6 +97,7 @@ func enter_dungeon(data: DungeonData) -> String:
 	add_child(current_dungeon)
 	current_dungeon.global_position = DUNGEON_ORIGIN
 	current_dungeon.exit_requested.connect(func(_by: Player) -> void: exit_dungeon())
+	current_dungeon.boss_arena_entered.connect(func() -> void: spawn_boss(current_dungeon.boss_point()))
 	var scene: PackedScene = load(ENEMY_SCENE_PATH)
 	for i in current_dungeon.enemy_points().size():
 		var enemy: BasicEnemy = scene.instantiate()
@@ -135,6 +136,22 @@ func exit_dungeon() -> void:
 	player.global_position = _return_point
 	player.velocity = Vector3.ZERO
 	player.message_requested.emit("Você saiu da masmorra.")
+
+
+## Cria Khar'Vesh em `at` (um chefe por vez). Devolve null se já houver um.
+func spawn_boss(at: Vector3) -> KharVesh:
+	if not get_tree().get_nodes_in_group(KharVesh.GROUP).is_empty():
+		return null
+	var boss := KharVesh.new()
+	boss.name = "KharVesh"
+	entities.add_child(boss)
+	boss.global_position = at
+	return boss
+
+
+## /boss: chefe a 10 m à frente do jogador (ponto livre de paredes).
+func spawn_boss_near_player() -> KharVesh:
+	return spawn_boss(_free_spot_near_player(10.0, 0, 1))
 
 
 func continue_after_death() -> void:

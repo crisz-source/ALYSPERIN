@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://game/items/item_data.gd" id="1_ixacl"]
+
+[resource]
+script = ExtResource("1_ixacl")
+id = &"living_branch"
+display_name = "Galho Vivo"
+description = "Galho-chicote que ainda se mexe."
+icon_color = Color(0.4, 0.28, 0.15, 1)
+max_stack = 99

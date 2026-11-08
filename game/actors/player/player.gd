@@ -1222,9 +1222,9 @@ func _on_sword_hit(target: Hurtbox) -> void:
 	# Golpe de escudo usa a mesma área de golpe: atordoa e não gasta a arma.
 	var bash := _active_ability as ShieldBashData
 	if state == State.ABILITY and bash:
-		var enemy := target.owner as BasicEnemy
-		if enemy:
-			enemy.apply_stun(bash.stun_time)
+		var actor: Node = _actor_with(target, &"apply_stun")
+		if actor:
+			actor.call("apply_stun", bash.stun_time)
 		Hitstop.request(hitstop_hit)
 		return
 	if equipment.weapon:
@@ -1345,6 +1345,13 @@ func _cast_support(s: SupportSpellData) -> void:
 
 # --- Auxiliares ------------------------------------------------------------
 
+## Sobe a árvore a partir de `node` até achar quem tem o método (ex.: a parte
+## atingida -> o chefe dono dela). Funciona com cenas e com corpos montados por código.
+static func _actor_with(node: Node, method: StringName) -> Node:
+	while node and not node.has_method(method):
+		node = node.get_parent()
+	return node
+
 ## Escolhe o objeto usável mais próximo dentro do alcance e posiciona o aviso.
 func _update_focus() -> void:
 	var best: Interactable = null
@@ -1378,10 +1385,12 @@ func _apply_damage_modifiers(info: DamageInfo) -> void:
 ## Provocar: inimigos vivos no raio passam a atacar este jogador.
 func _do_taunt(taunt: TauntData) -> void:
 	var count := 0
+	# Qualquer inimigo que saiba ser provocado (monstros comuns e chefes).
 	for node: Node in get_tree().get_nodes_in_group(BasicEnemy.GROUP):
-		var enemy := node as BasicEnemy
-		if enemy and not enemy.health.is_dead and enemy.global_position.distance_to(global_position) <= taunt.radius:
-			enemy.apply_taunt(self, taunt.taunt_time)
+		var enemy := node as Node3D
+		var hp: HealthComponent = enemy.get("health") if enemy else null
+		if hp and not hp.is_dead and enemy.has_method("apply_taunt") and enemy.global_position.distance_to(global_position) <= taunt.radius:
+			enemy.call("apply_taunt", self, taunt.taunt_time)
 			count += 1
 	FloatingText.spawn(self, "Provocou %d" % count if count > 0 else "Ninguém por perto", global_position + Vector3.UP * TEXT_HEIGHT, Color(1.0, 0.6, 0.3))
 

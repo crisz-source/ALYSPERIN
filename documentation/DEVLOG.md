@@ -97,6 +97,13 @@ conhecidos. Detalhes técnicos de cada etapa ficam em `documentation/worklog/`.
 - [x] 173 verificações automáticas passando
 - Ver `documentation/worklog/2026-11-07-migracao-3d.md`
 
+### Gear Score, masmorra Ruínas Esquecidas e chefe Khar'Vesh
+- [x] GS nos itens e no personagem, escala de dano, óleos de arma (fogo/gelo/raio)
+- [x] Portal (nível 20, GS 300), masmorra com Dungeon Sync (nível 24, GS 300), saída
+- [x] Khar'Vesh: partes destrutíveis, fases, Fúria 70/50/20, ataques com aviso, Molhada, materiais; `/boss`
+- [x] Menu P: ir para o nível 20; equipamento GS 320 + óleos
+- Ver `documentation/worklog/2026-11-08-gs-masmorra-chefe.md`
+
 ### Efeitos de status e habilidades de nível alto
 - [x] Lento, congelar, queimar, veneno, atordoar, medo, provocar (+ Postura, Protegido, Inabalável)
 - [x] 8 habilidades de nível alto do Guardião e do Devoto; revive solo do Devoto
@@ -136,6 +143,7 @@ conhecidos. Detalhes técnicos de cada etapa ficam em `documentation/worklog/`.
 - `test_arena.tscn`: chão quadriculado desenhado por código, paredes e pilares em
   `ColorRect`, texto de ajuda — no lugar de tilemap/arte reais.
 - Animação por código (`PlayerAnimator`) no lugar de animações de verdade; corpo do personagem continua cápsula.
+- Masmorra (`DungeonMap`) e Khar'Vesh montados por código com formas simples; números ⚑ provisórios.
 - `player.tscn`: corpo azul (`BodyPlaceholder`), seta amarela (`FacingIndicator`) e
   arco claro do golpe (`SwingPlaceholder`) no lugar de sprites/efeitos.
 - `basic_enemy.tscn`: inimigo inteiro é provisório (quadrado vermelho, sem nome nem

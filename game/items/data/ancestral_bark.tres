@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://game/items/item_data.gd" id="1_mhqos"]
+
+[resource]
+script = ExtResource("1_mhqos")
+id = &"ancestral_bark"
+display_name = "Casca Ancestral"
+description = "Casca negra com veios vermelhos."
+icon_color = Color(0.15, 0.1, 0.08, 1)
+max_stack = 99
