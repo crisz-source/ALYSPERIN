@@ -796,7 +796,9 @@ func _apply_growth() -> void:
 
 func _on_leveled_up(new_level: int) -> void:
 	_apply_growth()
-	FloatingText.spawn(self, "Nível %d!" % new_level, global_position + Vector3.UP * (TEXT_HEIGHT + 0.5), LEVEL_UP_COLOR)
+	FloatingText.spawn(self, "Nível %d!" % new_level, global_position + Vector3.UP * (TEXT_HEIGHT + 0.8), LEVEL_UP_COLOR)
+	# Filho do modelo (que gira com o personagem): as asas ficam sempre nas costas.
+	_model.add_child(LevelUpEffect.new())
 
 
 ## Movimento pedido (teclas) convertido para o mundo, relativo à câmera:

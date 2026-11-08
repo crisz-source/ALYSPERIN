@@ -14,6 +14,10 @@ extends Node3D
 @export var max_pitch_degrees: float = 15.0
 ## Converte a força de tremida da versão 2D (pixels) para metros.
 @export var shake_scale: float = 0.025
+## Distância da câmera (roda do mouse): mais perto / mais longe para ver o ambiente.
+@export var min_distance: float = 3.5
+@export var max_distance: float = 14.0
+@export var zoom_step: float = 1.0
 
 ## Quem a câmera segue; usado para saber se o jogador pode agir.
 var player: Player
@@ -21,9 +25,16 @@ var _manual_release: bool = false
 var _shake_strength: float = 0.0
 var _shake_time_left: float = 0.0
 var _shake_duration: float = 0.0
+## Distância desejada; o braço chega nela suavemente.
+var target_distance: float = 6.5
 
 @onready var _pitch: Node3D = $Pitch
 @onready var camera: Camera3D = $Pitch/SpringArm/Camera
+@onready var _arm: SpringArm3D = $Pitch/SpringArm
+
+
+func _ready() -> void:
+	target_distance = _arm.spring_length
 
 
 ## Para frente da câmera, no chão (sem inclinação): direção dos golpes.
@@ -66,6 +77,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		rotate_y(-motion.relative.x * mouse_sensitivity)
 		_pitch.rotation.x = clampf(_pitch.rotation.x - motion.relative.y * mouse_sensitivity,
 			deg_to_rad(min_pitch_degrees), deg_to_rad(max_pitch_degrees))
+	elif event is InputEventMouseButton and (event as InputEventMouseButton).pressed \
+			and ((event as InputEventMouseButton).button_index == MOUSE_BUTTON_WHEEL_UP
+			or (event as InputEventMouseButton).button_index == MOUSE_BUTTON_WHEEL_DOWN):
+		zoom((event as InputEventMouseButton).button_index == MOUSE_BUTTON_WHEEL_DOWN)
 	elif event.is_action_pressed("pause"):
 		_manual_release = not _manual_release
 	elif event is InputEventMouseButton and (event as InputEventMouseButton).pressed and _manual_release:
@@ -73,7 +88,13 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 
 
+## Afasta (true) ou aproxima (false) um passo.
+func zoom(out: bool) -> void:
+	target_distance = clampf(target_distance + (zoom_step if out else -zoom_step), min_distance, max_distance)
+
+
 func _process(delta: float) -> void:
+	_arm.spring_length = move_toward(_arm.spring_length, target_distance, 12.0 * delta)
 	var wants_capture: bool = _can_control() and not _manual_release
 	var mode: Input.MouseMode = Input.MOUSE_MODE_CAPTURED if wants_capture else Input.MOUSE_MODE_VISIBLE
 	if Input.mouse_mode != mode and DisplayServer.get_name() != "headless":

@@ -1,7 +1,7 @@
 class_name Hud
 extends CanvasLayer
 ## HUD provisório: barra de vida do jogador, nível, experiência, habilidades,
-## texto de ajuda e caixa de mensagem (placas, portas...).
+## mira, FPS/ping/hora, texto de ajuda e caixa de mensagem (placas, portas...).
 ##
 ## Só escuta sinais do jogador; não decide nada do jogo. A morte tem tela
 ## própria (DeathScreen), controlada pela área.
@@ -16,17 +16,29 @@ const SLOT: float = 20.0
 const SLOT_GAP: float = 2.0
 const EMPTY_SLOT_COLOR := Color(0.1, 0.1, 0.13, 0.75)
 ## Topo de cada fileira (tela 640x360): F1-F12 em cima, 1-9 embaixo.
-const ROW_F_Y: float = 314.0
-const ROW_NUMBERS_Y: float = 337.0
+const ROW_F_Y: float = 310.0
+const ROW_NUMBERS_Y: float = 332.0
+## Barra de experiência: faixa por toda a largura, abaixo da barra de habilidades.
+const XP_BAR_RECT := Rect2(0, 355, 640, 5)
+## Distância máxima em que a mira reconhece um inimigo (m).
+const CROSSHAIR_RANGE: float = 40.0
+## Camadas que o raio da mira enxerga: mundo (bloqueia) e inimigos.
+const CROSSHAIR_MASK: int = 1 | 4
+## Ping: sem servidor ainda (co-op é a Fase 7) -> mostra "--".
+const PING_PLACEHOLDER := "--"
 
 var _message_time_left: float = 0.0
 var _player: Player
+var _crosshair: Crosshair
+var _stats_label: Label
+var _stats_clock: float = 0.0
 
 @onready var _health_fill: ColorRect = $PlayerHealth/Fill
 @onready var _help_label: Label = $HelpPlaceholder
 @onready var _message_box: Control = $MessageBox
 @onready var _message_label: Label = $MessageBox/Text
 @onready var _level_label: Label = $LevelLabel
+@onready var _xp_bar: ColorRect = $XpBar
 @onready var _xp_fill: ColorRect = $XpBar/Fill
 @onready var _ability_bar: Control = $AbilityBar
 @onready var _mana_fill: ColorRect = $PlayerMana/Fill
@@ -36,6 +48,26 @@ var _player: Player
 func _ready() -> void:
 	_help_label.text = help_text
 	_message_box.visible = false
+	# Layout definido aqui (e não na cena) para estas peças acompanharem a barra
+	# de habilidades e a resolução 640x360.
+	_xp_bar.position = XP_BAR_RECT.position
+	_xp_bar.size = XP_BAR_RECT.size
+	_xp_fill.size = XP_BAR_RECT.size
+	_crosshair = Crosshair.new()
+	_crosshair.name = "Crosshair"
+	add_child(_crosshair)
+	_crosshair.position = Vector2(320, 180) - _crosshair.size / 2.0
+	_stats_label = Label.new()
+	_stats_label.name = "Stats"
+	_stats_label.position = Vector2(556, 316)
+	_stats_label.size = Vector2(80, 36)
+	_stats_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_stats_label.add_theme_font_size_override("font_size", 8)
+	_stats_label.add_theme_constant_override("outline_size", 2)
+	_stats_label.add_theme_color_override("font_outline_color", Color.BLACK)
+	_stats_label.add_theme_color_override("font_color", Color(0.85, 0.85, 0.9))
+	add_child(_stats_label)
+	_update_stats()
 
 
 func bind_player(player: Player) -> void:
@@ -70,6 +102,11 @@ func is_showing_message() -> bool:
 
 func _process(delta: float) -> void:
 	_update_ability_bar()
+	_update_crosshair()
+	_stats_clock -= delta
+	if _stats_clock <= 0.0:
+		_stats_clock = 0.5
+		_update_stats()
 	if _message_time_left <= 0.0:
 		return
 	_message_time_left -= delta
@@ -173,6 +210,34 @@ func _update_ability_bar() -> void:
 		shade.position.y = SLOT - shade.size.y
 
 
+## A mira fica vermelha se o centro da tela aponta para um inimigo (sem travar).
+## Escondida quando o jogador não pode agir (inventário, diálogo, morte).
+func _update_crosshair() -> void:
+	if _player == null:
+		return
+	_crosshair.visible = not _player.input_blocked and not _player.health.is_dead
+	_crosshair.targeted = _crosshair.visible and enemy_in_crosshair() != null
+
+
+## Inimigo no centro da tela (raio a partir da câmera; paredes bloqueiam), ou null.
+func enemy_in_crosshair() -> BasicEnemy:
+	var cam: Camera3D = _player.camera_rig().camera
+	var center: Vector2 = cam.get_viewport().get_visible_rect().size / 2.0
+	var from: Vector3 = cam.project_ray_origin(center)
+	var to: Vector3 = from + cam.project_ray_normal(center) * CROSSHAIR_RANGE
+	var query := PhysicsRayQueryParameters3D.create(from, to, CROSSHAIR_MASK)
+	query.exclude = [_player.get_rid()]
+	var hit: Dictionary = cam.get_world_3d().direct_space_state.intersect_ray(query)
+	var enemy := hit.get("collider") as BasicEnemy
+	return enemy if enemy and not enemy.health.is_dead else null
+
+
+## FPS, ping e hora no canto inferior direito.
+func _update_stats() -> void:
+	var now: Dictionary = Time.get_time_dict_from_system()
+	_stats_label.text = "FPS %d\nPing %s ms\n%02d:%02d" % [Engine.get_frames_per_second(), PING_PLACEHOLDER, now["hour"], now["minute"]]
+
+
 ## Canto superior direito: a primeira missão ativa e o progresso.
 func _update_quest_tracker() -> void:
 	var active: Array[QuestData] = _player.quest_log.active_quests()
@@ -196,7 +261,7 @@ func _on_mana_changed(current: int, maximum: int) -> void:
 
 func _on_xp_changed(xp: int, xp_to_next: int) -> void:
 	_level_label.text = "Nv %d" % _player.stats.level
-	_xp_fill.scale.x = float(xp) / float(xp_to_next)
+	_xp_fill.scale.x = 1.0 if _player.stats.is_max_level() else float(xp) / float(xp_to_next)
 
 
 func _on_player_health_changed(current: int, maximum: int) -> void:
